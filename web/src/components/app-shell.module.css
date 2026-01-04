@@ -1,0 +1,129 @@
+.shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #f7f2ea 0%, #efe6d8 45%, #e9ddcf 100%);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  color: #1f1a16;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 24px;
+  border-right: 1px solid rgba(91, 74, 61, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.tagline {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #6b5d4f;
+  margin-top: -12px;
+}
+
+.nav {
+  display: grid;
+  gap: 10px;
+}
+
+.navLink,
+.navLinkActive {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  text-decoration: none;
+  color: #3a2f26;
+}
+
+.navLink:hover {
+  background: rgba(191, 168, 144, 0.25);
+}
+
+.navLinkActive {
+  background: rgba(191, 168, 144, 0.45);
+  font-weight: 600;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+}
+
+.signIn {
+  background: #1f1a16;
+  color: #f7f2ea;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 32px 48px 48px;
+  gap: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.topbarLabel {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6b5d4f;
+}
+
+.content {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  padding: 32px;
+  border: 1px solid rgba(91, 74, 61, 0.15);
+  min-height: calc(100vh - 160px);
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid rgba(91, 74, 61, 0.2);
+  }
+
+  .nav {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 8px;
+  }
+
+  .main {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    padding: 20px;
+  }
+
+  .content {
+    padding: 24px;
+  }
+}

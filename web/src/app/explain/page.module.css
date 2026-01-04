@@ -1,22 +1,11 @@
 .page {
-  min-height: 100vh;
-  background: #f7f2ea;
-  color: #1f1a16;
-  font-family: var(--font-geist-sans);
-  padding: 40px 64px 80px;
+  display: grid;
+  gap: 24px;
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 8px;
-  margin-bottom: 32px;
-}
-
-.header a {
-  text-decoration: underline;
-  color: #1f1a16;
-  width: fit-content;
 }
 
 .form {
@@ -56,11 +45,10 @@
 
 .error {
   color: #8a3b2b;
-  margin-top: 16px;
 }
 
 .response {
-  margin-top: 32px;
+  margin-top: 8px;
   background: #fff;
   border-radius: 18px;
   padding: 24px;
@@ -98,10 +86,4 @@
   margin-top: 10px;
   color: #6b5d4f;
   font-size: 14px;
-}
-
-@media (max-width: 720px) {
-  .page {
-    padding: 32px 20px 56px;
-  }
 }

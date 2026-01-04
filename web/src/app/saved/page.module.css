@@ -1,22 +1,11 @@
 .page {
-  min-height: 100vh;
-  background: #f7f2ea;
-  color: #1f1a16;
-  font-family: var(--font-geist-sans);
-  padding: 40px 64px 80px;
+  display: grid;
+  gap: 24px;
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 8px;
-  margin-bottom: 32px;
-}
-
-.header a {
-  text-decoration: underline;
-  color: #1f1a16;
-  width: fit-content;
 }
 
 .list {
@@ -65,10 +54,4 @@
   padding: 10px 16px;
   font-size: 14px;
   cursor: pointer;
-}
-
-@media (max-width: 720px) {
-  .page {
-    padding: 32px 20px 56px;
-  }
 }

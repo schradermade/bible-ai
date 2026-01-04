@@ -26,3 +26,5 @@ out/
 
 # Prisma
 prisma/.env
+
+screenshots/

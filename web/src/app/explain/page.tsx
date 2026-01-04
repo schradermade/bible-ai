@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useAuth, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import Link from "next/link";
 import styles from "./page.module.css";
 
 type ExplainResponse = {
@@ -67,7 +66,6 @@ export default function ExplainPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/">Home</Link>
         <h1>Understand a passage</h1>
         <p>Ask for a calm, Scripture-first explanation.</p>
       </header>

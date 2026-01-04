@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import styles from "./page.module.css";
@@ -11,7 +10,6 @@ export default async function SavedPage() {
     return (
       <div className={styles.page}>
         <header className={styles.header}>
-          <Link href="/">Home</Link>
           <h1>Saved insights</h1>
         </header>
         <div className={styles.empty}>
@@ -30,7 +28,6 @@ export default async function SavedPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link href="/">Home</Link>
         <h1>Saved insights</h1>
       </header>
       <div className={styles.list}>
