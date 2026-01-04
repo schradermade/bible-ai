@@ -26,6 +26,24 @@ The product will launch as a web application before mobile.
 **Rationale**  
 Core features require long-form reading, reflection, and writing that are better suited to desktop environments. Mobile will be introduced later as a companion experience.
 
+### [2026-01-04] Initial Web Stack (Next.js + Postgres + Prisma)
+
+**Decision**  
+Use Next.js (App Router) for the web app, Postgres for the database, and Prisma as the ORM.
+
+**Rationale**  
+Fast iteration, a clean API boundary for future mobile clients, and a stable, widely supported stack.
+
+---
+
+### [2026-01-04] Hosted Auth Provider (Clerk)
+
+**Decision**  
+Use Clerk for authentication.
+
+**Rationale**  
+Reduce overhead and complexity for auth in V1 while keeping a clean upgrade path later.
+
 ---
 
 ## 3. Product Scope Decisions
@@ -47,6 +65,14 @@ AI will be a visible, central part of the product at launch.
 
 **Rationale**  
 Differentiation in a crowded Bible app market and the opportunity to introduce AI in a safe, meaningful context—especially for older users.
+
+### [2026-01-04] Scripture Source for V1 (WEB + KJV)
+
+**Decision**  
+Use World English Bible (WEB) and KJV for V1 Scripture text.
+
+**Rationale**  
+Both are public domain, enabling fast launch without licensing risk. Plan to add licensed translations later.
 
 ---
 
