@@ -26,28 +26,6 @@ function buildUserPrompt(reference: string, question?: string) {
   return lines.join("\n");
 }
 
-function fallbackResponse(reference: string): ExplainResponse {
-  return {
-    reference,
-    sections: [
-      {
-        title: "What the text clearly says",
-        content:
-          "This passage calls attention to God’s character and the meaning of faithfulness. It offers assurance and invites careful trust.",
-      },
-      {
-        title: "Context to consider",
-        content:
-          "Read the surrounding verses to see the flow of thought and the audience being addressed.",
-      },
-      {
-        title: "Reflection question",
-        content: "What part of this passage feels most relevant to you today?",
-      },
-    ],
-  };
-}
-
 export async function POST(request: Request) {
   const body = await request.json();
   const reference = typeof body.reference === "string" ? body.reference.trim() : "";
@@ -61,7 +39,10 @@ export async function POST(request: Request) {
   }
 
   if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json(fallbackResponse(reference));
+    return NextResponse.json(
+      { error: "ai_unavailable" },
+      { status: 503 }
+    );
   }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -85,6 +66,9 @@ export async function POST(request: Request) {
       sections: parsed.sections ?? [],
     });
   } catch {
-    return NextResponse.json(fallbackResponse(reference));
+    return NextResponse.json(
+      { error: "ai_invalid_response" },
+      { status: 502 }
+    );
   }
 }
