@@ -40,7 +40,12 @@ export default function ExplainPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Unable to generate explanation.");
+        const payload = await response.json().catch(() => null);
+        const message =
+          payload && typeof payload.message === "string"
+            ? payload.message
+            : "Unable to generate explanation.";
+        throw new Error(message);
       }
 
       const json = (await response.json()) as ExplainResponse;
@@ -191,29 +196,31 @@ export default function ExplainPage() {
                 <p className={styles.responseTag}>Response</p>
                 <h2>{data.reference}</h2>
               </div>
-              <div className={styles.sections}>
-                {data.sections.map((section) => (
-                  <div key={section.title} className={styles.sectionCard}>
-                    <h3>{section.title}</h3>
-                    <p>{section.content}</p>
-                  </div>
-                ))}
+              <div className={styles.responseBody}>
+                <div className={styles.sections}>
+                  {data.sections.map((section) => (
+                    <div key={section.title} className={styles.sectionCard}>
+                      <h3>{section.title}</h3>
+                      <p>{section.content}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.actions}>
+                  <SignedIn>
+                    <button type="button" onClick={handleSave}>
+                      {saved ? "Saved" : "Save insight"}
+                    </button>
+                  </SignedIn>
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button type="button">Sign in to save</button>
+                    </SignInButton>
+                  </SignedOut>
+                </div>
+                {isSignedIn ? null : (
+                  <p className={styles.helper}>Sign in to keep your insights.</p>
+                )}
               </div>
-              <div className={styles.actions}>
-                <SignedIn>
-                  <button type="button" onClick={handleSave}>
-                    {saved ? "Saved" : "Save insight"}
-                  </button>
-                </SignedIn>
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <button type="button">Sign in to save</button>
-                  </SignInButton>
-                </SignedOut>
-              </div>
-              {isSignedIn ? null : (
-                <p className={styles.helper}>Sign in to keep your insights.</p>
-              )}
             </div>
           )}
         </section>
