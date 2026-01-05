@@ -76,7 +76,8 @@ export async function POST(request: Request) {
   const attempt = async () => {
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: 0.3,
+      temperature: 0,
+      max_tokens: 600,
       response_format: {
         type: "json_schema",
         json_schema: {
@@ -117,12 +118,24 @@ export async function POST(request: Request) {
     if (!content) {
       throw new Error("AI response was empty.");
     }
-    const parsed = JSON.parse(content) as ExplainResponse;
-
-    return NextResponse.json({
-      reference: parsed.reference || reference,
-      sections: parsed.sections ?? [],
-    });
+    const raw = content.trim();
+    try {
+      const parsed = JSON.parse(raw) as ExplainResponse;
+      return NextResponse.json({
+        reference: parsed.reference || reference,
+        sections: parsed.sections ?? [],
+      });
+    } catch {
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) {
+        throw new Error("AI response was not valid JSON.");
+      }
+      const parsed = JSON.parse(match[0]) as ExplainResponse;
+      return NextResponse.json({
+        reference: parsed.reference || reference,
+        sections: parsed.sections ?? [],
+      });
+    }
   };
 
   try {
