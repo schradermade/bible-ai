@@ -18,6 +18,14 @@ export default function ExplainPage() {
   const [data, setData] = useState<ExplainResponse | null>(null);
   const [saved, setSaved] = useState(false);
 
+  const applyReference = (value: string) => {
+    setReference(value);
+  };
+
+  const applyQuestion = (value: string) => {
+    setQuestion(value);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -66,65 +74,152 @@ export default function ExplainPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Understand a passage</h1>
-        <p>Ask for a calm, Scripture-first explanation.</p>
+        <div>
+          <p className={styles.eyebrow}>AI-guided explanation</p>
+          <h1>Understand a passage</h1>
+          <p>
+            Choose a passage, set the lens, and receive a calm, Scripture-first
+            response.
+          </p>
+        </div>
+        <div className={styles.statusPill}>
+          <span>Scripture-first</span>
+          <span>Non-prescriptive</span>
+        </div>
       </header>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <label>
-          Passage reference
-          <input
-            type="text"
-            value={reference}
-            onChange={(event) => setReference(event.target.value)}
-            placeholder="Romans 8:1"
-            required
-          />
-        </label>
-        <label>
-          Optional question
-          <textarea
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            placeholder="What does this mean for daily life?"
-            rows={3}
-          />
-        </label>
-        <button type="submit" disabled={loading}>
-          {loading ? "Explaining..." : "Explain this"}
-        </button>
-      </form>
+      <div className={styles.layout}>
+        <form className={styles.composer} onSubmit={handleSubmit}>
+          <div className={styles.fieldBlock}>
+            <div className={styles.fieldHeader}>
+              <h2>Passage</h2>
+              <p>Start with a verse, chapter, or range.</p>
+            </div>
+            <div className={styles.inputWrap}>
+              <input
+                type="text"
+                value={reference}
+                onChange={(event) => setReference(event.target.value)}
+                placeholder="Romans 8:1–4"
+                aria-label="Passage reference"
+                required
+              />
+            </div>
+            <div className={styles.chips}>
+              {["Psalm 23", "John 15:1-8", "Romans 8:1-4"].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={styles.chip}
+                  onClick={() => applyReference(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+          <div className={styles.fieldBlock}>
+            <div className={styles.fieldHeader}>
+              <h2>Focus</h2>
+              <p>Tell the AI what you want to understand most.</p>
+            </div>
+            <div className={styles.textareaWrap}>
+              <textarea
+                value={question}
+                onChange={(event) => setQuestion(event.target.value)}
+                placeholder="Example: What does this mean for daily life?"
+                rows={4}
+                aria-label="Focus question"
+              />
+            </div>
+            <div className={styles.chips}>
+              {[
+                "Explain the plain meaning.",
+                "Give historical context.",
+                "How do Christians differ here?",
+              ].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={styles.chip}
+                  onClick={() => applyQuestion(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {data ? (
-        <section className={styles.response}>
-          <h2>{data.reference}</h2>
-          <div className={styles.sections}>
-            {data.sections.map((section) => (
-              <div key={section.title}>
-                <h3>{section.title}</h3>
-                <p>{section.content}</p>
+          <div className={styles.footer}>
+            <p className={styles.guardrail}>
+              The AI responds with Scripture, context, and reflection—never
+              directives.
+            </p>
+            <button type="submit" disabled={loading}>
+              {loading ? "Explaining..." : "Explain this"}
+            </button>
+          </div>
+        </form>
+
+        <section className={styles.responsePanel}>
+          {!data ? (
+            <div className={styles.emptyState}>
+              <p className={styles.emptyTitle}>Your response will appear here</p>
+              <p>
+                Ask about a passage and the AI will return a structured response
+                you can save and revisit.
+              </p>
+              <div className={styles.emptyGrid}>
+                <div>
+                  <h3>What the text clearly says</h3>
+                  <p>Short, grounded explanation.</p>
+                </div>
+                <div>
+                  <h3>Context to consider</h3>
+                  <p>Historical and literary context.</p>
+                </div>
+                <div>
+                  <h3>Reflection question</h3>
+                  <p>Invitational prompt to slow down.</p>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className={styles.actions}>
-            <SignedIn>
-              <button type="button" onClick={handleSave}>
-                {saved ? "Saved" : "Save insight"}
-              </button>
-            </SignedIn>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button type="button">Sign in to save</button>
-              </SignInButton>
-            </SignedOut>
-          </div>
-          {isSignedIn ? null : (
-            <p className={styles.helper}>Sign in to keep your insights.</p>
+            </div>
+          ) : (
+            <div className={styles.response}>
+              <div className={styles.responseHeader}>
+                <p className={styles.responseTag}>Response</p>
+                <h2>{data.reference}</h2>
+              </div>
+              <div className={styles.sections}>
+                {data.sections.map((section) => (
+                  <div key={section.title} className={styles.sectionCard}>
+                    <h3>{section.title}</h3>
+                    <p>{section.content}</p>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.actions}>
+                <SignedIn>
+                  <button type="button" onClick={handleSave}>
+                    {saved ? "Saved" : "Save insight"}
+                  </button>
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button type="button">Sign in to save</button>
+                  </SignInButton>
+                </SignedOut>
+              </div>
+              {isSignedIn ? null : (
+                <p className={styles.helper}>Sign in to keep your insights.</p>
+              )}
+            </div>
           )}
         </section>
-      ) : null}
+      </div>
+
+      {error ? <p className={styles.error}>{error}</p> : null}
     </div>
   );
 }

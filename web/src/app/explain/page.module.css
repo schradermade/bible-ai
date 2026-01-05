@@ -1,76 +1,240 @@
 .page {
   display: grid;
-  gap: 24px;
+  gap: 28px;
+  position: relative;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: -40px -40px auto auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(176, 123, 76, 0.2), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .header {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
-.form {
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header p {
+  margin: 8px 0 0;
+  color: #5a4d41;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 11px;
+  color: #6b5d4f;
+  margin: 0;
+}
+
+.statusPill {
   display: grid;
-  gap: 16px;
-  max-width: 520px;
-  background: #fff;
-  padding: 24px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 12px 16px;
   border-radius: 16px;
-  border: 1px solid #e7dccf;
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b5d4f;
 }
 
-.form label {
+.layout {
   display: grid;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.composer {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  box-shadow: 0 18px 30px rgba(31, 26, 22, 0.08);
+  animation: rise 0.6s ease-out;
+}
+
+.fieldBlock {
+  display: grid;
+  gap: 12px;
+}
+
+.fieldHeader h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.fieldHeader p {
+  margin: 4px 0 0;
+  color: #7a6a5c;
   font-size: 14px;
 }
 
-.form input,
-.form textarea {
-  border: 1px solid #d6c9bb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 16px;
-  font-family: inherit;
+.inputWrap,
+.textareaWrap {
+  background: #fdf9f3;
+  border-radius: 16px;
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  padding: 16px 18px;
 }
 
-.form button {
+.inputWrap input,
+.textareaWrap textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  font-family: inherit;
+  color: #1f1a16;
+  outline: none;
+}
+
+.textareaWrap textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: 1px solid rgba(176, 123, 76, 0.35);
+  background: #fff;
+  color: #5a4d41;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: rgba(176, 123, 76, 0.7);
+  color: #1f1a16;
+}
+
+.footer {
+  display: grid;
+  gap: 12px;
+}
+
+.guardrail {
+  margin: 0;
+  color: #7a6a5c;
+  font-size: 13px;
+}
+
+.composer button[type="submit"] {
+  justify-self: flex-start;
   background: #1f1a16;
   color: #f7f2ea;
   border: none;
   border-radius: 999px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   font-size: 14px;
   cursor: pointer;
 }
 
-.error {
-  color: #8a3b2b;
+.responsePanel {
+  position: relative;
+  z-index: 1;
+}
+
+.emptyState {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px dashed rgba(176, 123, 76, 0.4);
+  display: grid;
+  gap: 16px;
+  min-height: 420px;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 18px;
+}
+
+.emptyGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.emptyGrid h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.emptyGrid p {
+  margin: 0;
+  color: #7a6a5c;
 }
 
 .response {
-  margin-top: 8px;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 24px;
-  border: 1px solid #e7dccf;
-  max-width: 720px;
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  box-shadow: 0 16px 26px rgba(31, 26, 22, 0.08);
+  animation: rise 0.6s ease-out;
+}
+
+.responseHeader {
+  display: grid;
+  gap: 6px;
+}
+
+.responseTag {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  color: #7a6a5c;
+  margin: 0;
 }
 
 .sections {
   display: grid;
-  gap: 20px;
+  gap: 16px;
   margin-top: 16px;
+}
+
+.sectionCard {
+  background: #fdf9f3;
+  border-radius: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(176, 123, 76, 0.18);
 }
 
 .sections h3 {
   margin: 0 0 6px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .actions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 .actions button {
@@ -86,4 +250,30 @@
   margin-top: 10px;
   color: #6b5d4f;
   font-size: 14px;
+}
+
+.error {
+  color: #8a3b2b;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
