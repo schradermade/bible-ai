@@ -43,6 +43,16 @@
   margin: 0;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.title {
+  font-size: 73px;
+}
+
 .statusPill {
   display: grid;
   gap: 8px;

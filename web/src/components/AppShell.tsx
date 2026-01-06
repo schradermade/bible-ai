@@ -1,19 +1,61 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import styles from "./app-shell.module.css";
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import styles from './app-shell.module.css';
 
 type NavItem = {
   href: string;
   label: string;
+  icon: React.ReactNode;
 };
 
 const navItems: NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/explain", label: "Explain" },
-  { href: "/saved", label: "Saved" },
+  {
+    href: '/',
+    label: 'Home',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M3 11.5 12 4l9 7.5v7.5a1 1 0 0 1-1 1h-5.5V15a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v5H4a1 1 0 0 1-1-1z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: '/insight',
+    label: 'Insight',
+    icon: (
+      <Image
+        src="/insight.png"
+        alt=""
+        width={48}
+        height={48}
+        style={{ width: '48px', height: '48px' }}
+      />
+    ),
+  },
+  {
+    href: '/saved',
+    label: 'Saved',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M6.5 4.5h11a1 1 0 0 1 1 1v14.2a.8.8 0 0 1-1.3.6L12 16.8l-5.2 3.5a.8.8 0 0 1-1.3-.6V5.5a1 1 0 0 1 1-1z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -22,7 +64,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <div className={styles.brand}>Bible AI</div>
+        <div className={styles.brand}>Berea Study</div>
         <p className={styles.tagline}>Scripture-guided AI</p>
         <nav className={styles.nav}>
           {navItems.map((item) => (
@@ -33,6 +75,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 pathname === item.href ? styles.navLinkActive : styles.navLink
               }
             >
+              <span className={styles.navIcon}>{item.icon}</span>
               {item.label}
             </Link>
           ))}

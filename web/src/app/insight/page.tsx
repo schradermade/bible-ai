@@ -1,21 +1,22 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAuth, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import styles from "./page.module.css";
+import { useState } from 'react';
+import { useAuth, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import Image from 'next/image';
+import styles from './page.module.css';
 
-type ExplainResponse = {
+type InsightResponse = {
   reference: string;
   sections: { title: string; content: string }[];
 };
 
-export default function ExplainPage() {
+export default function InsightPage() {
   const { isSignedIn } = useAuth();
-  const [reference, setReference] = useState("");
-  const [question, setQuestion] = useState("");
+  const [reference, setReference] = useState('');
+  const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ExplainResponse | null>(null);
+  const [data, setData] = useState<InsightResponse | null>(null);
   const [saved, setSaved] = useState(false);
 
   const applyReference = (value: string) => {
@@ -33,25 +34,25 @@ export default function ExplainPage() {
     setSaved(false);
 
     try {
-      const response = await fetch("/api/ai/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/ai/insight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reference, question }),
       });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
         const message =
-          payload && typeof payload.message === "string"
+          payload && typeof payload.message === 'string'
             ? payload.message
-            : "Unable to generate explanation.";
+            : 'Unable to generate explanation.';
         throw new Error(message);
       }
 
-      const json = (await response.json()) as ExplainResponse;
+      const json = (await response.json()) as InsightResponse;
       setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -60,11 +61,11 @@ export default function ExplainPage() {
   const handleSave = async () => {
     if (!data) return;
 
-    const response = await fetch("/api/ai/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/ai/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        feature: "verse_explanation",
+        feature: 'verse_explanation',
         reference: data.reference,
         prompt: question,
         response: JSON.stringify(data),
@@ -80,8 +81,11 @@ export default function ExplainPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>AI-guided explanation</p>
-          <h1>Understand a passage</h1>
+          <div className={styles.titleRow}>
+            <Image src="/insight.png" alt="" width={200} height={200} />
+            <h1 className={styles.title}>Insights</h1>
+          </div>
+          <p className={styles.eyebrow}>AI-guided insight</p>
           <p>
             Choose a passage, set the lens, and receive a calm, Scripture-first
             response.
@@ -111,7 +115,7 @@ export default function ExplainPage() {
               />
             </div>
             <div className={styles.chips}>
-              {["Psalm 23", "John 15:1-8", "Romans 8:1-4"].map((item) => (
+              {['Psalm 23', 'John 15:1-8', 'Romans 8:1-4'].map((item) => (
                 <button
                   key={item}
                   type="button"
@@ -140,9 +144,9 @@ export default function ExplainPage() {
             </div>
             <div className={styles.chips}>
               {[
-                "Explain the plain meaning.",
-                "Give historical context.",
-                "How do Christians differ here?",
+                'Clarify the plain meaning.',
+                'Give historical context.',
+                'How do Christians differ here?',
               ].map((item) => (
                 <button
                   key={item}
@@ -162,7 +166,7 @@ export default function ExplainPage() {
               directives.
             </p>
             <button type="submit" disabled={loading}>
-              {loading ? "Explaining..." : "Explain this"}
+              {loading ? 'Working...' : 'Get insight'}
             </button>
           </div>
         </form>
@@ -170,7 +174,9 @@ export default function ExplainPage() {
         <section className={styles.responsePanel}>
           {!data ? (
             <div className={styles.emptyState}>
-              <p className={styles.emptyTitle}>Your response will appear here</p>
+              <p className={styles.emptyTitle}>
+                Your response will appear here
+              </p>
               <p>
                 Ask about a passage and the AI will return a structured response
                 you can save and revisit.
@@ -208,7 +214,7 @@ export default function ExplainPage() {
                 <div className={styles.actions}>
                   <SignedIn>
                     <button type="button" onClick={handleSave}>
-                      {saved ? "Saved" : "Save insight"}
+                      {saved ? 'Saved' : 'Save insight'}
                     </button>
                   </SignedIn>
                   <SignedOut>
@@ -218,7 +224,9 @@ export default function ExplainPage() {
                   </SignedOut>
                 </div>
                 {isSignedIn ? null : (
-                  <p className={styles.helper}>Sign in to keep your insights.</p>
+                  <p className={styles.helper}>
+                    Sign in to keep your insights.
+                  </p>
                 )}
               </div>
             </div>

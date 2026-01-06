@@ -42,6 +42,9 @@
   font-size: 15px;
   text-decoration: none;
   color: #3a2f26;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .navLink:hover {
@@ -51,6 +54,22 @@
 .navLinkActive {
   background: rgba(191, 168, 144, 0.45);
   font-weight: 600;
+}
+
+.navIcon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  color: #7a6a5c;
+}
+
+.navLinkActive .navIcon {
+  color: #1f1a16;
+}
+
+.navIcon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .sidebarFooter {

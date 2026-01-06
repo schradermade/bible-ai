@@ -1,5 +1,5 @@
-import Link from "next/link";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import styles from './page.module.css';
 
 export default function Home() {
   return (
@@ -15,8 +15,8 @@ export default function Home() {
             anchored in the text without being overwhelmed.
           </p>
           <div className={styles.actions}>
-            <Link className={styles.primary} href="/explain">
-              Understand a passage
+            <Link className={styles.primary} href="/insight">
+              Get insight on a passage
             </Link>
             <Link className={styles.secondary} href="/saved">
               View saved insights
@@ -38,10 +38,10 @@ export default function Home() {
           </div>
           <div className={styles.panelBody}>
             <div className={styles.panelCard}>
-              <h3>Understand a passage</h3>
+              <h3>Insight on a passage</h3>
               <p>Explain Scripture with context and careful reflection.</p>
-              <Link className={styles.panelLink} href="/explain">
-                Begin
+              <Link className={styles.panelLink} href="/insight">
+                Start
               </Link>
             </div>
             <div className={styles.panelCardDisabled}>
@@ -58,7 +58,7 @@ export default function Home() {
           <h2>What you get</h2>
           <ul className={styles.featureList}>
             <li>
-              <strong>Explain Scripture</strong> with context and clarity.
+              <strong>Scripture insight</strong> with context and clarity.
             </li>
             <li>
               <strong>Discern decisions</strong> with biblical principles.
@@ -80,7 +80,10 @@ export default function Home() {
           </div>
           <div className={styles.previewSection}>
             <h4>Reflection question</h4>
-            <p>Where do you still carry guilt that this passage invites you to release?</p>
+            <p>
+              Where do you still carry guilt that this passage invites you to
+              release?
+            </p>
           </div>
         </div>
       </section>
