@@ -82,8 +82,10 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
     return (
       <div className={styles.prophecyPreview}>
         <div className={styles.previewIcon}>📜</div>
-        <div className={styles.previewTitle}>Prophetic Word</div>
-        <div className={styles.previewSubtitle}>Past • Present • Future</div>
+        <div className={styles.previewContent}>
+          <div className={styles.previewLabel}>Prophetic Word</div>
+          <div className={styles.previewTitle}>Past, Present, Future</div>
+        </div>
       </div>
     );
   }

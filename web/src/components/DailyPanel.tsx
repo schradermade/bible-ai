@@ -71,7 +71,6 @@ export default function DailyPanel({ content, isPreview = false }: DailyPanelPro
         <div className={styles.previewIcon}>🙏</div>
         <div className={styles.previewContent}>
           <div className={styles.previewLabel}>Today's Devotional</div>
-          <div className={styles.previewScripture}>{displayContent.scripture.reference}</div>
           <div className={styles.previewTitle}>{displayContent.title}</div>
         </div>
       </div>
