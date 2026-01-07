@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './dashboard.module.css';
 import ContextualWidgets from './ContextualWidgets';
 import ChatInput from './ChatInput';
+import DailyPanel from './DailyPanel';
 
 type PanelType = 'insight' | 'life' | 'reflect' | 'daily' | null;
 
@@ -75,7 +76,7 @@ export default function Dashboard() {
                 )}
               </div>
               <div className={styles.panelContent}>
-                {/* Content will go here */}
+                {panel.id === 'daily' && <DailyPanel />}
               </div>
             </div>
           );
