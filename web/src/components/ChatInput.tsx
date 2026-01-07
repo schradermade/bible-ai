@@ -1,11 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './chat-input.module.css';
+
+const prompts = [
+  'What are you seeking today?',
+  'Bring your questions into the light.',
+  'What would you have revealed?',
+  'Search the Scriptures.',
+  'What is stirring your heart today?',
+  'Come, let us reason together.',
+];
 
 export default function ChatInput() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPromptIndex((prevIndex) => (prevIndex + 1) % prompts.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +41,13 @@ export default function ChatInput() {
 
   return (
     <div className={styles.chatInputContainer}>
+      <div className={styles.promptText}>
+        <span key={currentPromptIndex} className={styles.rotatingText}>
+          {prompts[currentPromptIndex]}
+        </span>
+        {' '}
+        <span className={styles.staticText}>Ask Berea AI.</span>
+      </div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputWrapper}>
           <input
