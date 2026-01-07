@@ -1,0 +1,219 @@
+.dashboard {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 200px);
+}
+
+/* Default Grid - 4 equal containers */
+.gridDefault {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 20px;
+  height: 100%;
+  min-height: 600px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Expanded Grid - one large, three small */
+.gridExpanded {
+  display: grid;
+  grid-template-columns: 4fr minmax(180px, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 16px;
+  height: 100%;
+  min-height: 600px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Panel Base Styles */
+.panel {
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 16px rgba(31, 26, 22, 0.08),
+    0 1px 3px rgba(31, 26, 22, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle at top right, rgba(176, 123, 76, 0.08), transparent 65%);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.panel:hover {
+  border-color: rgba(176, 123, 76, 0.35);
+  box-shadow:
+    0 6px 20px rgba(31, 26, 22, 0.12),
+    0 2px 6px rgba(31, 26, 22, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Expanded Panel - takes up main space */
+.panelExpanded {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  cursor: default;
+  border: 2px solid #b07b4c;
+  box-shadow:
+    0 8px 24px rgba(176, 123, 76, 0.2),
+    0 4px 12px rgba(176, 123, 76, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.panelExpanded:hover {
+  transform: none;
+}
+
+.panelExpanded::before {
+  opacity: 0.5;
+}
+
+/* Collapsed Panels - smaller thumbnails */
+.panelCollapsed {
+  grid-column: 2;
+  grid-row: auto;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 16px;
+}
+
+.panelCollapsed:hover {
+  opacity: 1;
+  border-color: rgba(176, 123, 76, 0.4);
+}
+
+.panelCollapsed .panelContent {
+  display: none;
+}
+
+/* Panel Header */
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f1a16;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.panelExpanded .panelTitle {
+  font-size: 32px;
+}
+
+.panelCollapsed .panelTitle {
+  font-size: 16px;
+}
+
+.panelCollapsed .panelHeader {
+  margin-bottom: 0;
+}
+
+/* Collapse Button */
+.collapseButton {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.08));
+  border: 1px solid rgba(176, 123, 76, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b5d4f;
+  box-shadow: 0 2px 6px rgba(31, 26, 22, 0.1);
+}
+
+.collapseButton:hover {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.25), rgba(176, 123, 76, 0.15));
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(31, 26, 22, 0.15);
+}
+
+/* Panel Content */
+.panelContent {
+  position: relative;
+  z-index: 1;
+  height: calc(100% - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b5d4f;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .gridDefault {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, minmax(200px, 1fr));
+    min-height: auto;
+  }
+
+  .gridExpanded {
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr repeat(3, 1fr);
+  }
+
+  .panelExpanded {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .panelCollapsed {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    min-height: auto;
+  }
+
+  .gridDefault,
+  .gridExpanded {
+    gap: 12px;
+    min-height: auto;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .panelTitle {
+    font-size: 20px;
+  }
+
+  .panelExpanded .panelTitle {
+    font-size: 26px;
+  }
+
+  .panelCollapsed .panelTitle {
+    font-size: 16px;
+  }
+}
