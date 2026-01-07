@@ -4,6 +4,20 @@
   color: #1f1a16;
 }
 
+.title {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: inherit;
+}
+
+.separator {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
 .loading,
 .error {
   display: flex;
