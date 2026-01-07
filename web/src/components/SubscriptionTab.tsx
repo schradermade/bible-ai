@@ -88,15 +88,12 @@ export default function SubscriptionTab() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Subscription</h2>
-        <div className={styles.statusBadge}>
-          {status.isActive ? (
-            <span className={styles.statusActive}>Plus Active</span>
-          ) : (
-            <span className={styles.statusFree}>Free Plan</span>
-          )}
-        </div>
+      <div className={styles.statusBadge}>
+        {status.isActive ? (
+          <span className={styles.statusActive}>Plus Active</span>
+        ) : (
+          <span className={styles.statusFree}>Free Plan</span>
+        )}
       </div>
 
       <div className={styles.section}>

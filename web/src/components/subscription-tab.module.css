@@ -1,10 +1,6 @@
 .container {
-  padding: 24px;
   display: grid;
   gap: 20px;
-  max-width: 560px;
-  margin: 0 auto;
-  min-height: 400px;
   color: #1f1a16;
 }
 
@@ -19,30 +15,10 @@
   text-align: center;
 }
 
-.error {
-  color: #a84b3a;
-}
-
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(176, 123, 76, 0.15);
-}
-
-.title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  color: #1f1a16;
-}
-
 .statusBadge {
   display: flex;
   align-items: center;
+  margin-bottom: 4px;
 }
 
 .statusActive,
@@ -526,15 +502,6 @@
 }
 
 @media (max-width: 640px) {
-  .container {
-    padding: 20px 16px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .usageHeader {
     flex-direction: column;
     align-items: flex-start;
