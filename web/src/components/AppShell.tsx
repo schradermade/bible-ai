@@ -70,32 +70,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <p className={styles.tagline}>Scripture-guided AI</p>
         </div>
 
-        <nav className={styles.nav}>
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                pathname === item.href ? styles.navLinkActive : styles.navLink
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
-          <SignedOut>
-            <Link
-              href="/sign-up"
-              className={
-                pathname.startsWith('/sign-up')
-                  ? styles.navLinkActive
-                  : styles.navLink
-              }
-            >
-              Signup
-            </Link>
-          </SignedOut>
-        </nav>
-
         <div className={styles.headerRight}>
           <SignedOut>
             <SignInButton mode="modal">

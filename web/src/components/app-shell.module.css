@@ -9,8 +9,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 32px;
-  padding: 20px 32px;
+  justify-content: space-between;
+  padding: 20px 40px;
   border-bottom: 1px solid rgba(91, 74, 61, 0.2);
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
@@ -109,25 +109,13 @@
   width: 100%;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .header {
-    flex-wrap: wrap;
-    gap: 20px;
     padding: 16px 20px;
-  }
-
-  .nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .headerRight {
-    margin-left: auto;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .header {
     padding: 16px;
   }
@@ -136,19 +124,11 @@
     padding: 20px 16px;
   }
 
-
-  .navIcon {
-    width: 32px;
-    height: 32px;
+  .brand {
+    font-size: 18px;
   }
 
-  .nav {
-    gap: 4px;
-  }
-
-  .navLink,
-  .navLinkActive {
-    padding: 8px 10px;
-    font-size: 14px;
+  .tagline {
+    font-size: 10px;
   }
 }
