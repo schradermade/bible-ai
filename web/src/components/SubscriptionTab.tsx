@@ -102,28 +102,68 @@ export default function SubscriptionTab() {
       <div className={styles.section}>
         <div className={styles.planCard}>
           <div className={styles.planHeader}>
-            <h3 className={styles.planTitle}>
-              {status.isActive ? 'Berea Study Plus' : 'Berea Study Free'}
-            </h3>
-            <div className={styles.planPrice}>
-              {status.isActive ? '$8/mo' : '$0'}
-            </div>
+            <h3 className={styles.planTitle}>Berea Study Free</h3>
+            <div className={styles.planPrice}>$0</div>
           </div>
           <ul className={styles.planFeatures}>
-            {status.isActive ? (
-              <>
-                <li>100 AI insights per month</li>
-                <li>Save and revisit every insight</li>
-                <li>Priority processing and support</li>
-              </>
-            ) : (
-              <>
-                <li>10 AI insights per month</li>
-                <li>Session-based responses</li>
-                <li>Community-grade support</li>
-              </>
-            )}
+            <li>10 AI insights per month</li>
+            <li>Session-based responses</li>
+            <li>Community-grade support</li>
           </ul>
+          {!status.isActive && (
+            <div className={styles.currentPlanBadge}>Current Plan</div>
+          )}
+        </div>
+
+        <div
+          className={
+            status.isActive ? styles.planCardActive : styles.planCardUpgrade
+          }
+          onClick={!status.isActive ? startCheckout : undefined}
+          role={!status.isActive ? 'button' : undefined}
+          tabIndex={!status.isActive ? 0 : undefined}
+          onKeyDown={
+            !status.isActive
+              ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    startCheckout();
+                  }
+                }
+              : undefined
+          }
+        >
+          <div className={styles.planHeader}>
+            <h3 className={styles.planTitle}>Berea Study Plus</h3>
+            <div className={styles.planPrice}>$8/mo</div>
+          </div>
+          <ul className={styles.planFeatures}>
+            <li>100 AI insights per month</li>
+            <li>Save and revisit every insight</li>
+            <li>Priority processing and support</li>
+          </ul>
+          {status.isActive ? (
+            <div className={styles.currentPlanBadge}>Current Plan</div>
+          ) : (
+            <div className={styles.upgradePrompt}>
+              Click to upgrade
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 3L8 13M8 3L12 7M8 3L4 7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          )}
         </div>
       </div>
 
@@ -156,36 +196,29 @@ export default function SubscriptionTab() {
         </div>
       )}
 
-      <div className={styles.actions}>
-        {!status.isActive ? (
-          <button
-            type="button"
-            className={styles.primaryButton}
-            onClick={startCheckout}
-            disabled={actionLoading}
-          >
-            {actionLoading ? 'Redirecting...' : 'Upgrade to Plus'}
-          </button>
-        ) : status.cancelAtPeriodEnd ? (
-          <button
-            type="button"
-            className={styles.primaryButton}
-            onClick={() => updateSubscription('resume')}
-            disabled={actionLoading}
-          >
-            {actionLoading ? 'Working...' : 'Resume Subscription'}
-          </button>
-        ) : (
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={() => updateSubscription('cancel')}
-            disabled={actionLoading}
-          >
-            {actionLoading ? 'Working...' : 'Cancel Subscription'}
-          </button>
-        )}
-      </div>
+      {status.isActive && (
+        <div className={styles.actions}>
+          {status.cancelAtPeriodEnd ? (
+            <button
+              type="button"
+              className={styles.primaryButton}
+              onClick={() => updateSubscription('resume')}
+              disabled={actionLoading}
+            >
+              {actionLoading ? 'Working...' : 'Resume Subscription'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => updateSubscription('cancel')}
+              disabled={actionLoading}
+            >
+              {actionLoading ? 'Working...' : 'Cancel Subscription'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

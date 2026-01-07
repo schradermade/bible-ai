@@ -101,6 +101,113 @@
   pointer-events: none;
 }
 
+/* Plan Card Upgrade (Clickable) */
+.planCardUpgrade {
+  background: linear-gradient(145deg, #b07b4c 0%, #8d6239 100%);
+  border: 1px solid rgba(141, 98, 57, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 6px 20px rgba(176, 123, 76, 0.3),
+    0 2px 6px rgba(31, 26, 22, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #fff;
+}
+
+.planCardUpgrade::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.15), transparent 60%);
+  pointer-events: none;
+}
+
+.planCardUpgrade::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at bottom right, rgba(31, 26, 22, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+.planCardUpgrade:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 30px rgba(176, 123, 76, 0.4),
+    0 4px 10px rgba(31, 26, 22, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.planCardUpgrade:active {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 16px rgba(176, 123, 76, 0.35),
+    0 2px 6px rgba(31, 26, 22, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.planCardUpgrade .planTitle,
+.planCardUpgrade .planPrice,
+.planCardUpgrade .planFeatures {
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.planCardUpgrade .planFeatures li::before {
+  background: linear-gradient(135deg, #fff, #f7f2ea);
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
+}
+
+/* Plan Card Active (Current Plus Plan) */
+.planCardActive {
+  background: linear-gradient(145deg, #8d6239 0%, #6b5d4f 100%);
+  border: 1px solid rgba(107, 93, 79, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 4px 16px rgba(31, 26, 22, 0.2),
+    0 1px 3px rgba(31, 26, 22, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  color: #f7f2ea;
+}
+
+.planCardActive::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.08), transparent 60%);
+  pointer-events: none;
+}
+
+.planCardActive .planTitle,
+.planCardActive .planPrice,
+.planCardActive .planFeatures {
+  color: #f7f2ea;
+  position: relative;
+  z-index: 1;
+}
+
+.planCardActive .planFeatures li::before {
+  background: linear-gradient(135deg, #f7f2ea, #e7dccf);
+  box-shadow: 0 1px 2px rgba(247, 242, 234, 0.3);
+}
+
 .planHeader {
   display: flex;
   justify-content: space-between;
@@ -149,6 +256,83 @@
   background: linear-gradient(135deg, #b07b4c, #8d6239);
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(176, 123, 76, 0.4);
+}
+
+/* Current Plan Badge */
+.currentPlanBadge {
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.08));
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  text-align: center;
+  color: #6b5d4f;
+  box-shadow:
+    0 2px 6px rgba(31, 26, 22, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.planCardUpgrade .currentPlanBadge,
+.planCardActive .currentPlanBadge {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  box-shadow:
+    0 2px 6px rgba(31, 26, 22, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Upgrade Prompt */
+.upgradePrompt {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+  box-shadow:
+    0 2px 8px rgba(31, 26, 22, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+.planCardUpgrade:hover .upgradePrompt {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 10px rgba(31, 26, 22, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.upgradePrompt svg {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 /* Usage Card */
