@@ -64,9 +64,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>Berea Study</div>
-        <p className={styles.tagline}>Scripture-guided AI</p>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <div className={styles.brand}>Berea Study</div>
+          <p className={styles.tagline}>Scripture-guided AI</p>
+        </div>
+
         <nav className={styles.nav}>
           {navItems.map((item) => (
             <Link
@@ -110,7 +113,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </SignedOut>
         </nav>
-        <div className={styles.sidebarFooter}>
+
+        <div className={styles.headerRight}>
           <SignedOut>
             <SignInButton mode="modal">
               <button className={styles.signIn}>Sign in</button>
@@ -137,16 +141,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </UserButton>
           </SignedIn>
         </div>
-      </aside>
+      </header>
 
-      <div className={styles.main}>
-        <div className={styles.topbar}>
-          <span className={styles.topbarLabel}>
-            Calm, Scripture-first guidance
-          </span>
-        </div>
+      <main className={styles.main}>
         <div className={styles.content}>{children}</div>
-      </div>
+      </main>
     </div>
   );
 }
