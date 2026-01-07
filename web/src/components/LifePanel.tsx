@@ -28,6 +28,9 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
   const [headerVisible, setHeaderVisible] = useState(true);
   const [savedVerseIndex, setSavedVerseIndex] = useState<number | null>(null);
   const [hoveredVerseIndex, setHoveredVerseIndex] = useState<number | null>(null);
+  const [additionalVerses, setAdditionalVerses] = useState<Array<{ reference: string; text: string }>>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [newlyAddedIndices, setNewlyAddedIndices] = useState<Set<number>>(new Set());
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -51,6 +54,66 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
     panelElement.addEventListener('scroll', handleScroll, { passive: true });
     return () => panelElement.removeEventListener('scroll', handleScroll);
   }, [isPreview]);
+
+  // Pool of additional verses for searching
+  const additionalVersesPool = [
+    {
+      reference: '1 Peter 4:8',
+      text: 'Above all, love each other deeply, because love covers over a multitude of sins.',
+    },
+    {
+      reference: 'Philippians 2:3-4',
+      text: 'Do nothing out of selfish ambition or vain conceit. Rather, in humility value others above yourselves, not looking to your own interests but each of you to the interests of the others.',
+    },
+    {
+      reference: 'Hebrews 12:14',
+      text: 'Make every effort to live in peace with everyone and to be holy; without holiness no one will see the Lord.',
+    },
+    {
+      reference: '1 Corinthians 13:4-5',
+      text: 'Love is patient, love is kind. It does not envy, it does not boast, it is not proud. It does not dishonor others, it is not self-seeking, it is not easily angered, it keeps no record of wrongs.',
+    },
+    {
+      reference: 'Galatians 6:1',
+      text: 'Brothers and sisters, if someone is caught in a sin, you who live by the Spirit should restore that person gently. But watch yourselves, or you also may be tempted.',
+    },
+  ];
+
+  const handleSearchMore = () => {
+    setIsSearching(true);
+
+    // Simulate search delay
+    setTimeout(() => {
+      // Get 3-5 random verses from the pool that haven't been added yet
+      const availableVerses = additionalVersesPool.filter(
+        poolVerse => !additionalVerses.some(added => added.reference === poolVerse.reference)
+      );
+
+      const numberOfVersesToAdd = Math.min(
+        Math.floor(Math.random() * 3) + 3, // Random 3-5
+        availableVerses.length
+      );
+
+      const versesToAdd = availableVerses.slice(0, numberOfVersesToAdd);
+
+      // Calculate the starting index for new verses
+      const currentLength = (displayContent.biblicalPrinciples || []).length + additionalVerses.length;
+      const newIndices = new Set<number>();
+
+      for (let i = 0; i < versesToAdd.length; i++) {
+        newIndices.add(currentLength + i);
+      }
+
+      setAdditionalVerses([...additionalVerses, ...versesToAdd]);
+      setNewlyAddedIndices(newIndices);
+      setIsSearching(false);
+
+      // Remove highlight after 5 seconds
+      setTimeout(() => {
+        setNewlyAddedIndices(new Set());
+      }, 5000);
+    }, 800);
+  };
 
   // Default content for demonstration
   const defaultContent = {
@@ -88,6 +151,12 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
 
   const displayContent = content || defaultContent;
 
+  // Combine default verses with additional verses
+  const allBiblicalPrinciples = [
+    ...(displayContent.biblicalPrinciples || []),
+    ...additionalVerses,
+  ];
+
   if (isPreview) {
     return (
       <div className={styles.lifePreview}>
@@ -112,14 +181,14 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
         <p className={styles.situationText}>{displayContent.situation}</p>
       </div>
 
-      {displayContent.biblicalPrinciples && displayContent.biblicalPrinciples.length > 0 && (
+      {allBiblicalPrinciples && allBiblicalPrinciples.length > 0 && (
         <>
           <div className={styles.divider}></div>
 
           <div className={styles.contentSection}>
             <div className={styles.sectionLabel}>Biblical Principles</div>
-            {displayContent.biblicalPrinciples.map((principle, index) => (
-              <div key={index} className={`${styles.verseContainer} ${hoveredVerseIndex === index ? styles.verseHighlighted : ''}`}>
+            {allBiblicalPrinciples.map((principle, index) => (
+              <div key={index} className={`${styles.verseContainer} ${hoveredVerseIndex === index ? styles.verseHighlighted : ''} ${newlyAddedIndices.has(index) ? styles.verseNewlyAdded : ''}`}>
                 <div className={styles.verseWithButton}>
                   <div className={styles.verseContent}>
                     <div className={styles.scriptureReference}>{principle.reference}</div>
@@ -159,6 +228,35 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
                 </div>
               </div>
             ))}
+            <button
+              className={styles.searchMoreButton}
+              onClick={handleSearchMore}
+              disabled={isSearching || additionalVerses.length >= additionalVersesPool.length}
+            >
+              {isSearching ? (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="60" strokeDashoffset="40"/>
+                  </svg>
+                  Searching...
+                </>
+              ) : additionalVerses.length >= additionalVersesPool.length ? (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  All Relevant Passages Shown
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Search for More Relevant Passages
+                </>
+              )}
+            </button>
           </div>
         </>
       )}

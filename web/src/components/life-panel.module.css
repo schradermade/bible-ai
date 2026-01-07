@@ -236,6 +236,29 @@
   background: linear-gradient(145deg, rgba(176, 123, 76, 0.06), rgba(176, 123, 76, 0.04));
 }
 
+.verseNewlyAdded {
+  animation: fadeNewVerse 5s ease-in-out forwards;
+}
+
+@keyframes fadeNewVerse {
+  0% {
+    background: transparent;
+    box-shadow: none;
+  }
+  20% {
+    background: linear-gradient(145deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+    box-shadow: 0 2px 8px rgba(176, 123, 76, 0.15);
+  }
+  70% {
+    background: linear-gradient(145deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+    box-shadow: 0 2px 8px rgba(176, 123, 76, 0.15);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
 .verseWithButton {
   display: flex;
   gap: 12px;
@@ -288,6 +311,75 @@
 
 .saveVerseButton:hover svg {
   transform: scale(1.15);
+}
+
+/* Search More Button */
+.searchMoreButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.08), rgba(176, 123, 76, 0.05));
+  border: 1.5px solid rgba(176, 123, 76, 0.25);
+  border-radius: 10px;
+  color: #8b6239;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.08);
+}
+
+.searchMoreButton:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.1));
+  border-color: rgba(176, 123, 76, 0.4);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 98, 57, 0.15);
+}
+
+.searchMoreButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.12);
+}
+
+.searchMoreButton svg {
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchMoreButton:hover svg {
+  transform: scale(1.1);
+}
+
+.searchMoreButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.05);
+}
+
+.searchMoreButton:disabled:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.08), rgba(176, 123, 76, 0.05));
+  border-color: rgba(176, 123, 76, 0.25);
+  transform: none;
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.05);
+}
+
+.spinningIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Saved Toast Message */
@@ -514,6 +606,16 @@
   .saveVerseButton svg {
     width: 14px;
     height: 14px;
+  }
+
+  .searchMoreButton {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .searchMoreButton svg {
+    width: 16px;
+    height: 16px;
   }
 
   .previewIcon {
