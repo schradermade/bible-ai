@@ -67,15 +67,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.brandSection}>
-            <div>
-              <div className={styles.brand}>Berea Study</div>
-              <p className={styles.tagline}>Daily Scripture study with AI</p>
-            </div>
-            <div className={styles.trustBadge}>Scripture-First</div>
+            <div className={styles.brand}>Berea Study</div>
+            <p className={styles.tagline}>Daily Scripture study with AI</p>
           </div>
         </div>
 
-        <div className={styles.socialProof}>Join 2,000+ students</div>
+        <div className={styles.marketingBar}>
+          <div className={styles.trustBadge}>
+            <span className={styles.trustBadgeCheck}>✓</span>
+            <span>Scripture First, AI Supported</span>
+          </div>
+
+          <div className={styles.socialProof}>
+            <span className={styles.socialProofIcon}>✦</span>
+            <span>2,000+ daily students</span>
+          </div>
+
+          <div className={styles.freshBadge}>
+            <span className={styles.freshBadgeIcon}>☀</span>
+            <span>New Study Daily</span>
+          </div>
+        </div>
 
         <div className={styles.headerRight}>
           <SignedOut>

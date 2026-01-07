@@ -23,8 +23,8 @@
 
 .brandSection {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .brand {
@@ -56,59 +56,186 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   color: #6b5d4f;
-  margin: 6px 0 0;
+  margin: 0;
   opacity: 0.9;
 }
 
-/* Trust Badge */
+/* Marketing Bar - Unified Container */
+.marketingBar {
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 16px rgba(31, 26, 22, 0.15),
+    0 2px 8px rgba(31, 26, 22, 0.1);
+}
+
+/* Trust Badge - Section 1 */
 .trustBadge {
-  background: linear-gradient(135deg, #d4a574 0%, #b88a5a 100%);
-  border: 1px solid rgba(176, 123, 76, 0.6);
-  border-radius: 999px;
-  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2a5a4d 0%, #1e4239 50%, #2a5a4d 100%);
+  padding: 10px 16px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ffffff;
-  box-shadow:
-    0 4px 12px rgba(176, 123, 76, 0.4),
-    0 2px 6px rgba(176, 123, 76, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 0 16px rgba(212, 165, 116, 0.3);
+  color: #f0e6d2;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  animation: subtle-pulse 3s ease-in-out infinite;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  border-right: 2px solid rgba(255, 255, 255, 0.15);
 }
 
-@keyframes subtle-pulse {
+.trustBadge > span {
+  position: relative;
+  z-index: 2;
+}
+
+.trustBadgeCheck {
+  font-size: 14px;
+  font-weight: 900;
+  color: #8dc7a8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.trustBadge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: shimmer 60s infinite;
+  z-index: 0;
+}
+
+@keyframes shimmer {
   0%, 100% {
-    box-shadow:
-      0 4px 12px rgba(176, 123, 76, 0.4),
-      0 2px 6px rgba(176, 123, 76, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5),
-      0 0 16px rgba(212, 165, 116, 0.3);
+    left: -100%;
   }
   50% {
-    box-shadow:
-      0 4px 12px rgba(176, 123, 76, 0.5),
-      0 2px 6px rgba(176, 123, 76, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      0 0 24px rgba(212, 165, 116, 0.4);
+    left: 100%;
   }
 }
 
-/* Social Proof */
+/* Social Proof - Section 2 */
 .socialProof {
-  font-size: 14px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #d4a574 0%, #b88a5a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #d4a574 0%, #b88a5a 50%, #a07449 100%);
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff4e6;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(176, 123, 76, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  border-right: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.socialProof > span {
+  position: relative;
+  z-index: 2;
+}
+
+.socialProofIcon {
+  font-size: 12px;
+  color: #ffd699;
+  filter: drop-shadow(0 1px 2px rgba(255, 214, 153, 0.4));
+  animation: sparkle 60s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Fresh Badge - Section 3 */
+.freshBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #d4710a 0%, #b85c08 50%, #a04f07 100%);
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff4e6;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.freshBadge > span {
+  position: relative;
+  z-index: 2;
+}
+
+.freshBadge::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.15) 90deg,
+    transparent 180deg
+  );
+  animation: rotate 60s linear infinite;
+  z-index: 0;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.freshBadgeIcon {
+  font-size: 14px;
+  color: #ffd699;
+  filter: drop-shadow(0 1px 3px rgba(255, 214, 153, 0.5));
+  animation: pulse 60s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
 }
 
 /* CTA Pill */
@@ -214,7 +341,7 @@
 }
 
 @media (max-width: 1024px) {
-  .socialProof {
+  .marketingBar {
     display: none;
   }
 }
@@ -222,10 +349,6 @@
 @media (max-width: 768px) {
   .header {
     padding: 16px 20px;
-  }
-
-  .trustBadge {
-    display: none;
   }
 }
 
@@ -245,6 +368,5 @@
   .tagline {
     font-size: 10px;
     letter-spacing: 0.06em;
-    margin: 4px 0 0;
   }
 }
