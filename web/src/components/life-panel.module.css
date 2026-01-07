@@ -1,8 +1,8 @@
 /* Life Panel - Matching Prophecy Panel Structure */
 
 .lifePanel {
-  height: 100%;
-  overflow-y: auto;
+  height: auto;
+  overflow-y: visible;
   font-family: 'Georgia', 'Times New Roman', serif;
   padding: 0;
   display: flex;
@@ -14,20 +14,6 @@
   margin-bottom: -28px;
   width: calc(100% + 56px);
   position: relative;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0px,
-    black 60px,
-    black calc(100% - 60px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0px,
-    black 60px,
-    black calc(100% - 60px),
-    transparent 100%
-  );
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
 }
