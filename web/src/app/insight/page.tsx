@@ -34,7 +34,7 @@ export default function InsightPage() {
     setSaved(false);
 
     try {
-      const response = await fetch('/api/ai/insight', {
+      const response = await fetch('/api/ai/explain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reference, question }),
