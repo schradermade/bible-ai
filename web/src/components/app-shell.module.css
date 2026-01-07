@@ -25,6 +25,15 @@
 .headerLeft {
   display: flex;
   align-items: center;
+  flex: 1;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .brandSection {
@@ -449,12 +458,6 @@
 .navIcon svg {
   width: 100%;
   height: 100%;
-}
-
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: 14px;
 }
 
 .signIn {
