@@ -66,12 +66,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className={styles.shell}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <div className={styles.brand}>Berea Study</div>
-          <p className={styles.tagline}>Daily Scripture study with AI</p>
+          <div className={styles.brandSection}>
+            <div>
+              <div className={styles.brand}>Berea Study</div>
+              <p className={styles.tagline}>Daily Scripture study with AI</p>
+            </div>
+            <div className={styles.trustBadge}>Scripture-First</div>
+          </div>
         </div>
+
+        <div className={styles.socialProof}>Join 2,000+ students</div>
 
         <div className={styles.headerRight}>
           <SignedOut>
+            <Link href="/sign-up">
+              <div className={styles.ctaPill}>Free to start</div>
+            </Link>
             <SignInButton mode="modal">
               <button className={styles.signIn}>Sign in</button>
             </SignInButton>

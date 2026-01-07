@@ -18,8 +18,13 @@
 
 .headerLeft {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+}
+
+.brandSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .brand {
@@ -51,8 +56,88 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   color: #6b5d4f;
-  margin: 0;
+  margin: 6px 0 0;
   opacity: 0.9;
+}
+
+/* Trust Badge */
+.trustBadge {
+  background: linear-gradient(135deg, #d4a574 0%, #b88a5a 100%);
+  border: 1px solid rgba(176, 123, 76, 0.6);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffffff;
+  box-shadow:
+    0 4px 12px rgba(176, 123, 76, 0.4),
+    0 2px 6px rgba(176, 123, 76, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 16px rgba(212, 165, 116, 0.3);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 12px rgba(176, 123, 76, 0.4),
+      0 2px 6px rgba(176, 123, 76, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 0 16px rgba(212, 165, 116, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 12px rgba(176, 123, 76, 0.5),
+      0 2px 6px rgba(176, 123, 76, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 24px rgba(212, 165, 116, 0.4);
+  }
+}
+
+/* Social Proof */
+.socialProof {
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #d4a574 0%, #b88a5a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(176, 123, 76, 0.2);
+}
+
+/* CTA Pill */
+.ctaPill {
+  background: linear-gradient(135deg, #e8b36a 0%, #d4a574 50%, #b88a5a 100%);
+  border: 2px solid rgba(232, 179, 106, 0.6);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1f1a16;
+  box-shadow:
+    0 4px 16px rgba(232, 179, 106, 0.5),
+    0 2px 8px rgba(212, 165, 116, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ctaPill:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(232, 179, 106, 0.6),
+    0 3px 10px rgba(212, 165, 116, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.7);
 }
 
 .nav {
@@ -102,7 +187,7 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .signIn {
@@ -128,9 +213,19 @@
   width: 100%;
 }
 
+@media (max-width: 1024px) {
+  .socialProof {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 16px 20px;
+  }
+
+  .trustBadge {
+    display: none;
   }
 }
 
@@ -150,5 +245,6 @@
   .tagline {
     font-size: 10px;
     letter-spacing: 0.06em;
+    margin: 4px 0 0;
   }
 }
