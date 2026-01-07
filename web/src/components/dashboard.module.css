@@ -55,7 +55,7 @@
 .gridExpanded {
   display: grid;
   grid-template-columns: 4fr 220px;
-  grid-template-rows: 400px 400px 400px;
+  grid-template-rows: 800px 800px 800px;
   gap: 16px;
   height: auto;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
