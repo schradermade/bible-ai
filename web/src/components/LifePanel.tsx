@@ -27,6 +27,7 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
   const panelRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [savedVerseIndex, setSavedVerseIndex] = useState<number | null>(null);
+  const [hoveredVerseIndex, setHoveredVerseIndex] = useState<number | null>(null);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -118,12 +119,17 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
           <div className={styles.contentSection}>
             <div className={styles.sectionLabel}>Biblical Principles</div>
             {displayContent.biblicalPrinciples.map((principle, index) => (
-              <div key={index} className={styles.verseContainer}>
-                <div className={styles.verseHeader}>
-                  <div className={styles.scriptureReference}>{principle.reference}</div>
+              <div key={index} className={`${styles.verseContainer} ${hoveredVerseIndex === index ? styles.verseHighlighted : ''}`}>
+                <div className={styles.verseWithButton}>
+                  <div className={styles.verseContent}>
+                    <div className={styles.scriptureReference}>{principle.reference}</div>
+                    <p className={styles.scriptureText}>"{principle.text}"</p>
+                  </div>
                   <div style={{ position: 'relative' }}>
                     <button
                       className={styles.saveVerseButton}
+                      onMouseEnter={() => setHoveredVerseIndex(index)}
+                      onMouseLeave={() => setHoveredVerseIndex(null)}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (onSaveVerse) {
@@ -137,7 +143,7 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
                       }}
                       title="Save to My Verses"
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
@@ -151,7 +157,6 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
                     )}
                   </div>
                 </div>
-                <p className={styles.scriptureText}>"{principle.text}"</p>
               </div>
             ))}
           </div>
