@@ -119,17 +119,6 @@
   position: relative;
 }
 
-.prophecyTitle::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, #b07b4c 50%, transparent 100%);
-}
-
 .prophecySubtitle {
   font-size: 14px;
   font-weight: 500;

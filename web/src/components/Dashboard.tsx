@@ -6,6 +6,8 @@ import ContextualWidgets from './ContextualWidgets';
 import ChatInput from './ChatInput';
 import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
+import InsightPanel from './InsightPanel';
+import LifePanel from './LifePanel';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
 
@@ -51,10 +53,14 @@ export default function Dashboard() {
                   : isCollapsed
                   ? styles.panelCollapsed
                   : ''
-              } ${panel.id === 'prophecy' && isExpanded ? styles.prophecyExpanded : ''}`}
+              } ${
+                (panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && isExpanded
+                  ? styles.prophecyExpanded
+                  : ''
+              }`}
               onClick={() => handlePanelClick(panel.id)}
             >
-              {!(panel.id === 'prophecy' && isExpanded) && (
+              {!((panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && isExpanded) && (
                 <div className={styles.panelHeader}>
                   <h2 className={styles.panelTitle}>{panel.title}</h2>
                   {isExpanded && (
@@ -79,10 +85,14 @@ export default function Dashboard() {
                 </div>
               )}
               <div className={styles.panelContent}>
-                {panel.id === 'daily' && !isCollapsed && <DailyPanel />}
-                {panel.id === 'daily' && isCollapsed && <DailyPanel isPreview={true} />}
+                {panel.id === 'insight' && !isCollapsed && <InsightPanel />}
+                {panel.id === 'insight' && isCollapsed && <InsightPanel isPreview={true} />}
+                {panel.id === 'life' && !isCollapsed && <LifePanel />}
+                {panel.id === 'life' && isCollapsed && <LifePanel isPreview={true} />}
                 {panel.id === 'prophecy' && !isCollapsed && <ProphecyPanel />}
                 {panel.id === 'prophecy' && isCollapsed && <ProphecyPanel isPreview={true} />}
+                {panel.id === 'daily' && !isCollapsed && <DailyPanel />}
+                {panel.id === 'daily' && isCollapsed && <DailyPanel isPreview={true} />}
               </div>
             </div>
           );

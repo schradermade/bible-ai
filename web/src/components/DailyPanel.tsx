@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import styles from './daily-panel.module.css';
 
 interface DailyPanelProps {
@@ -18,6 +19,32 @@ interface DailyPanelProps {
 }
 
 export default function DailyPanel({ content, isPreview = false }: DailyPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const panelElement = panelRef.current;
+    if (!panelElement || isPreview) return;
+
+    const handleScroll = () => {
+      const currentScrollY = panelElement.scrollTop;
+
+      if (currentScrollY <= 5) {
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 20) {
+        setHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY.current) {
+        setHeaderVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    panelElement.addEventListener('scroll', handleScroll, { passive: true });
+    return () => panelElement.removeEventListener('scroll', handleScroll);
+  }, [isPreview]);
+
   // Default content for demonstration
   const defaultContent = {
     title: 'Finding Peace in the Storm',
@@ -52,31 +79,44 @@ export default function DailyPanel({ content, isPreview = false }: DailyPanelPro
   }
 
   return (
-    <div className={styles.dailyPanel}>
-      <div className={styles.header}>
+    <div ref={panelRef} className={styles.dailyPanel}>
+      <div className={`${styles.header} ${!headerVisible ? styles.headerHidden : ''}`}>
+        <h2 className={styles.panelTitle}>Daily</h2>
+        <div className={styles.panelSubtitle}>Today's Devotional Reflection</div>
+      </div>
+
+      <div className={styles.contentSection}>
         <div className={styles.datebadge}>{displayContent.date}</div>
         <h3 className={styles.title}>{displayContent.title}</h3>
       </div>
 
-      <div className={styles.scriptureSection}>
-        <div className={styles.scriptureLabel}>Today's Scripture</div>
+      <div className={styles.divider}></div>
+
+      <div className={styles.contentSection}>
+        <div className={styles.sectionLabel}>Today's Scripture</div>
         <div className={styles.scriptureReference}>{displayContent.scripture.reference}</div>
         <p className={styles.scriptureText}>"{displayContent.scripture.text}"</p>
       </div>
 
-      <div className={styles.reflectionSection}>
+      <div className={styles.divider}></div>
+
+      <div className={styles.contentSection}>
         <div className={styles.sectionLabel}>Reflection</div>
-        <p className={styles.reflectionText}>{displayContent.reflection}</p>
+        <p className={styles.sectionText}>{displayContent.reflection}</p>
       </div>
 
-      <div className={styles.prayerSection}>
+      <div className={styles.divider}></div>
+
+      <div className={styles.contentSection}>
         <div className={styles.sectionLabel}>Prayer</div>
-        <p className={styles.prayerText}>{displayContent.prayer}</p>
+        <p className={styles.sectionText}>{displayContent.prayer}</p>
       </div>
 
-      <div className={styles.actionSection}>
-        <div className={styles.actionLabel}>Today's Action Step</div>
-        <p className={styles.actionText}>{displayContent.actionStep}</p>
+      <div className={styles.divider}></div>
+
+      <div className={styles.contentSection}>
+        <div className={styles.sectionLabel}>Today's Action Step</div>
+        <p className={styles.sectionText}>{displayContent.actionStep}</p>
       </div>
     </div>
   );
