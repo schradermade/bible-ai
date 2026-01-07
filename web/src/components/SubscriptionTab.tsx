@@ -38,10 +38,23 @@ export default function SubscriptionTab() {
   const startCheckout = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch('/api/billing/checkout', { method: 'POST' });
-      const payload = await response.json();
-      if (payload?.url) {
-        window.location.href = payload.url;
+      // Use mock endpoint for testing in development
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+
+      if (isDevelopment) {
+        // Mock checkout - toggle subscription status
+        const response = await fetch('/api/billing/mock-toggle', { method: 'POST' });
+        if (response.ok) {
+          // Refresh status after mock toggle
+          await fetchBillingStatus();
+        }
+      } else {
+        // Real Stripe checkout
+        const response = await fetch('/api/billing/checkout', { method: 'POST' });
+        const payload = await response.json();
+        if (payload?.url) {
+          window.location.href = payload.url;
+        }
       }
     } finally {
       setActionLoading(false);
@@ -51,12 +64,21 @@ export default function SubscriptionTab() {
   const updateSubscription = async (action: 'cancel' | 'resume') => {
     setActionLoading(true);
     try {
-      await fetch('/api/billing/subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
-      });
-      await fetchBillingStatus();
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+
+      if (isDevelopment) {
+        // Mock cancel/resume - toggle subscription status
+        await fetch('/api/billing/mock-toggle', { method: 'POST' });
+        await fetchBillingStatus();
+      } else {
+        // Real Stripe cancel/resume
+        await fetch('/api/billing/subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action }),
+        });
+        await fetchBillingStatus();
+      }
     } finally {
       setActionLoading(false);
     }
