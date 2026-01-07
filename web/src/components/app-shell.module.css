@@ -291,6 +291,25 @@
   overflow-wrap: break-word;
 }
 
+.tooltipIcon {
+  display: inline-block;
+  font-size: 16px;
+  margin-right: 6px;
+  filter: brightness(0.7) saturate(1.5) drop-shadow(0 2px 4px rgba(139, 98, 57, 0.6));
+  animation: explosiveGlow 2s ease-in-out infinite;
+}
+
+@keyframes explosiveGlow {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(0.7) saturate(1.5) drop-shadow(0 2px 4px rgba(139, 98, 57, 0.6));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: brightness(0.8) saturate(1.5) drop-shadow(0 2px 6px rgba(139, 98, 57, 0.8));
+  }
+}
+
 .trustBadge:hover ~ .tooltipTrust,
 .socialProof:hover ~ .tooltipSocial,
 .freshBadge:hover ~ .tooltipFresh {

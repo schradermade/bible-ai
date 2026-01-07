@@ -89,13 +89,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className={`${styles.tooltip} ${styles.tooltipTrust}`}>
-            <p>Our AI assists your study but never replaces the primacy of Scripture. You lead, AI supports.</p>
+            <p><span className={styles.tooltipIcon}>✨</span> Our AI assists your study but never replaces the primacy of Scripture. You lead, AI supports.</p>
           </div>
           <div className={`${styles.tooltip} ${styles.tooltipSocial}`}>
-            <p>Join thousands of believers engaging with Scripture daily through thoughtful, AI-enhanced study.</p>
+            <p><span className={styles.tooltipIcon}>✨</span> Join thousands of believers engaging with Scripture daily through thoughtful, AI-enhanced study.</p>
           </div>
           <div className={`${styles.tooltip} ${styles.tooltipFresh}`}>
-            <p>Fresh insights and study materials added every day to deepen your understanding of God&apos;s Word.</p>
+            <p><span className={styles.tooltipIcon}>✨</span> Fresh insights and study materials added every day to deepen your understanding of God&apos;s Word.</p>
           </div>
         </div>
 
