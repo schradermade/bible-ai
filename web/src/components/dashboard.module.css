@@ -54,8 +54,8 @@
 /* Expanded Grid - one large, three small */
 .gridExpanded {
   display: grid;
-  grid-template-columns: 4fr 220px;
-  grid-template-rows: auto;
+  grid-template-columns: 1fr 220px;
+  grid-auto-rows: min-content;
   gap: 16px;
   height: auto;
   align-items: start;
@@ -135,10 +135,19 @@
   opacity: 0.5;
 }
 
+/* Collapsed Panels Container */
+.collapsedPanelsContainer {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
 /* Collapsed Panels - smaller thumbnails */
 .panelCollapsed {
-  grid-column: 2;
-  grid-row: auto;
   opacity: 0.7;
   cursor: pointer;
   padding: 16px;
@@ -269,16 +278,19 @@
 
   .gridExpanded {
     grid-template-columns: 1fr;
-    grid-template-rows: 2fr repeat(3, 1fr);
   }
 
   .panelExpanded {
     grid-column: 1;
-    grid-row: 1;
+  }
+
+  .collapsedPanelsContainer {
+    grid-column: 1;
+    position: static;
   }
 
   .panelCollapsed {
-    grid-column: 1;
+    width: 100%;
   }
 }
 

@@ -66,63 +66,101 @@ export default function Dashboard() {
           expandedPanel ? styles.gridExpanded : styles.gridDefault
         }
       >
-        {panels.map((panel) => {
-          const isExpanded = expandedPanel === panel.id;
-          const isCollapsed = expandedPanel && expandedPanel !== panel.id;
+        {expandedPanel ? (
+          <>
+            {/* Expanded Panel */}
+            {panels.map((panel) => {
+              const isExpanded = expandedPanel === panel.id;
+              if (!isExpanded) return null;
 
-          return (
+              return (
+                <div
+                  key={panel.id}
+                  className={`${styles.panel} ${styles.panelExpanded} ${
+                    (panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily')
+                      ? styles.prophecyExpanded
+                      : ''
+                  }`}
+                  onClick={() => handlePanelClick(panel.id)}
+                >
+                  {!(panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && (
+                    <div className={styles.panelHeader}>
+                      <h2 className={styles.panelTitle}>{panel.title}</h2>
+                      <button className={styles.collapseButton}>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M15 10H5M10 5L5 10L10 15"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  <div className={styles.panelContent}>
+                    {panel.id === 'insight' && <InsightPanel />}
+                    {panel.id === 'life' && <LifePanel onSaveVerse={addVerse} />}
+                    {panel.id === 'prophecy' && <ProphecyPanel />}
+                    {panel.id === 'daily' && <DailyPanel />}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Collapsed Panels Container */}
+            <div className={styles.collapsedPanelsContainer}>
+              {panels.map((panel) => {
+                const isCollapsed = expandedPanel && expandedPanel !== panel.id;
+                if (!isCollapsed) return null;
+
+                return (
+                  <div
+                    key={panel.id}
+                    className={`${styles.panel} ${styles.panelCollapsed}`}
+                    onClick={() => handlePanelClick(panel.id)}
+                  >
+                    <div className={styles.panelHeader}>
+                      <h2 className={styles.panelTitle}>{panel.title}</h2>
+                    </div>
+                    <div className={styles.panelContent}>
+                      {panel.id === 'insight' && <InsightPanel isPreview={true} />}
+                      {panel.id === 'life' && <LifePanel isPreview={true} />}
+                      {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
+                      {panel.id === 'daily' && <DailyPanel isPreview={true} />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          /* Default Grid - All Panels Equal Size */
+          panels.map((panel) => (
             <div
               key={panel.id}
-              className={`${styles.panel} ${
-                isExpanded
-                  ? styles.panelExpanded
-                  : isCollapsed
-                  ? styles.panelCollapsed
-                  : ''
-              } ${
-                (panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && isExpanded
-                  ? styles.prophecyExpanded
-                  : ''
-              }`}
+              className={styles.panel}
               onClick={() => handlePanelClick(panel.id)}
             >
-              {!((panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && isExpanded) && (
-                <div className={styles.panelHeader}>
-                  <h2 className={styles.panelTitle}>{panel.title}</h2>
-                  {isExpanded && (
-                    <button className={styles.collapseButton}>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M15 10H5M10 5L5 10L10 15"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              )}
+              <div className={styles.panelHeader}>
+                <h2 className={styles.panelTitle}>{panel.title}</h2>
+              </div>
               <div className={styles.panelContent}>
-                {panel.id === 'insight' && !isCollapsed && <InsightPanel />}
-                {panel.id === 'insight' && isCollapsed && <InsightPanel isPreview={true} />}
-                {panel.id === 'life' && !isCollapsed && <LifePanel onSaveVerse={addVerse} />}
-                {panel.id === 'life' && isCollapsed && <LifePanel isPreview={true} />}
-                {panel.id === 'prophecy' && !isCollapsed && <ProphecyPanel />}
-                {panel.id === 'prophecy' && isCollapsed && <ProphecyPanel isPreview={true} />}
-                {panel.id === 'daily' && !isCollapsed && <DailyPanel />}
-                {panel.id === 'daily' && isCollapsed && <DailyPanel isPreview={true} />}
+                {panel.id === 'insight' && <InsightPanel isPreview={true} />}
+                {panel.id === 'life' && <LifePanel isPreview={true} />}
+                {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
+                {panel.id === 'daily' && <DailyPanel isPreview={true} />}
               </div>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
       </div>
 
