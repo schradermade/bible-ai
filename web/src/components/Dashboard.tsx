@@ -76,7 +76,8 @@ export default function Dashboard() {
                 )}
               </div>
               <div className={styles.panelContent}>
-                {panel.id === 'daily' && <DailyPanel />}
+                {panel.id === 'daily' && !isCollapsed && <DailyPanel />}
+                {panel.id === 'daily' && isCollapsed && <DailyPanel isPreview={true} />}
               </div>
             </div>
           );

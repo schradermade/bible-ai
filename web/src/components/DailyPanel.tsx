@@ -14,9 +14,10 @@ interface DailyPanelProps {
     prayer: string;
     actionStep: string;
   };
+  isPreview?: boolean;
 }
 
-export default function DailyPanel({ content }: DailyPanelProps) {
+export default function DailyPanel({ content, isPreview = false }: DailyPanelProps) {
   // Default content for demonstration
   const defaultContent = {
     title: 'Finding Peace in the Storm',
@@ -36,6 +37,19 @@ export default function DailyPanel({ content }: DailyPanelProps) {
   };
 
   const displayContent = content || defaultContent;
+
+  if (isPreview) {
+    return (
+      <div className={styles.dailyPreview}>
+        <div className={styles.previewIcon}>🙏</div>
+        <div className={styles.previewContent}>
+          <div className={styles.previewLabel}>Today's Devotional</div>
+          <div className={styles.previewScripture}>{displayContent.scripture.reference}</div>
+          <div className={styles.previewTitle}>{displayContent.title}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.dailyPanel}>
