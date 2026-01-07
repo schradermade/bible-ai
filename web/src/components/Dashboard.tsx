@@ -19,7 +19,7 @@ const panels = [
 ];
 
 export default function Dashboard() {
-  const [expandedPanel, setExpandedPanel] = useState<PanelType>(null);
+  const [expandedPanel, setExpandedPanel] = useState<PanelType>('insight');
 
   const handlePanelClick = (panelId: PanelType) => {
     if (expandedPanel === panelId) {
