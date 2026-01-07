@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from './dashboard.module.css';
+import ContextualWidgets from './ContextualWidgets';
 
 type PanelType = 'insight' | 'life' | 'reflect' | 'daily' | null;
 
@@ -26,7 +27,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.dashboardWrapper}>
+      <div className={styles.dashboard}>
       <div
         className={
           expandedPanel ? styles.gridExpanded : styles.gridDefault
@@ -77,6 +79,11 @@ export default function Dashboard() {
           );
         })}
       </div>
+      </div>
+
+      <aside className={styles.widgetsSidebar}>
+        <ContextualWidgets />
+      </aside>
     </div>
   );
 }
