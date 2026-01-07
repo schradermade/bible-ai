@@ -64,17 +64,18 @@
 /* Panel Base Styles */
 .panel {
   background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
-  border: 1px solid rgba(176, 123, 76, 0.2);
-  border-radius: 20px;
-  padding: 24px;
+  border: 2px solid rgba(176, 123, 76, 0.3);
+  border-radius: 24px;
+  padding: 28px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 4px 16px rgba(31, 26, 22, 0.08),
-    0 1px 3px rgba(31, 26, 22, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 8px 24px rgba(31, 26, 22, 0.15),
+    0 4px 12px rgba(31, 26, 22, 0.08),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(176, 123, 76, 0.1);
 }
 
 .panel::before {
@@ -82,20 +83,30 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle at top right, rgba(176, 123, 76, 0.08), transparent 65%);
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle at top right, rgba(176, 123, 76, 0.15), transparent 65%);
   pointer-events: none;
   transition: opacity 0.4s ease;
 }
 
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: linear-gradient(145deg, transparent 0%, rgba(176, 123, 76, 0.03) 100%);
+  pointer-events: none;
+}
+
 .panel:hover {
-  border-color: rgba(176, 123, 76, 0.35);
+  border-color: rgba(176, 123, 76, 0.5);
   box-shadow:
-    0 6px 20px rgba(31, 26, 22, 0.12),
-    0 2px 6px rgba(31, 26, 22, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  transform: translateY(-2px);
+    0 12px 32px rgba(31, 26, 22, 0.18),
+    0 6px 16px rgba(31, 26, 22, 0.12),
+    inset 0 2px 4px rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(176, 123, 76, 0.2);
+  transform: translateY(-3px);
 }
 
 /* Expanded Panel - takes up main space */
@@ -103,11 +114,13 @@
   grid-column: 1;
   grid-row: 1 / -1;
   cursor: default;
-  border: 2px solid #b07b4c;
+  border: 3px solid #b07b4c;
   box-shadow:
-    0 8px 24px rgba(176, 123, 76, 0.2),
-    0 4px 12px rgba(176, 123, 76, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 16px 48px rgba(176, 123, 76, 0.25),
+    0 8px 24px rgba(176, 123, 76, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(176, 123, 76, 0.2),
+    0 0 32px rgba(176, 123, 76, 0.15);
 }
 
 .panelExpanded:hover {
@@ -148,11 +161,12 @@
 
 .panelTitle {
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
   color: #1f1a16;
   text-transform: capitalize;
   letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(176, 123, 76, 0.1);
 }
 
 .panelExpanded .panelTitle {
