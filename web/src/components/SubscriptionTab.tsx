@@ -91,16 +91,11 @@ export default function SubscriptionTab() {
       <h1 className={styles.title}>Subscription</h1>
       <div className={styles.separator} />
 
-      <div className={styles.statusBadge}>
-        {status.isActive ? (
-          <span className={styles.statusActive}>Plus Active</span>
-        ) : (
-          <span className={styles.statusFree}>Free Plan</span>
-        )}
-      </div>
-
       <div className={styles.section}>
-        <div className={styles.planCard}>
+        <div className={!status.isActive ? styles.planCardCurrent : styles.planCard}>
+          {!status.isActive && (
+            <div className={styles.currentPlanRibbon}>Current Plan</div>
+          )}
           <div className={styles.planHeader}>
             <h3 className={styles.planTitle}>Berea Study Free</h3>
             <div className={styles.planPrice}>$0</div>
@@ -110,14 +105,13 @@ export default function SubscriptionTab() {
             <li>Session-based responses</li>
             <li>Community-grade support</li>
           </ul>
-          {!status.isActive && (
-            <div className={styles.currentPlanBadge}>Current Plan</div>
-          )}
         </div>
 
         <div
           className={
-            status.isActive ? styles.planCardActive : styles.planCardUpgrade
+            status.isActive
+              ? styles.planCardCurrent
+              : styles.planCardUpgrade
           }
           onClick={!status.isActive ? startCheckout : undefined}
           role={!status.isActive ? 'button' : undefined}
@@ -133,6 +127,9 @@ export default function SubscriptionTab() {
               : undefined
           }
         >
+          {status.isActive && (
+            <div className={styles.currentPlanRibbon}>Current Plan</div>
+          )}
           <div className={styles.planHeader}>
             <h3 className={styles.planTitle}>Berea Study Plus</h3>
             <div className={styles.planPrice}>$8/mo</div>
@@ -142,9 +139,7 @@ export default function SubscriptionTab() {
             <li>Save and revisit every insight</li>
             <li>Priority processing and support</li>
           </ul>
-          {status.isActive ? (
-            <div className={styles.currentPlanBadge}>Current Plan</div>
-          ) : (
+          {!status.isActive && (
             <div className={styles.upgradePrompt}>
               Click to upgrade
               <svg
