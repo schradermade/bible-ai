@@ -67,7 +67,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.brandSection}>
-            <div className={styles.brand}>Berea Study</div>
+            <div className={styles.brand}>
+              <svg className={styles.brandIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.5 3H20V21H6.5C5.83696 21 5.20107 20.7366 4.73223 20.2678C4.26339 19.7989 4 19.163 4 18.5V5.5C4 4.83696 4.26339 4.20107 4.73223 3.73223C5.20107 3.26339 5.83696 3 6.5 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 3V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Berea Study
+            </div>
             <p className={styles.tagline}>Daily Scripture study with AI</p>
           </div>
         </div>
