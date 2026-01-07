@@ -68,13 +68,30 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className={styles.headerLeft}>
           <div className={styles.brandSection}>
             <div className={styles.brand}>
-              <svg className={styles.brandIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 3H8C9.06087 3 10.0783 3.42143 10.8284 4.17157C11.5786 4.92172 12 5.93913 12 7V21C12 20.2044 11.6839 19.4413 11.1213 18.8787C10.5587 18.3161 9.79565 18 9 18H2V3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M22 3H16C14.9391 3 13.9217 3.42143 13.1716 4.17157C12.4214 4.92172 12 5.93913 12 7V21C12 20.2044 12.3161 19.4413 12.8787 18.8787C13.4413 18.3161 14.2044 18 15 18H22V3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                className={styles.brandIcon}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 3H8C9.06087 3 10.0783 3.42143 10.8284 4.17157C11.5786 4.92172 12 5.93913 12 7V21C12 20.2044 11.6839 19.4413 11.1213 18.8787C10.5587 18.3161 9.79565 18 9 18H2V3Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M22 3H16C14.9391 3 13.9217 3.42143 13.1716 4.17157C12.4214 4.92172 12 5.93913 12 7V21C12 20.2044 12.3161 19.4413 12.8787 18.8787C13.4413 18.3161 14.2044 18 15 18H22V3Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Berea Study
             </div>
-            <p className={styles.tagline}>Daily Scripture study with AI</p>
+            <p className={styles.tagline}>Bible study with AI</p>
           </div>
         </div>
 
@@ -95,13 +112,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className={`${styles.tooltip} ${styles.tooltipTrust}`}>
-            <p><span className={styles.tooltipIcon}>✨</span> Our AI assists your study but never replaces the primacy of Scripture. You lead, AI supports.</p>
+            <p>
+              <span className={styles.tooltipIcon}>✨</span> Our AI assists your
+              study but never replaces the primacy of Scripture. You lead, AI
+              supports.
+            </p>
           </div>
           <div className={`${styles.tooltip} ${styles.tooltipSocial}`}>
-            <p><span className={styles.tooltipIcon}>✨</span> Join thousands of believers engaging with Scripture daily through thoughtful, AI-enhanced study.</p>
+            <p>
+              <span className={styles.tooltipIcon}>✨</span> Join thousands of
+              believers engaging with Scripture daily through thoughtful,
+              AI-enhanced study.
+            </p>
           </div>
           <div className={`${styles.tooltip} ${styles.tooltipFresh}`}>
-            <p><span className={styles.tooltipIcon}>✨</span> Fresh insights and study materials added every day to deepen your understanding of God&apos;s Word.</p>
+            <p>
+              <span className={styles.tooltipIcon}>✨</span> Fresh insights and
+              study materials added every day to deepen your understanding of
+              God&apos;s Word.
+            </p>
           </div>
         </div>
 
@@ -120,7 +149,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 label="Subscription"
                 url="subscription"
                 labelIcon={
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                  >
                     <path
                       d="M3 8h18M3 12h18M3 16h18M7 4v16M17 4v16"
                       stroke="currentColor"

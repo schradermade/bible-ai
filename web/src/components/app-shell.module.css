@@ -35,7 +35,7 @@
 
 .brand {
   font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -48,12 +48,12 @@
   padding-bottom: 4px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brandIcon {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   color: #b07b4c;
   filter: drop-shadow(0 2px 4px rgba(176, 123, 76, 0.3));
 }
@@ -62,7 +62,7 @@
   content: "";
   position: absolute;
   bottom: 0;
-  left: 44px;
+  left: 0;
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, #b07b4c 0%, #d4a574 30%, rgba(212, 165, 116, 0.3) 70%, transparent 100%);
@@ -70,7 +70,7 @@
 }
 
 .tagline {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.08em;
   color: #6b5d4f;
