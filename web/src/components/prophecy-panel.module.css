@@ -1,0 +1,344 @@
+/* Prophecy Panel */
+.prophecyPanel {
+  height: 100%;
+  overflow-y: auto;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: -28px;
+  width: calc(100% + 56px);
+  position: relative;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 40px,
+    black calc(100% - 60px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 40px,
+    black calc(100% - 60px),
+    transparent 100%
+  );
+}
+
+/* Prophecy Header - Styled Title */
+.prophecyHeader {
+  text-align: center;
+  padding: 32px 32px 28px;
+  position: relative;
+  background: linear-gradient(180deg, rgba(176, 123, 76, 0.06) 0%, transparent 100%);
+  border-bottom: 2px solid rgba(176, 123, 76, 0.15);
+  flex-shrink: 0;
+}
+
+.prophecyHeader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #b07b4c 50%, transparent 100%);
+}
+
+.prophecyTitle {
+  font-size: 40px;
+  font-weight: 700;
+  color: #2a2118;
+  margin: 0 0 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant: small-caps;
+  text-shadow:
+    0 2px 4px rgba(176, 123, 76, 0.15),
+    0 1px 2px rgba(176, 123, 76, 0.1);
+  position: relative;
+}
+
+.prophecyTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #b07b4c 50%, transparent 100%);
+}
+
+.prophecySubtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b5d4f;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* Timeline Divider */
+.timelineDivider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(176, 123, 76, 0.3) 20%,
+    rgba(176, 123, 76, 0.3) 80%,
+    transparent 100%
+  );
+  margin: 32px 32px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.timelineDivider:last-of-type {
+  margin-bottom: 16px;
+}
+
+.timelineDivider::before {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #b07b4c;
+  font-size: 10px;
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+/* Epoch Section */
+.epochSection {
+  padding: 0 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.epochSection:last-child {
+  padding-bottom: 4px;
+}
+
+.epochLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #b07b4c;
+  opacity: 0.8;
+  font-variant: small-caps;
+}
+
+.epochTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2a2118;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.scriptureRef {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b6239;
+  letter-spacing: 0.03em;
+  font-variant: small-caps;
+}
+
+.scriptureText {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #3a2f26;
+  font-style: italic;
+  margin: 0;
+  letter-spacing: 0.01em;
+  padding-left: 16px;
+  border-left: 3px solid rgba(176, 123, 76, 0.3);
+}
+
+.contextText {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4d3f2e;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.wordText {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a2118;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+}
+
+.promiseText {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a2118;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+}
+
+/* Preview Design */
+.prophecyPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  height: 100%;
+  min-height: 200px;
+}
+
+.previewIcon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 8px rgba(176, 123, 76, 0.3));
+  animation: scrollFloat 4s ease-in-out infinite;
+}
+
+@keyframes scrollFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+    opacity: 1;
+  }
+}
+
+.previewTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2a2118;
+  letter-spacing: 0.03em;
+  font-variant: small-caps;
+}
+
+.previewSubtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b5d4f;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .prophecyPanel {
+    margin: -24px;
+    width: calc(100% + 48px);
+  }
+
+  .prophecyHeader {
+    padding: 28px 24px 24px;
+  }
+
+  .prophecyTitle {
+    font-size: 32px;
+  }
+
+  .prophecySubtitle {
+    font-size: 13px;
+  }
+
+  .epochSection {
+    padding: 0 28px 28px;
+    gap: 14px;
+  }
+
+  .epochSection:last-child {
+    padding-bottom: 4px;
+  }
+
+  .epochTitle {
+    font-size: 20px;
+  }
+
+  .scriptureText,
+  .wordText,
+  .promiseText {
+    font-size: 15px;
+  }
+
+  .contextText {
+    font-size: 14px;
+  }
+
+  .timelineDivider {
+    margin: 28px 24px;
+  }
+
+  .timelineDivider:last-of-type {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .prophecyPanel {
+    margin: -20px;
+    width: calc(100% + 40px);
+  }
+
+  .prophecyHeader {
+    padding: 24px 20px 20px;
+  }
+
+  .prophecyTitle {
+    font-size: 28px;
+  }
+
+  .prophecySubtitle {
+    font-size: 12px;
+  }
+
+  .epochSection {
+    padding: 0 24px 24px;
+    gap: 12px;
+  }
+
+  .epochSection:last-child {
+    padding-bottom: 4px;
+  }
+
+  .epochTitle {
+    font-size: 18px;
+  }
+
+  .scriptureText,
+  .wordText,
+  .promiseText,
+  .contextText {
+    font-size: 14px;
+  }
+
+  .timelineDivider {
+    margin: 24px 20px;
+  }
+
+  .timelineDivider:last-of-type {
+    margin-bottom: 16px;
+  }
+
+  .previewIcon {
+    font-size: 40px;
+  }
+
+  .previewTitle {
+    font-size: 16px;
+  }
+
+  .previewSubtitle {
+    font-size: 12px;
+  }
+}

@@ -5,13 +5,14 @@ import styles from './dashboard.module.css';
 import ContextualWidgets from './ContextualWidgets';
 import ChatInput from './ChatInput';
 import DailyPanel from './DailyPanel';
+import ProphecyPanel from './ProphecyPanel';
 
-type PanelType = 'insight' | 'life' | 'reflect' | 'daily' | null;
+type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
 
 const panels = [
   { id: 'insight' as const, title: 'Insight' },
   { id: 'life' as const, title: 'Life' },
-  { id: 'reflect' as const, title: 'Reflect' },
+  { id: 'prophecy' as const, title: 'Prophecy' },
   { id: 'daily' as const, title: 'Daily' },
 ];
 
@@ -50,34 +51,38 @@ export default function Dashboard() {
                   : isCollapsed
                   ? styles.panelCollapsed
                   : ''
-              }`}
+              } ${panel.id === 'prophecy' && isExpanded ? styles.prophecyExpanded : ''}`}
               onClick={() => handlePanelClick(panel.id)}
             >
-              <div className={styles.panelHeader}>
-                <h2 className={styles.panelTitle}>{panel.title}</h2>
-                {isExpanded && (
-                  <button className={styles.collapseButton}>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 10H5M10 5L5 10L10 15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
+              {!(panel.id === 'prophecy' && isExpanded) && (
+                <div className={styles.panelHeader}>
+                  <h2 className={styles.panelTitle}>{panel.title}</h2>
+                  {isExpanded && (
+                    <button className={styles.collapseButton}>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M15 10H5M10 5L5 10L10 15"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
               <div className={styles.panelContent}>
                 {panel.id === 'daily' && !isCollapsed && <DailyPanel />}
                 {panel.id === 'daily' && isCollapsed && <DailyPanel isPreview={true} />}
+                {panel.id === 'prophecy' && !isCollapsed && <ProphecyPanel />}
+                {panel.id === 'prophecy' && isCollapsed && <ProphecyPanel isPreview={true} />}
               </div>
             </div>
           );

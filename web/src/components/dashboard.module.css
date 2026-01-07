@@ -219,6 +219,10 @@
   font-size: 14px;
 }
 
+.prophecyExpanded .panelContent {
+  height: 100%;
+}
+
 /* Responsive Design */
 @media (max-width: 1760px) {
   .widgetsSidebar {
