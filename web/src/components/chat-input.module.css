@@ -1,20 +1,20 @@
 .chatInputContainer {
   width: 100%;
   max-width: 1680px;
-  margin: 0 auto 32px;
+  margin: 48px auto 32px;
 }
 
 .promptText {
-  text-align: center;
+  text-align: left;
   font-size: 20px;
   font-weight: 600;
   color: #5a4a30;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   min-height: 32px;
   letter-spacing: 0.02em;
   line-height: 1.4;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.3em;
@@ -145,7 +145,7 @@
 @media (max-width: 768px) {
   .promptText {
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
   }
 
   .inputWrapper {

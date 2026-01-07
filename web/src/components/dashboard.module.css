@@ -14,10 +14,10 @@
 .widgetsSidebar {
   position: fixed;
   right: calc((100vw - 1680px) / 2 + 40px);
-  top: 96px;
+  top: 188px;
   width: 320px;
   height: fit-content;
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 212px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
