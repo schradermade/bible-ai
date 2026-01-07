@@ -23,12 +23,11 @@ export default function Dashboard() {
 
   const handlePanelClick = (panelId: PanelType) => {
     if (expandedPanel === panelId) {
-      // Collapse if clicking the already expanded panel
-      setExpandedPanel(null);
-    } else {
-      // Expand the clicked panel
-      setExpandedPanel(panelId);
+      // Do nothing if clicking the already expanded panel
+      return;
     }
+    // Expand the clicked panel
+    setExpandedPanel(panelId);
   };
 
   return (
