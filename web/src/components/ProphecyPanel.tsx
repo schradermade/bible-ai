@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import styles from './prophecy-panel.module.css';
 
 interface ProphecyContent {
@@ -27,6 +28,35 @@ interface ProphecyPanelProps {
 }
 
 export default function ProphecyPanel({ content, isPreview = false }: ProphecyPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const panelElement = panelRef.current;
+    if (!panelElement || isPreview) return;
+
+    const handleScroll = () => {
+      const currentScrollY = panelElement.scrollTop;
+
+      if (currentScrollY <= 5) {
+        // At the top, always show header
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY.current && currentScrollY > 20) {
+        // Scrolling down past threshold - hide header
+        setHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY.current) {
+        // Scrolling up - show header
+        setHeaderVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    panelElement.addEventListener('scroll', handleScroll, { passive: true });
+    return () => panelElement.removeEventListener('scroll', handleScroll);
+  }, [isPreview]);
+
   const defaultContent: ProphecyContent = {
     past: {
       title: 'What Was Spoken',
@@ -59,13 +89,11 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
   }
 
   return (
-    <div className={styles.prophecyPanel}>
-      <div className={styles.prophecyHeader}>
+    <div ref={panelRef} className={styles.prophecyPanel}>
+      <div className={`${styles.prophecyHeader} ${!headerVisible ? styles.headerHidden : ''}`}>
         <h2 className={styles.prophecyTitle}>Prophecy</h2>
         <div className={styles.prophecySubtitle}>God's Word Unfolding Through Time</div>
       </div>
-
-      <div className={styles.timelineDivider}></div>
 
       <div className={styles.epochSection}>
         <div className={styles.epochLabel}>Past</div>
