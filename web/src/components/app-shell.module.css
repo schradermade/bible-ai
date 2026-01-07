@@ -14,6 +14,8 @@
   border-bottom: 1px solid rgba(91, 74, 61, 0.2);
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 1000;
 }
 
 .headerLeft {
@@ -64,11 +66,13 @@
 .marketingBar {
   display: flex;
   align-items: stretch;
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 12px;
+  overflow: visible;
   box-shadow:
     0 4px 16px rgba(31, 26, 22, 0.15),
     0 2px 8px rgba(31, 26, 22, 0.1);
+  position: relative;
+  z-index: 100;
 }
 
 /* Trust Badge - Section 1 */
@@ -86,8 +90,10 @@
   white-space: nowrap;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-right: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: help;
+  border-radius: 12px 0 0 12px;
 }
 
 .trustBadge > span {
@@ -140,8 +146,9 @@
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-right: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: help;
 }
 
 .socialProof > span {
@@ -184,7 +191,9 @@
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  cursor: help;
+  border-radius: 0 12px 12px 0;
 }
 
 .freshBadge > span {
@@ -236,6 +245,49 @@
     transform: scale(1.15);
     opacity: 1;
   }
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: -2px;
+  right: -2px;
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border: 2px solid rgba(176, 123, 76, 0.3);
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  padding: 16px 20px;
+  box-shadow:
+    0 6px 20px rgba(31, 26, 22, 0.2),
+    0 3px 10px rgba(31, 26, 22, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 9999;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.tooltip p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3a2f26;
+  text-align: center;
+  font-weight: 500;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.trustBadge:hover ~ .tooltipTrust,
+.socialProof:hover ~ .tooltipSocial,
+.freshBadge:hover ~ .tooltipFresh {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* CTA Pill */
