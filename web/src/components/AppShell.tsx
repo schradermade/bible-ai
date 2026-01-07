@@ -67,7 +67,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.brand}>Berea Study</div>
-          <p className={styles.tagline}>Scripture-guided AI</p>
+          <p className={styles.tagline}>Daily Scripture study with AI</p>
         </div>
 
         <div className={styles.headerRight}>
