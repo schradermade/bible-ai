@@ -55,3 +55,15 @@
   font-size: 14px;
   cursor: pointer;
 }
+
+.empty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f1a16;
+  color: #f7f2ea;
+  border-radius: 999px;
+  padding: 10px 16px;
+  text-decoration: none;
+  font-size: 14px;
+}

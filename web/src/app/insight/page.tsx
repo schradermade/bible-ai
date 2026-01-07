@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import styles from './page.module.css';
@@ -8,6 +8,13 @@ import styles from './page.module.css';
 type InsightResponse = {
   reference: string;
   sections: { title: string; content: string }[];
+};
+
+type BillingStatus = {
+  isActive: boolean;
+  usageCount: number;
+  usageLimit: number;
+  periodEnd: string;
 };
 
 export default function InsightPage() {
@@ -18,6 +25,25 @@ export default function InsightPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<InsightResponse | null>(null);
   const [saved, setSaved] = useState(false);
+  const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setBillingStatus(null);
+      return;
+    }
+
+    const loadStatus = async () => {
+      const response = await fetch('/api/billing/status');
+      if (!response.ok) return;
+      const payload = (await response.json()) as BillingStatus;
+      setBillingStatus(payload);
+    };
+
+    loadStatus();
+  }, [isSignedIn]);
 
   const applyReference = (value: string) => {
     setReference(value);
@@ -29,6 +55,10 @@ export default function InsightPage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isSignedIn) {
+      setError('Sign in to request insights.');
+      return;
+    }
     setLoading(true);
     setError(null);
     setSaved(false);
@@ -51,6 +81,15 @@ export default function InsightPage() {
 
       const json = (await response.json()) as InsightResponse;
       setData(json);
+      if (billingStatus) {
+        setBillingStatus({
+          ...billingStatus,
+          usageCount: Math.min(
+            billingStatus.usageLimit,
+            billingStatus.usageCount + 1
+          ),
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
@@ -74,7 +113,15 @@ export default function InsightPage() {
 
     if (response.ok) {
       setSaved(true);
+      return;
     }
+
+    const payload = await response.json().catch(() => null);
+    const message =
+      payload && typeof payload.message === 'string'
+        ? payload.message
+        : 'Unable to save insight.';
+    setError(message);
   };
 
   return (
@@ -82,7 +129,15 @@ export default function InsightPage() {
       <header className={styles.header}>
         <div>
           <div className={styles.titleRow}>
-            <Image src="/insight.png" alt="" width={200} height={200} />
+            <div className="icon">
+              <Image
+                src="/insight.png"
+                alt="Insight"
+                fill
+                sizes="80px"
+                className="iconImage"
+              />
+            </div>
             <h1 className={styles.title}>Insights</h1>
           </div>
           <p className={styles.eyebrow}>AI-guided insight</p>
@@ -165,9 +220,18 @@ export default function InsightPage() {
               The AI responds with Scripture, context, and reflection—never
               directives.
             </p>
-            <button type="submit" disabled={loading}>
+            {billingStatus ? (
+              <p className={styles.usage}>
+                {billingStatus.usageCount}/{billingStatus.usageLimit} insights
+                used this month.
+              </p>
+            ) : null}
+            <button type="submit" disabled={loading || !isSignedIn}>
               {loading ? 'Working...' : 'Get insight'}
             </button>
+            {isSignedIn ? null : (
+              <p className={styles.helper}>Sign in to request insights.</p>
+            )}
           </div>
         </form>
 
@@ -213,9 +277,15 @@ export default function InsightPage() {
                 </div>
                 <div className={styles.actions}>
                   <SignedIn>
-                    <button type="button" onClick={handleSave}>
-                      {saved ? 'Saved' : 'Save insight'}
-                    </button>
+                    {billingStatus?.isActive ? (
+                      <button type="button" onClick={handleSave}>
+                        {saved ? 'Saved' : 'Save insight'}
+                      </button>
+                    ) : (
+                      <a className={styles.upgradeLink} href="/billing">
+                        Upgrade to save
+                      </a>
+                    )}
                   </SignedIn>
                   <SignedOut>
                     <SignInButton mode="modal">

@@ -1,0 +1,313 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 40px;
+  padding: 48px clamp(24px, 6vw, 72px);
+  background: radial-gradient(circle at top left, rgba(255, 235, 210, 0.6), transparent 55%),
+    radial-gradient(circle at 80% 20%, rgba(201, 169, 124, 0.25), transparent 50%),
+    linear-gradient(135deg, #f8f1e6 0%, #efe7db 50%, #f5efe5 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: -120px auto auto -80px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(176, 123, 76, 0.2), transparent 70%);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  inset: auto -120px -120px auto;
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(120, 135, 150, 0.25), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero,
+.signupPanel {
+  position: relative;
+  z-index: 1;
+}
+
+.hero {
+  display: grid;
+  gap: 32px;
+  align-content: start;
+}
+
+.heroText h1 {
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.05;
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino", "Garamond", "Times New Roman", serif;
+  color: #1f1a16;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 11px;
+  color: #7d6a58;
+  margin: 0 0 12px;
+}
+
+.lead {
+  margin: 14px 0 0;
+  font-size: 16px;
+  color: #4e4337;
+  max-width: 520px;
+}
+
+.planCard {
+  background: linear-gradient(145deg, rgba(255, 250, 242, 0.95), rgba(241, 232, 220, 0.95));
+  border-radius: 28px;
+  padding: 26px;
+  border: 1px solid rgba(176, 123, 76, 0.35);
+  box-shadow: 0 28px 40px rgba(31, 26, 22, 0.18);
+  display: grid;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.planCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.75), transparent 45%);
+  pointer-events: none;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.planLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 11px;
+  margin: 0 0 8px;
+  color: #6f5a45;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.price {
+  font-size: 44px;
+  font-weight: 600;
+  color: #1f1a16;
+}
+
+.per {
+  color: #6f5a45;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.planStamp {
+  background: linear-gradient(140deg, #a7743c, #d1a767);
+  color: #fdf8f0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.planMeta {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: #4d4032;
+}
+
+.materialStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.material {
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 11px;
+  color: rgba(31, 26, 22, 0.7);
+  display: flex;
+  align-items: flex-end;
+  min-height: 82px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 18px rgba(31, 26, 22, 0.15);
+}
+
+.material span {
+  position: relative;
+  z-index: 1;
+}
+
+.material::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.7), transparent 55%);
+  opacity: 0.8;
+}
+
+.materialBook {
+  background: linear-gradient(135deg, #4b3a2a, #b58a5e);
+  color: #f7efe4;
+}
+
+.materialPaper {
+  background: linear-gradient(135deg, #f4e6d2, #efe0c8);
+}
+
+.materialSeal {
+  background: linear-gradient(135deg, #c59a5d, #e3c488);
+  color: #3d2a14;
+}
+
+.materialSteel {
+  background: linear-gradient(135deg, #b9c1c8, #e5eaee);
+  color: #2f353b;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 16px 24px rgba(31, 26, 22, 0.08);
+}
+
+.featureCard h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-family: "Iowan Old Style", "Palatino", "Garamond", "Times New Roman", serif;
+}
+
+.featureCard p {
+  margin: 0;
+  font-size: 13px;
+  color: #5a4c3e;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    0 8px 16px rgba(31, 26, 22, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.7), transparent 55%);
+}
+
+.thumbParchment {
+  background: linear-gradient(145deg, #f4e3cd, #e9d6be);
+}
+
+.thumbBook {
+  background: linear-gradient(145deg, #2e241b, #6f5338);
+}
+
+.thumbSteel {
+  background: linear-gradient(145deg, #9da7b0, #d1d7dc);
+}
+
+.thumbGlass {
+  background: linear-gradient(145deg, rgba(233, 240, 246, 0.85), rgba(186, 198, 210, 0.75));
+}
+
+.signupPanel {
+  display: grid;
+  align-content: center;
+}
+
+.signupFrame {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 28px;
+  padding: 26px;
+  border: 1px solid rgba(140, 150, 160, 0.35);
+  box-shadow: 0 28px 50px rgba(31, 26, 22, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.signupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #6f5a45;
+}
+
+.signupHeader span {
+  font-size: 11px;
+  color: #8b7a68;
+}
+
+@media (max-width: 1100px) {
+  .page {
+    grid-template-columns: 1fr;
+    padding: 32px 20px 48px;
+  }
+
+  .signupPanel {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .materialStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .signupHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

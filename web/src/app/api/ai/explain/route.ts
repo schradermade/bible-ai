@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { auth } from '@clerk/nextjs/server';
+import {
+  getSubscriptionStatus,
+  getUsageCount,
+  getUsageLimit,
+  incrementUsage,
+  INSIGHT_FEATURE_KEY,
+} from '@/lib/billing';
 
 type InsightResponse = {
   reference: string;
@@ -62,6 +70,15 @@ function buildUserPrompt(reference: string, question?: string) {
 }
 
 export async function POST(request: Request) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'unauthorized', message: 'Sign in to use Insights.' },
+      { status: 401 }
+    );
+  }
+
   const body = await request.json();
   const reference =
     typeof body.reference === 'string' ? body.reference.trim() : '';
@@ -74,6 +91,20 @@ export async function POST(request: Request) {
 
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: 'ai_unavailable' }, { status: 503 });
+  }
+
+  const subscription = await getSubscriptionStatus(userId);
+  const usageCount = await getUsageCount(userId, INSIGHT_FEATURE_KEY);
+  const usageLimit = getUsageLimit(subscription.isActive);
+
+  if (usageCount >= usageLimit) {
+    return NextResponse.json(
+      {
+        error: 'usage_limit_reached',
+        message: `Monthly insight limit reached (${usageLimit}).`,
+      },
+      { status: 429 }
+    );
   }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -127,6 +158,7 @@ export async function POST(request: Request) {
     const raw = content.trim();
     try {
       const parsed = JSON.parse(raw) as InsightResponse;
+      await incrementUsage(userId, INSIGHT_FEATURE_KEY);
       return NextResponse.json({
         reference: parsed.reference || reference,
         sections: parsed.sections ?? [],
@@ -137,6 +169,7 @@ export async function POST(request: Request) {
         throw new Error('AI response was not valid JSON.');
       }
       const parsed = JSON.parse(match[0]) as InsightResponse;
+      await incrementUsage(userId, INSIGHT_FEATURE_KEY);
       return NextResponse.json({
         reference: parsed.reference || reference,
         sections: parsed.sections ?? [],

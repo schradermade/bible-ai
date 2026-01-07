@@ -79,6 +79,35 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               {item.label}
             </Link>
           ))}
+          <SignedOut>
+            <Link
+              href="/sign-up"
+              className={
+                pathname.startsWith('/sign-up')
+                  ? styles.navLinkActive
+                  : styles.navLink
+              }
+            >
+              <span className={styles.navIcon}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  />
+                  <path
+                    d="M5 19.5a7 7 0 0 1 14 0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              Signup
+            </Link>
+          </SignedOut>
         </nav>
         <div className={styles.sidebarFooter}>
           <SignedOut>

@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import styles from "./page.module.css";
 import SignInAction from "@/components/SignInAction";
+import { getSubscriptionStatus } from "@/lib/billing";
 
 export default async function SavedPage() {
   const { userId } = await auth();
@@ -15,6 +16,21 @@ export default async function SavedPage() {
         <div className={styles.empty}>
           <p>Sign in to view saved insights.</p>
           <SignInAction />
+        </div>
+      </div>
+    );
+  }
+
+  const subscription = await getSubscriptionStatus(userId);
+  if (!subscription.isActive) {
+    return (
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <h1>Saved insights</h1>
+        </header>
+        <div className={styles.empty}>
+          <p>Upgrade to save and view insights.</p>
+          <a href="/billing">View plans</a>
         </div>
       </div>
     );

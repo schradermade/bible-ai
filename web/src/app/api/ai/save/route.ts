@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { getSubscriptionStatus } from "@/lib/billing";
 
 export const runtime = "nodejs";
 
@@ -9,6 +10,17 @@ export async function POST(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const subscription = await getSubscriptionStatus(userId);
+  if (!subscription.isActive) {
+    return NextResponse.json(
+      {
+        error: "subscription_required",
+        message: "Upgrade to save insights.",
+      },
+      { status: 403 }
+    );
   }
 
   const body = await request.json();
