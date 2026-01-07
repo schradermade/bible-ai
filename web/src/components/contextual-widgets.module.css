@@ -42,6 +42,15 @@
   margin-bottom: 12px;
   position: relative;
   z-index: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.widgetTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
 }
 
 .widgetTitle {
@@ -53,6 +62,28 @@
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 0.1em;
+}
+
+.chevronButton {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #9b8b7e;
+  transition: color 0.2s ease;
+}
+
+.chevronButton:hover {
+  color: #6b5d4f;
+}
+
+.chevronButton svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .addButton {
@@ -94,6 +125,16 @@
 .widgetContent {
   position: relative;
   z-index: 1;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.3s ease;
+  opacity: 1;
+}
+
+.widgetContent.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: -12px;
 }
 
 .emptyState {
@@ -225,6 +266,120 @@
   font-size: 11px;
   color: #6b5d4f;
   letter-spacing: 0.02em;
+}
+
+/* My Verses Styles */
+.countBadge {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.1));
+  color: #8b6239;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(176, 123, 76, 0.25);
+}
+
+.versesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
+}
+
+/* Custom Scrollbar for My Verses */
+.versesList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.versesList::-webkit-scrollbar-track {
+  background: rgba(176, 123, 76, 0.08);
+  border-radius: 3px;
+}
+
+.versesList::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #b07b4c 0%, #8b6239 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.versesList::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c4915f 0%, #9b7653 100%);
+}
+
+.verseCard {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(31, 26, 22, 0.05);
+}
+
+.verseCard:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(176, 123, 76, 0.3);
+  box-shadow: 0 2px 6px rgba(31, 26, 22, 0.08);
+}
+
+.verseCardHeader {
+  margin-bottom: 8px;
+}
+
+.verseReference {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8b6239;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-variant: small-caps;
+}
+
+.verseText {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3a2f26;
+  font-style: italic;
+  margin: 0 0 10px;
+  letter-spacing: 0.01em;
+}
+
+.memorizeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.1), rgba(176, 123, 76, 0.05));
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.memorizeButton:hover {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.18), rgba(176, 123, 76, 0.12));
+  border-color: rgba(176, 123, 76, 0.4);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.15);
+}
+
+.memorizeButton:active {
+  transform: translateY(0);
+}
+
+.memorizeButton svg {
+  flex-shrink: 0;
 }
 
 /* Responsive */

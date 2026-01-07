@@ -3,18 +3,66 @@
 import { useState } from 'react';
 import styles from './contextual-widgets.module.css';
 
-export default function ContextualWidgets() {
+interface SavedVerse {
+  reference: string;
+  text: string;
+}
+
+interface ContextualWidgetsProps {
+  myVerses: SavedVerse[];
+}
+
+export default function ContextualWidgets({ myVerses }: ContextualWidgetsProps) {
   const [prayerNotes, setPrayerNotes] = useState<string[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<string[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
+  const [collapsedWidgets, setCollapsedWidgets] = useState<Record<string, boolean>>({
+    prayer: false,
+    myVerses: false,
+    memory: false,
+    study: false,
+  });
+
+  const toggleWidget = (widgetId: string) => {
+    setCollapsedWidgets(prev => ({
+      ...prev,
+      [widgetId]: !prev[widgetId],
+    }));
+  };
+
+  const handleMemorizeVerse = (verse: SavedVerse) => {
+    // Add to memory verses
+    setMemoryVerses([...memoryVerses, `${verse.reference}: ${verse.text}`]);
+    // Optionally remove from My Verses or keep it there
+    // For now, we'll keep it in My Verses too
+  };
 
   return (
     <div className={styles.widgetsContainer}>
       {/* Prayer Journal Widget */}
       <div className={styles.widget}>
-        <div className={styles.widgetHeader}>
-          <h3 className={styles.widgetTitle}>Prayer Journal</h3>
-          <button className={styles.addButton}>
+        <div className={styles.widgetHeader} onClick={() => toggleWidget('prayer')}>
+          <div className={styles.widgetTitleRow}>
+            <h3 className={styles.widgetTitle}>Prayer Journal</h3>
+            <button className={styles.chevronButton}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ transform: collapsedWidgets.prayer ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <button className={styles.addButton} onClick={(e) => e.stopPropagation()}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M8 3V13M3 8H13"
@@ -25,7 +73,7 @@ export default function ContextualWidgets() {
             </svg>
           </button>
         </div>
-        <div className={styles.widgetContent}>
+        <div className={`${styles.widgetContent} ${collapsedWidgets.prayer ? styles.collapsed : ''}`}>
           {prayerNotes.length === 0 ? (
             <p className={styles.emptyState}>No prayer notes yet</p>
           ) : (
@@ -40,11 +88,82 @@ export default function ContextualWidgets() {
         </div>
       </div>
 
+      {/* My Verses Widget */}
+      <div className={styles.widget}>
+        <div className={styles.widgetHeader} onClick={() => toggleWidget('myVerses')}>
+          <div className={styles.widgetTitleRow}>
+            <h3 className={styles.widgetTitle}>My Verses</h3>
+            <button className={styles.chevronButton}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ transform: collapsedWidgets.myVerses ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <span className={styles.countBadge}>{myVerses.length}</span>
+        </div>
+        <div className={`${styles.widgetContent} ${collapsedWidgets.myVerses ? styles.collapsed : ''}`}>
+          {myVerses.length === 0 ? (
+            <p className={styles.emptyState}>No verses saved yet</p>
+          ) : (
+            <div className={styles.versesList}>
+              {myVerses.map((verse, index) => (
+                <div key={index} className={styles.verseCard}>
+                  <div className={styles.verseCardHeader}>
+                    <span className={styles.verseReference}>{verse.reference}</span>
+                  </div>
+                  <p className={styles.verseText}>"{verse.text}"</p>
+                  <button
+                    className={styles.memorizeButton}
+                    onClick={() => handleMemorizeVerse(verse)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Memorize
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Memory Verses Widget */}
       <div className={styles.widget}>
-        <div className={styles.widgetHeader}>
-          <h3 className={styles.widgetTitle}>Memory Verses</h3>
-          <button className={styles.addButton}>
+        <div className={styles.widgetHeader} onClick={() => toggleWidget('memory')}>
+          <div className={styles.widgetTitleRow}>
+            <h3 className={styles.widgetTitle}>Memory Verses</h3>
+            <button className={styles.chevronButton}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ transform: collapsedWidgets.memory ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <button className={styles.addButton} onClick={(e) => e.stopPropagation()}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M8 3V13M3 8H13"
@@ -55,7 +174,7 @@ export default function ContextualWidgets() {
             </svg>
           </button>
         </div>
-        <div className={styles.widgetContent}>
+        <div className={`${styles.widgetContent} ${collapsedWidgets.memory ? styles.collapsed : ''}`}>
           {memoryVerses.length === 0 ? (
             <p className={styles.emptyState}>No verses saved yet</p>
           ) : (
@@ -72,11 +191,30 @@ export default function ContextualWidgets() {
 
       {/* Study Plan Widget */}
       <div className={styles.widget}>
-        <div className={styles.widgetHeader}>
-          <h3 className={styles.widgetTitle}>Study Plan</h3>
+        <div className={styles.widgetHeader} onClick={() => toggleWidget('study')}>
+          <div className={styles.widgetTitleRow}>
+            <h3 className={styles.widgetTitle}>Study Plan</h3>
+            <button className={styles.chevronButton}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ transform: collapsedWidgets.study ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
           <span className={styles.progressBadge}>{studyProgress}%</span>
         </div>
-        <div className={styles.widgetContent}>
+        <div className={`${styles.widgetContent} ${collapsedWidgets.study ? styles.collapsed : ''}`}>
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}

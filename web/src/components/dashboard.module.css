@@ -55,9 +55,9 @@
 .gridExpanded {
   display: grid;
   grid-template-columns: 4fr 220px;
-  grid-template-rows: 220px 220px 220px;
+  grid-template-rows: 400px 400px 400px;
   gap: 16px;
-  height: fit-content;
+  height: auto;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -121,7 +121,6 @@
     inset 0 2px 4px rgba(255, 255, 255, 1),
     0 0 0 1px rgba(176, 123, 76, 0.2),
     0 0 32px rgba(176, 123, 76, 0.15);
-  height: 100%;
   overflow-y: auto;
 }
 

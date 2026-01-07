@@ -11,6 +11,11 @@ import LifePanel from './LifePanel';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
 
+interface SavedVerse {
+  reference: string;
+  text: string;
+}
+
 const panels = [
   { id: 'insight' as const, title: 'Insight' },
   { id: 'life' as const, title: 'Life' },
@@ -20,6 +25,28 @@ const panels = [
 
 export default function Dashboard() {
   const [expandedPanel, setExpandedPanel] = useState<PanelType>('insight');
+  const [myVerses, setMyVerses] = useState<SavedVerse[]>([
+    {
+      reference: 'Ephesians 4:2-3',
+      text: 'Be completely humble and gentle; be patient, bearing with one another in love.',
+    },
+    {
+      reference: 'Colossians 3:13',
+      text: 'Bear with each other and forgive one another if any of you has a grievance against someone.',
+    },
+    {
+      reference: 'Proverbs 15:1',
+      text: 'A gentle answer turns away wrath, but a harsh word stirs up anger.',
+    },
+  ]);
+
+  const addVerse = (verse: SavedVerse) => {
+    // Check if verse already exists
+    const exists = myVerses.some(v => v.reference === verse.reference);
+    if (!exists) {
+      setMyVerses([verse, ...myVerses]); // Add to beginning of array
+    }
+  };
 
   const handlePanelClick = (panelId: PanelType) => {
     if (expandedPanel === panelId) {
@@ -86,7 +113,7 @@ export default function Dashboard() {
               <div className={styles.panelContent}>
                 {panel.id === 'insight' && !isCollapsed && <InsightPanel />}
                 {panel.id === 'insight' && isCollapsed && <InsightPanel isPreview={true} />}
-                {panel.id === 'life' && !isCollapsed && <LifePanel />}
+                {panel.id === 'life' && !isCollapsed && <LifePanel onSaveVerse={addVerse} />}
                 {panel.id === 'life' && isCollapsed && <LifePanel isPreview={true} />}
                 {panel.id === 'prophecy' && !isCollapsed && <ProphecyPanel />}
                 {panel.id === 'prophecy' && isCollapsed && <ProphecyPanel isPreview={true} />}
@@ -100,7 +127,7 @@ export default function Dashboard() {
       </div>
 
       <aside className={styles.widgetsSidebar}>
-        <ContextualWidgets />
+        <ContextualWidgets myVerses={myVerses} />
       </aside>
     </div>
   );

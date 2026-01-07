@@ -218,6 +218,102 @@
   letter-spacing: 0.01em;
 }
 
+/* Verse Container with Memory Button */
+.verseContainer {
+  margin-bottom: 20px;
+}
+
+.verseContainer:last-child {
+  margin-bottom: 0;
+}
+
+.verseHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.saveVerseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+  border: 1.5px solid rgba(176, 123, 76, 0.3);
+  border-radius: 8px;
+  padding: 8px;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.1);
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.saveVerseButton:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.15));
+  border-color: rgba(176, 123, 76, 0.5);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 98, 57, 0.18);
+}
+
+.saveVerseButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.15);
+}
+
+.saveVerseButton svg {
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saveVerseButton:hover svg {
+  transform: scale(1.15);
+}
+
+/* Saved Toast Message */
+.savedToast {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  background: linear-gradient(145deg, #f9f6f0 0%, #efe6d8 100%);
+  color: #5a4a30;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1.5px solid rgba(176, 123, 76, 0.4);
+  box-shadow:
+    0 4px 12px rgba(176, 123, 76, 0.25),
+    0 2px 6px rgba(176, 123, 76, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.savedToast svg {
+  flex-shrink: 0;
+  color: #8b6239;
+}
+
 /* Preview Design */
 .lifePreview {
   display: flex;
@@ -322,6 +418,16 @@
   .divider:last-of-type {
     margin-bottom: 16px;
   }
+
+  .verseHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .saveVerseButton {
+    align-self: flex-start;
+  }
 }
 
 @media (max-width: 480px) {
@@ -373,11 +479,33 @@
     margin-bottom: 16px;
   }
 
+  .saveVerseButton {
+    width: 30px;
+    height: 30px;
+    padding: 6px;
+  }
+
+  .saveVerseButton svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .previewIcon {
     font-size: 40px;
   }
 
   .previewTitle {
     font-size: 16px;
+  }
+
+  .savedToast {
+    font-size: 11px;
+    padding: 6px 10px;
+    top: 38px;
+  }
+
+  .savedToast svg {
+    width: 12px;
+    height: 12px;
   }
 }
