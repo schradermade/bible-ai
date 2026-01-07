@@ -261,15 +261,9 @@
   left: 0;
   right: 0;
   background: linear-gradient(145deg, #f9f6f0 0%, #efe6d8 100%);
-  border: 2px solid rgba(176, 123, 76, 0.35);
   border-radius: 0 0 12px 12px;
   border-top: none;
   padding: 18px 20px 8px 20px;
-  box-shadow:
-    0 6px 20px rgba(176, 123, 76, 0.15),
-    0 3px 10px rgba(31, 26, 22, 0.12),
-    inset 0 1px 2px rgba(255, 255, 255, 0.6),
-    inset 0 -1px 1px rgba(176, 123, 76, 0.08);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -277,6 +271,33 @@
   z-index: 0;
   margin-top: 0;
   box-sizing: border-box;
+}
+
+.tooltipTrust {
+  border: 2px solid rgba(42, 90, 77, 0.5);
+  box-shadow:
+    0 6px 20px rgba(42, 90, 77, 0.2),
+    0 3px 10px rgba(30, 66, 57, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(42, 90, 77, 0.1);
+}
+
+.tooltipSocial {
+  border: 2px solid rgba(180, 138, 90, 0.5);
+  box-shadow:
+    0 6px 20px rgba(180, 138, 90, 0.2),
+    0 3px 10px rgba(160, 116, 73, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(180, 138, 90, 0.1);
+}
+
+.tooltipFresh {
+  border: 2px solid rgba(212, 113, 10, 0.5);
+  box-shadow:
+    0 6px 20px rgba(212, 113, 10, 0.2),
+    0 3px 10px rgba(184, 92, 8, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(212, 113, 10, 0.1);
 }
 
 .tooltip p {
