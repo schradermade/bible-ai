@@ -3,17 +3,13 @@
   top: 60px;
   left: 0;
   transform: translateY(0);
-  width: calc((100vw - 1680px) / 2 + 1170px + 120px);
-  padding: 32px 120px 40px calc((100vw - 1680px) / 2);
+  width: calc((100vw - 1680px) / 2 + 1336px);
+  padding: 32px 0 40px calc((100vw - 1680px) / 2);
   background: #efe6d8;
   -webkit-mask-image:
-    linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
-    linear-gradient(to right, black calc(100% - 120px), transparent 100%);
+    linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
   mask-image:
-    linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
-    linear-gradient(to right, black calc(100% - 120px), transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+    linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
   z-index: 100;
   opacity: 1;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -167,7 +163,7 @@
 @media (max-width: 1760px) {
   .chatInputContainer {
     left: 0;
-    width: calc(100vw - 40px - 320px - 24px);
+    width: calc(100vw - 40px - 320px - 24px - 150px - 16px);
     padding-left: 40px;
   }
 }
