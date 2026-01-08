@@ -34,6 +34,18 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const [usage, setUsage] = useState<UsageData | null>(null);
   const lastScrollY = useRef(0);
 
+  const fetchUsage = async () => {
+    try {
+      const response = await fetch('/api/usage');
+      if (response.ok) {
+        const data = await response.json();
+        setUsage(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch usage:', error);
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPromptIndex((prevIndex) => (prevIndex + 1) % prompts.length);
@@ -50,18 +62,6 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     }
     fetchUsage();
   }, [usageRefreshTrigger, user]);
-
-  const fetchUsage = async () => {
-    try {
-      const response = await fetch('/api/usage');
-      if (response.ok) {
-        const data = await response.json();
-        setUsage(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch usage:', error);
-    }
-  };
 
   useEffect(() => {
     const handleScroll = () => {
