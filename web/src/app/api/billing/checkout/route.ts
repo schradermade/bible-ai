@@ -5,8 +5,6 @@ import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
-const PRICE_ID = process.env.STRIPE_PRICE_ID;
-
 function getOrigin(request: Request) {
   const origin = request.headers.get("origin") ||
     request.headers.get("referer")?.replace(/\/$/, '') ||
@@ -28,6 +26,8 @@ export async function POST(request: Request) {
     }
 
     console.log('[Checkout] UserId:', userId);
+
+    const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
     if (!PRICE_ID) {
       console.log('[Checkout] Error: STRIPE_PRICE_ID not set');
