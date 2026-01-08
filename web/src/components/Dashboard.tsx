@@ -114,6 +114,10 @@ export default function Dashboard() {
     }
   };
 
+  const deleteVerse = (verse: SavedVerse) => {
+    setMyVerses(myVerses.filter(v => v.reference !== verse.reference));
+  };
+
   const handleSearch = async (query: string) => {
     setIsLoadingContent(true);
     setLastQuery(query);
@@ -299,7 +303,7 @@ export default function Dashboard() {
       </div>
 
       <aside className={styles.widgetsSidebar}>
-        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} />
+        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} />
       </aside>
     </div>
   );

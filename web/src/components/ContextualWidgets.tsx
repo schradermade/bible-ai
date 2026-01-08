@@ -12,9 +12,10 @@ interface SavedVerse {
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
+  onDeleteVerse: (verse: SavedVerse) => void;
 }
 
-export default function ContextualWidgets({ myVerses, onLoadHistory }: ContextualWidgetsProps) {
+export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVerse }: ContextualWidgetsProps) {
   const [prayerNotes, setPrayerNotes] = useState<string[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<string[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
@@ -132,6 +133,15 @@ export default function ContextualWidgets({ myVerses, onLoadHistory }: Contextua
                 <div key={index} className={styles.verseCard}>
                   <div className={styles.verseCardHeader}>
                     <span className={styles.verseReference}>{verse.reference}</span>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => onDeleteVerse(verse)}
+                      aria-label="Delete verse"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
                   </div>
                   <p className={styles.verseText}>"{verse.text}"</p>
                   <button
