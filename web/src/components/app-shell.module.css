@@ -244,6 +244,7 @@
   );
   animation: rotate 60s linear infinite;
   z-index: 0;
+  pointer-events: none;
 }
 
 @keyframes rotate {
@@ -278,13 +279,13 @@
 /* Tooltip */
 .tooltip {
   position: absolute;
-  top: calc(100% - 10px);
+  top: 100%;
   left: 0;
   right: 0;
   background: linear-gradient(145deg, #f9f6f0 0%, #efe6d8 100%);
   border-radius: 0 0 12px 12px;
   border-top: none;
-  padding: 18px 20px 8px 20px;
+  padding: 14px 20px 12px 20px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
