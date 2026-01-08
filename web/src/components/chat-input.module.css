@@ -1,22 +1,18 @@
 .chatInputContainer {
   position: fixed;
   top: 60px;
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
-  width: 100%;
-  max-width: 1680px;
-  padding: 32px 40px 20px;
-  background: linear-gradient(180deg, rgba(247, 242, 234, 0.98) 0%, rgba(247, 242, 234, 0.95) 100%);
-  backdrop-filter: blur(8px);
+  left: calc((100vw - 1680px) / 2);
+  transform: translateY(0);
+  width: 1336px;
+  padding: 32px 0 20px;
   z-index: 100;
   opacity: 1;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(31, 26, 22, 0.08);
 }
 
 .chatInputContainer.hidden {
-  transform: translateX(-50%) translateY(-120%);
+  transform: translateY(-120%);
   opacity: 0;
   pointer-events: none;
 }
@@ -156,6 +152,19 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1760px) {
+  .chatInputContainer {
+    left: 40px;
+    width: calc(100vw - 80px - 320px - 24px);
+  }
+}
+
+@media (max-width: 1280px) {
+  .chatInputContainer {
+    width: calc(100vw - 80px);
   }
 }
 

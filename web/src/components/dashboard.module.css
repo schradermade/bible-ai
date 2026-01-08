@@ -15,10 +15,10 @@
 .widgetsSidebar {
   position: fixed;
   right: calc((100vw - 1680px) / 2 + 40px);
-  top: 240px;
+  top: 180px;
   width: 320px;
   height: fit-content;
-  max-height: calc(100vh - 264px);
+  max-height: calc(100vh - 204px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
@@ -142,8 +142,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  position: sticky;
-  top: 20px;
+  position: fixed;
+  top: 240px;
+  right: calc((100vw - 1680px) / 2 + 40px + 320px + 24px);
   align-self: start;
 }
 
@@ -254,6 +255,10 @@
   .widgetsSidebar {
     right: 40px;
   }
+
+  .collapsedPanelsContainer {
+    right: calc(40px + 320px + 24px);
+  }
 }
 
 @media (max-width: 1280px) {
@@ -267,6 +272,11 @@
     right: auto;
     width: 100%;
     max-height: none;
+  }
+
+  .collapsedPanelsContainer {
+    position: static;
+    right: auto;
   }
 }
 
@@ -298,7 +308,7 @@
 @media (max-width: 768px) {
   .dashboard {
     min-height: auto;
-    margin-top: 200px;
+    padding-top: 140px;
   }
 
   .gridDefault,
