@@ -286,29 +286,32 @@
   gap: 12px;
   max-height: 400px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 8px;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
 }
 
 /* Custom Scrollbar for My Verses */
 .versesList::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .versesList::-webkit-scrollbar-track {
   background: rgba(176, 123, 76, 0.08);
-  border-radius: 3px;
+  border-radius: 4px;
+  margin: 4px 0;
 }
 
 .versesList::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #b07b4c 0%, #8b6239 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .versesList::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #c4915f 0%, #9b7653 100%);
+  background-clip: padding-box;
 }
 
 .verseCard {
