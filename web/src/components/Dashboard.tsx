@@ -16,6 +16,66 @@ interface SavedVerse {
   text: string;
 }
 
+interface InsightContent {
+  title: string;
+  mainInsight: string;
+  scriptureContext: {
+    reference: string;
+    text: string;
+  };
+  application: string;
+  deeperTruth: string;
+}
+
+interface LifeContent {
+  title: string;
+  situation: string;
+  biblicalPrinciples: Array<{
+    reference: string;
+    text: string;
+  }>;
+  practicalWisdom: string;
+  encouragement: string;
+}
+
+interface ProphecyContent {
+  past: {
+    title: string;
+    scripture: {
+      reference: string;
+      text: string;
+    };
+    context: string;
+  };
+  present: {
+    title: string;
+    word: string;
+  };
+  future: {
+    title: string;
+    promise: string;
+  };
+}
+
+interface DailyContent {
+  title: string;
+  date: string;
+  scripture: {
+    reference: string;
+    text: string;
+  };
+  reflection: string;
+  prayer: string;
+  actionStep: string;
+}
+
+interface PanelContent {
+  insight?: InsightContent;
+  life?: LifeContent;
+  prophecy?: ProphecyContent;
+  daily?: DailyContent;
+}
+
 const panels = [
   { id: 'insight' as const, title: 'Insight' },
   { id: 'life' as const, title: 'Life' },
@@ -39,12 +99,42 @@ export default function Dashboard() {
       text: 'A gentle answer turns away wrath, but a harsh word stirs up anger.',
     },
   ]);
+  const [panelContent, setPanelContent] = useState<PanelContent | null>(null);
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
 
   const addVerse = (verse: SavedVerse) => {
     // Check if verse already exists
     const exists = myVerses.some(v => v.reference === verse.reference);
     if (!exists) {
       setMyVerses([verse, ...myVerses]); // Add to beginning of array
+    }
+  };
+
+  const handleSearch = async (query: string) => {
+    setIsLoadingContent(true);
+
+    try {
+      const response = await fetch('/api/ai/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to fetch insights');
+      }
+
+      const data = await response.json();
+      setPanelContent(data);
+
+      // Expand first panel (Insight) after content loads
+      setExpandedPanel('insight');
+    } catch (error) {
+      console.error('Search error:', error);
+      // TODO: Show error toast/message to user
+    } finally {
+      setIsLoadingContent(false);
     }
   };
 
@@ -60,7 +150,8 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
-      <ChatInput />
+      <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} />
+      <div className={styles.panelsContainer}>
       <div
         className={
           expandedPanel ? styles.gridExpanded : styles.gridDefault
@@ -83,34 +174,21 @@ export default function Dashboard() {
                   }`}
                   onClick={() => handlePanelClick(panel.id)}
                 >
-                  {!(panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily') && (
-                    <div className={styles.panelHeader}>
-                      <h2 className={styles.panelTitle}>{panel.title}</h2>
-                      <button className={styles.collapseButton}>
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M15 10H5M10 5L5 10L10 15"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
+                  <div className={styles.panelContent}>
+                    {panel.id === 'insight' && <InsightPanel content={panelContent?.insight} />}
+                    {panel.id === 'life' && <LifePanel content={panelContent?.life} onSaveVerse={addVerse} />}
+                    {panel.id === 'prophecy' && <ProphecyPanel content={panelContent?.prophecy} />}
+                    {panel.id === 'daily' && <DailyPanel content={panelContent?.daily} />}
+                  </div>
+                  {isLoadingContent && (
+                    <div className={styles.panelLoadingOverlay}>
+                      <div className={styles.loadingContent}>
+                        <div className={styles.loadingSpinner}></div>
+                        <div className={styles.loadingText}>Seeking wisdom from Scripture...</div>
+                        <div className={styles.loadingSubtext}>Preparing your biblical insights</div>
+                      </div>
                     </div>
                   )}
-                  <div className={styles.panelContent}>
-                    {panel.id === 'insight' && <InsightPanel />}
-                    {panel.id === 'life' && <LifePanel onSaveVerse={addVerse} />}
-                    {panel.id === 'prophecy' && <ProphecyPanel />}
-                    {panel.id === 'daily' && <DailyPanel />}
-                  </div>
                 </div>
               );
             })}
@@ -136,6 +214,11 @@ export default function Dashboard() {
                       {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
                       {panel.id === 'daily' && <DailyPanel isPreview={true} />}
                     </div>
+                    {isLoadingContent && (
+                      <div className={styles.collapsedPanelLoadingOverlay}>
+                        <div className={styles.smallLoadingSpinner}></div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -153,14 +236,15 @@ export default function Dashboard() {
                 <h2 className={styles.panelTitle}>{panel.title}</h2>
               </div>
               <div className={styles.panelContent}>
-                {panel.id === 'insight' && <InsightPanel isPreview={true} />}
-                {panel.id === 'life' && <LifePanel isPreview={true} />}
-                {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
-                {panel.id === 'daily' && <DailyPanel isPreview={true} />}
+                {panel.id === 'insight' && <InsightPanel content={panelContent?.insight} isPreview={true} />}
+                {panel.id === 'life' && <LifePanel content={panelContent?.life} isPreview={true} />}
+                {panel.id === 'prophecy' && <ProphecyPanel content={panelContent?.prophecy} isPreview={true} />}
+                {panel.id === 'daily' && <DailyPanel content={panelContent?.daily} isPreview={true} />}
               </div>
             </div>
           ))
         )}
+      </div>
       </div>
       </div>
 

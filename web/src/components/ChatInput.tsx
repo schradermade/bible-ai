@@ -12,9 +12,13 @@ const prompts = [
   'Come, let us reason together.',
 ];
 
-export default function ChatInput() {
+interface ChatInputProps {
+  onSearch: (query: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+export default function ChatInput({ onSearch, isLoading }: ChatInputProps) {
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
@@ -54,32 +58,21 @@ export default function ChatInput() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    setIsLoading(true);
-    // TODO: Handle LLM request and populate containers
-    console.log('User input:', input);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    await onSearch(input.trim());
   };
 
   return (
-    <div className={`${styles.chatInputContainer} ${!isVisible ? styles.hidden : ''}`}>
-      <div className={styles.promptText}>
-        <span key={currentPromptIndex} className={styles.rotatingText}>
-          {prompts[currentPromptIndex]}
-        </span>
-        {' '}
-        <span className={styles.staticText}>Ask Berea AI.</span>
-      </div>
+    <div
+      className={`${styles.chatInputContainer} ${!isVisible ? styles.hidden : ''}`}
+    >
+      <div className={styles.promptText}>Ask Berea AI.</div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputWrapper}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="What's on your heart today? (e.g., 'I'm struggling with depression')"
+            placeholder={prompts[currentPromptIndex]}
             className={styles.input}
             disabled={isLoading}
           />
