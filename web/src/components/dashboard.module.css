@@ -9,16 +9,16 @@
 .dashboard {
   width: 100%;
   min-height: 400px;
-  margin-top: 180px;
+  padding-top: 144px;
 }
 
 .widgetsSidebar {
   position: fixed;
   right: calc((100vw - 1680px) / 2 + 40px);
-  top: 188px;
+  top: 240px;
   width: 320px;
   height: fit-content;
-  max-height: calc(100vh - 212px);
+  max-height: calc(100vh - 264px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
@@ -298,7 +298,7 @@
 @media (max-width: 768px) {
   .dashboard {
     min-height: auto;
-    margin-top: 160px;
+    margin-top: 200px;
   }
 
   .gridDefault,
