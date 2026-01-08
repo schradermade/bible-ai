@@ -143,7 +143,7 @@
   flex-direction: column;
   gap: 16px;
   position: fixed;
-  top: 240px;
+  top: 100px;
   right: calc((100vw - 1680px) / 2 + 40px + 320px + 24px);
   align-self: start;
 }
