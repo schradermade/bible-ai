@@ -19,7 +19,7 @@
 
 .widgetsSidebar {
   position: fixed;
-  right: calc((100vw - 1680px) / 2 + 40px);
+  right: calc((100vw - 1680px) / 2);
   top: 100px;
   width: 320px;
   height: fit-content;
@@ -156,7 +156,7 @@
   gap: 16px;
   position: fixed;
   top: 100px;
-  right: calc((100vw - 1680px) / 2 + 40px + 320px + 24px);
+  right: calc((100vw - 1680px) / 2 + 320px + 24px);
   align-self: start;
   z-index: 101;
 }
