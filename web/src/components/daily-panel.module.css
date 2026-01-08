@@ -14,20 +14,6 @@
   margin-bottom: -28px;
   width: calc(100% + 56px);
   position: relative;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0px,
-    black 60px,
-    black calc(100% - 60px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0px,
-    black 60px,
-    black calc(100% - 60px),
-    transparent 100%
-  );
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
 }

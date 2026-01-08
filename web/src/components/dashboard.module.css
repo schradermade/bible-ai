@@ -126,6 +126,7 @@
   overflow: hidden;
   height: auto;
   min-height: 400px;
+  padding-top: 28px;
 }
 
 .panelExpanded:hover {
