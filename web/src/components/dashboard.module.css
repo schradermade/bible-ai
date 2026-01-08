@@ -9,6 +9,7 @@
 .dashboard {
   width: 100%;
   min-height: 400px;
+  margin-top: 180px;
 }
 
 .widgetsSidebar {
@@ -297,6 +298,7 @@
 @media (max-width: 768px) {
   .dashboard {
     min-height: auto;
+    margin-top: 160px;
   }
 
   .gridDefault,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './chat-input.module.css';
 
 const prompts = [
@@ -16,6 +16,8 @@ export default function ChatInput() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,6 +25,29 @@ export default function ChatInput() {
     }, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY.current;
+
+      if (currentScrollY <= 100) {
+        // Always show if near the top
+        setIsVisible(true);
+      } else if (scrollingDown && currentScrollY > 20) {
+        // Hide when scrolling down
+        setIsVisible(false);
+      } else if (!scrollingDown) {
+        // Show when scrolling up
+        setIsVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +65,7 @@ export default function ChatInput() {
   };
 
   return (
-    <div className={styles.chatInputContainer}>
+    <div className={`${styles.chatInputContainer} ${!isVisible ? styles.hidden : ''}`}>
       <div className={styles.promptText}>
         <span key={currentPromptIndex} className={styles.rotatingText}>
           {prompts[currentPromptIndex]}
