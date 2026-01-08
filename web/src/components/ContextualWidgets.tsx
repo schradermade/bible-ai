@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './contextual-widgets.module.css';
 import SearchHistory from './SearchHistory';
 
@@ -34,6 +34,29 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     searchHistory: false,
   });
 
+  // Load memorized verses on mount
+  useEffect(() => {
+    const loadMemorizedVerses = async () => {
+      try {
+        const response = await fetch('/api/verses/memorized');
+        if (response.ok) {
+          const data = await response.json();
+          const verses: MemoryVerse[] = data.verses.map((v: any) => ({
+            id: v.id,
+            reference: v.reference,
+            text: v.text || '',
+            memorized: true, // All verses from DB are marked as memorized
+          }));
+          setMemoryVerses(verses);
+        }
+      } catch (error) {
+        console.error('Failed to load memorized verses:', error);
+      }
+    };
+
+    loadMemorizedVerses();
+  }, []);
+
   const toggleWidget = (widgetId: string) => {
     setCollapsedWidgets(prev => ({
       ...prev,
@@ -55,14 +78,64 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     }
   };
 
-  const toggleMemorized = (id: string) => {
-    setMemoryVerses(memoryVerses.map(verse =>
-      verse.id === id ? { ...verse, memorized: !verse.memorized } : verse
+  const toggleMemorized = async (id: string) => {
+    const verse = memoryVerses.find(v => v.id === id);
+    if (!verse) return;
+
+    const newMemorizedState = !verse.memorized;
+
+    // Optimistically update UI
+    setMemoryVerses(memoryVerses.map(v =>
+      v.id === id ? { ...v, memorized: newMemorizedState } : v
     ));
+
+    try {
+      if (newMemorizedState) {
+        // Mark as memorized in database
+        await fetch('/api/verses/memorized', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reference: verse.reference,
+            text: verse.text || null,
+          }),
+        });
+      } else {
+        // Remove from database
+        await fetch('/api/verses/memorized', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reference: verse.reference }),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update memorized status:', error);
+      // Revert on error
+      setMemoryVerses(memoryVerses.map(v =>
+        v.id === id ? { ...v, memorized: !newMemorizedState } : v
+      ));
+    }
   };
 
-  const deleteMemoryVerse = (id: string) => {
-    setMemoryVerses(memoryVerses.filter(verse => verse.id !== id));
+  const deleteMemoryVerse = async (id: string) => {
+    const verse = memoryVerses.find(v => v.id === id);
+    if (!verse) return;
+
+    // Optimistically remove from UI
+    setMemoryVerses(memoryVerses.filter(v => v.id !== id));
+
+    try {
+      // Remove from database
+      await fetch('/api/verses/memorized', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: verse.reference }),
+      });
+    } catch (error) {
+      console.error('Failed to delete verse:', error);
+      // Revert on error
+      setMemoryVerses([...memoryVerses]);
+    }
   };
 
   return (
