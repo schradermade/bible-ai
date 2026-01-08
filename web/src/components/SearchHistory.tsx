@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import styles from './search-history.module.css';
 
 interface HistoryItem {
@@ -17,12 +18,19 @@ interface SearchHistoryProps {
 }
 
 export default function SearchHistory({ onLoadHistory, isCollapsed, onToggle }: SearchHistoryProps) {
+  const { user } = useUser();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      // Clear history when user signs out
+      setHistory([]);
+      setIsLoading(false);
+      return;
+    }
     fetchHistory();
-  }, []);
+  }, [user]);
 
   const fetchHistory = async () => {
     try {

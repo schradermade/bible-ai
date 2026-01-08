@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import styles from './contextual-widgets.module.css';
 import SearchHistory from './SearchHistory';
 
@@ -23,6 +24,7 @@ interface ContextualWidgetsProps {
 }
 
 export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVerse }: ContextualWidgetsProps) {
+  const { user } = useUser();
   const [prayerNotes, setPrayerNotes] = useState<string[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<MemoryVerse[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
@@ -34,9 +36,17 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     searchHistory: false,
   });
 
-  // Load memorized verses on mount
+  // Load memorized verses on mount and when user changes
   useEffect(() => {
     const loadMemorizedVerses = async () => {
+      if (!user) {
+        // Clear data when user signs out
+        setMemoryVerses([]);
+        setPrayerNotes([]);
+        setStudyProgress(0);
+        return;
+      }
+
       try {
         const response = await fetch('/api/verses/memorized');
         if (response.ok) {
@@ -55,7 +65,7 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     };
 
     loadMemorizedVerses();
-  }, []);
+  }, [user]);
 
   const toggleWidget = (widgetId: string) => {
     setCollapsedWidgets(prev => ({

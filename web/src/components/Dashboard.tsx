@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import styles from './dashboard.module.css';
 import ContextualWidgets from './ContextualWidgets';
 import ChatInput from './ChatInput';
@@ -86,6 +87,7 @@ const panels = [
 
 export default function Dashboard() {
   const { showError } = useToast();
+  const { user } = useUser();
   const [expandedPanel, setExpandedPanel] = useState<PanelType>('insight');
   const [myVerses, setMyVerses] = useState<SavedVerse[]>([
     {
@@ -105,6 +107,15 @@ export default function Dashboard() {
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
+
+  // Clear user data when signed out
+  useEffect(() => {
+    if (!user) {
+      setMyVerses([]);
+      setPanelContent(null);
+      setLastQuery('');
+    }
+  }, [user]);
 
   const addVerse = (verse: SavedVerse) => {
     // Check if verse already exists

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useUser } from '@clerk/nextjs';
 import styles from './chat-input.module.css';
 
 const prompts = [
@@ -26,6 +27,7 @@ interface ChatInputProps {
 }
 
 export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0 }: ChatInputProps) {
+  const { user } = useUser();
   const [input, setInput] = useState('');
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -41,8 +43,13 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      // Clear usage data when user signs out
+      setUsage(null);
+      return;
+    }
     fetchUsage();
-  }, [usageRefreshTrigger]);
+  }, [usageRefreshTrigger, user]);
 
   const fetchUsage = async () => {
     try {
