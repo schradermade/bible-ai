@@ -8,6 +8,7 @@ import {
   incrementUsage,
   INSIGHT_FEATURE_KEY,
 } from '@/lib/billing';
+import prisma from '@/lib/prisma';
 
 type DashboardResponse = {
   insight: {
@@ -328,6 +329,17 @@ export async function POST(request: Request) {
     const raw = content.trim();
     try {
       const parsed = JSON.parse(raw) as DashboardResponse;
+
+      // Save to database
+      await prisma.savedAiResponse.create({
+        data: {
+          userId,
+          feature: 'dashboard',
+          prompt: query,
+          response: JSON.stringify(parsed),
+        },
+      });
+
       await incrementUsage(userId, INSIGHT_FEATURE_KEY);
       return NextResponse.json(parsed);
     } catch {
@@ -336,6 +348,17 @@ export async function POST(request: Request) {
         throw new Error('AI response was not valid JSON.');
       }
       const parsed = JSON.parse(match[0]) as DashboardResponse;
+
+      // Save to database
+      await prisma.savedAiResponse.create({
+        data: {
+          userId,
+          feature: 'dashboard',
+          prompt: query,
+          response: JSON.stringify(parsed),
+        },
+      });
+
       await incrementUsage(userId, INSIGHT_FEATURE_KEY);
       return NextResponse.json(parsed);
     }

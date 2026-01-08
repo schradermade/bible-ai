@@ -1,0 +1,152 @@
+/* Widget Container */
+.widget {
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border: 2px solid rgba(176, 123, 76, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 12px rgba(31, 26, 22, 0.1),
+    0 2px 6px rgba(31, 26, 22, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.widget:hover {
+  border-color: rgba(176, 123, 76, 0.4);
+  box-shadow:
+    0 6px 16px rgba(31, 26, 22, 0.12),
+    0 3px 8px rgba(31, 26, 22, 0.06),
+    inset 0 1px 2px rgba(255, 255, 255, 1);
+}
+
+/* Widget Header */
+.widgetHeader {
+  padding: 16px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(176, 123, 76, 0.15);
+  transition: background 0.2s ease;
+}
+
+.widgetHeader:hover {
+  background: rgba(176, 123, 76, 0.05);
+}
+
+.widgetTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.widgetTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #3a2f26;
+  letter-spacing: 0.01em;
+}
+
+.chevronButton {
+  background: none;
+  border: none;
+  color: #8b6239;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.chevronButton svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.countBadge {
+  background: linear-gradient(135deg, #b07b4c 0%, #8b6239 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(176, 123, 76, 0.3);
+}
+
+/* Widget Content */
+.widgetContent {
+  max-height: 400px;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widgetContent.collapsed {
+  max-height: 0;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #8b7665;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* History List */
+.historyList {
+  padding: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
+}
+
+.historyList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.historyList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.historyList::-webkit-scrollbar-thumb {
+  background: rgba(176, 123, 76, 0.3);
+  border-radius: 3px;
+}
+
+.historyList::-webkit-scrollbar-thumb:hover {
+  background: rgba(176, 123, 76, 0.5);
+}
+
+.historyItem {
+  padding: 12px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.historyItem:hover {
+  background: rgba(176, 123, 76, 0.08);
+  border-color: rgba(176, 123, 76, 0.3);
+  transform: translateX(2px);
+  box-shadow: 0 2px 6px rgba(176, 123, 76, 0.15);
+}
+
+.historyPrompt {
+  font-size: 13px;
+  font-weight: 500;
+  color: #3a2f26;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.historyDate {
+  font-size: 11px;
+  color: #8b6239;
+  font-weight: 500;
+}

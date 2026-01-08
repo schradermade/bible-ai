@@ -8,6 +8,7 @@ import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
 import LifePanel from './LifePanel';
+import { useToast } from '@/contexts/ToastContext';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
 
@@ -84,6 +85,7 @@ const panels = [
 ];
 
 export default function Dashboard() {
+  const { showError } = useToast();
   const [expandedPanel, setExpandedPanel] = useState<PanelType>('insight');
   const [myVerses, setMyVerses] = useState<SavedVerse[]>([
     {
@@ -101,6 +103,7 @@ export default function Dashboard() {
   ]);
   const [panelContent, setPanelContent] = useState<PanelContent | null>(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
+  const [lastQuery, setLastQuery] = useState<string>('');
 
   const addVerse = (verse: SavedVerse) => {
     // Check if verse already exists
@@ -112,6 +115,7 @@ export default function Dashboard() {
 
   const handleSearch = async (query: string) => {
     setIsLoadingContent(true);
+    setLastQuery(query);
 
     try {
       const response = await fetch('/api/ai/dashboard', {
@@ -122,7 +126,26 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to fetch insights');
+
+        // Handle specific error types
+        if (response.status === 401) {
+          showError('Please sign in to use AI insights.');
+          return;
+        }
+
+        if (response.status === 429) {
+          showError(errorData.message || 'Monthly insight limit reached. Upgrade to continue.');
+          return;
+        }
+
+        if (response.status === 503) {
+          showError('AI service is temporarily unavailable. Please try again later.');
+          return;
+        }
+
+        // Generic error
+        showError(errorData.message || 'Failed to generate insights. Please try again.');
+        return;
       }
 
       const data = await response.json();
@@ -132,9 +155,32 @@ export default function Dashboard() {
       setExpandedPanel('insight');
     } catch (error) {
       console.error('Search error:', error);
-      // TODO: Show error toast/message to user
+
+      // Network or other errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        showError('Network error. Please check your connection and try again.');
+      } else {
+        showError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoadingContent(false);
+    }
+  };
+
+  const handleRetry = () => {
+    if (lastQuery) {
+      handleSearch(lastQuery);
+    }
+  };
+
+  const handleLoadHistory = (responseString: string) => {
+    try {
+      const parsed = JSON.parse(responseString);
+      setPanelContent(parsed);
+      setExpandedPanel('insight');
+    } catch (error) {
+      console.error('Failed to parse history response:', error);
+      showError('Failed to load search history item.');
     }
   };
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from './contextual-widgets.module.css';
+import UsageIndicator from './UsageIndicator';
 
 interface SavedVerse {
   reference: string;
@@ -39,6 +40,9 @@ export default function ContextualWidgets({ myVerses }: ContextualWidgetsProps) 
 
   return (
     <div className={styles.widgetsContainer}>
+      {/* Usage Indicator */}
+      <UsageIndicator />
+
       {/* Prayer Journal Widget */}
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('prayer')}>
