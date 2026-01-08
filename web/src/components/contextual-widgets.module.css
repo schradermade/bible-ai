@@ -410,6 +410,51 @@
   flex-shrink: 0;
 }
 
+.memorizedButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.1), rgba(176, 123, 76, 0.05));
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.memorizedButton:hover {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.18), rgba(176, 123, 76, 0.12));
+  border-color: rgba(176, 123, 76, 0.4);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.15);
+}
+
+.memorizedButton:active {
+  transform: translateY(0);
+}
+
+.memorizedButton svg {
+  flex-shrink: 0;
+}
+
+.memorizedActive {
+  background: linear-gradient(135deg, #2a5a4d 0%, #1e4239 100%);
+  border-color: #2a5a4d;
+  color: #f0e6d2;
+}
+
+.memorizedActive:hover {
+  background: linear-gradient(135deg, #35705f 0%, #2a5a4d 100%);
+  border-color: #35705f;
+  color: #ffffff;
+}
+
 /* Responsive */
 @media (max-width: 1320px) {
   .widgetsContainer {
