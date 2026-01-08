@@ -12,15 +12,24 @@ const prompts = [
   'Come, let us reason together.',
 ];
 
+interface UsageData {
+  used: number;
+  limit: number;
+  remaining: number;
+  isSubscribed: boolean;
+}
+
 interface ChatInputProps {
   onSearch: (query: string) => Promise<void>;
   isLoading: boolean;
+  usageRefreshTrigger?: number;
 }
 
-export default function ChatInput({ onSearch, isLoading }: ChatInputProps) {
+export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0 }: ChatInputProps) {
   const [input, setInput] = useState('');
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [usage, setUsage] = useState<UsageData | null>(null);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -30,6 +39,22 @@ export default function ChatInput({ onSearch, isLoading }: ChatInputProps) {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    fetchUsage();
+  }, [usageRefreshTrigger]);
+
+  const fetchUsage = async () => {
+    try {
+      const response = await fetch('/api/usage');
+      if (response.ok) {
+        const data = await response.json();
+        setUsage(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch usage:', error);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,7 +90,14 @@ export default function ChatInput({ onSearch, isLoading }: ChatInputProps) {
     <div
       className={`${styles.chatInputContainer} ${!isVisible ? styles.hidden : ''}`}
     >
-      <div className={styles.promptText}>Ask Berea AI.</div>
+      <div className={styles.topRow}>
+        <div className={styles.promptText}>Ask Berea AI.</div>
+        {usage && (
+          <div className={styles.usageText}>
+            {usage.remaining} of {usage.limit} searches remaining
+          </div>
+        )}
+      </div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputWrapper}>
           <input

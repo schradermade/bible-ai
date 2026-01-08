@@ -104,6 +104,7 @@ export default function Dashboard() {
   const [panelContent, setPanelContent] = useState<PanelContent | null>(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
+  const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
 
   const addVerse = (verse: SavedVerse) => {
     // Check if verse already exists
@@ -153,6 +154,9 @@ export default function Dashboard() {
 
       // Expand first panel (Insight) after content loads
       setExpandedPanel('insight');
+
+      // Trigger usage refresh
+      setUsageRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Search error:', error);
 
@@ -196,7 +200,7 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
-      <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} />
+      <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />
       <div className={styles.panelsContainer}>
       <div
         className={

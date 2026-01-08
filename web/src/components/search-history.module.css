@@ -116,6 +116,7 @@
 /* History List */
 .historyList {
   padding: 8px;
+  padding-right: 12px;
   max-height: 400px;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -123,20 +124,24 @@
 }
 
 .historyList::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .historyList::-webkit-scrollbar-track {
   background: transparent;
+  margin: 4px 0;
 }
 
 .historyList::-webkit-scrollbar-thumb {
   background: rgba(176, 123, 76, 0.3);
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .historyList::-webkit-scrollbar-thumb:hover {
   background: rgba(176, 123, 76, 0.5);
+  background-clip: padding-box;
 }
 
 .historyItem {

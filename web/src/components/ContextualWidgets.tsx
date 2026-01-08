@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import styles from './contextual-widgets.module.css';
-import UsageIndicator from './UsageIndicator';
 import SearchHistory from './SearchHistory';
 
 interface SavedVerse {
@@ -43,9 +42,6 @@ export default function ContextualWidgets({ myVerses, onLoadHistory }: Contextua
 
   return (
     <div className={styles.widgetsContainer}>
-      {/* Usage Indicator */}
-      <UsageIndicator />
-
       {/* Search History Widget */}
       <SearchHistory
         onLoadHistory={onLoadHistory}

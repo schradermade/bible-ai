@@ -26,21 +26,33 @@
   pointer-events: none;
 }
 
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
 .promptText {
   text-align: left;
   font-size: 20px;
   font-weight: 600;
   color: #5a4a30;
-  margin-bottom: 0;
   padding-left: 8px;
-  min-height: 32px;
   letter-spacing: 0.02em;
   line-height: 1.4;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.3em;
+}
+
+.usageText {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b6239;
+  padding-right: 8px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .rotatingText {
@@ -201,10 +213,21 @@
     mask-image: none;
   }
 
+  .topRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
   .promptText {
     font-size: 16px;
-    margin-bottom: 0;
     padding-left: 8px;
+  }
+
+  .usageText {
+    font-size: 12px;
+    padding-left: 8px;
+    padding-right: 0;
   }
 
   .inputWrapper {
