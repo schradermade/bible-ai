@@ -146,6 +146,7 @@
   top: 100px;
   right: calc((100vw - 1680px) / 2 + 40px + 320px + 24px);
   align-self: start;
+  z-index: 101;
 }
 
 /* Collapsed Panels - smaller thumbnails */
