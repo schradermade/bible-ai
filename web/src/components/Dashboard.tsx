@@ -295,7 +295,7 @@ export default function Dashboard() {
       </div>
 
       <aside className={styles.widgetsSidebar}>
-        <ContextualWidgets myVerses={myVerses} />
+        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} />
       </aside>
     </div>
   );

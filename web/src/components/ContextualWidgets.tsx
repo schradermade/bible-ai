@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from './contextual-widgets.module.css';
 import UsageIndicator from './UsageIndicator';
+import SearchHistory from './SearchHistory';
 
 interface SavedVerse {
   reference: string;
@@ -11,9 +12,10 @@ interface SavedVerse {
 
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
+  onLoadHistory: (response: string) => void;
 }
 
-export default function ContextualWidgets({ myVerses }: ContextualWidgetsProps) {
+export default function ContextualWidgets({ myVerses, onLoadHistory }: ContextualWidgetsProps) {
   const [prayerNotes, setPrayerNotes] = useState<string[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<string[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
@@ -22,6 +24,7 @@ export default function ContextualWidgets({ myVerses }: ContextualWidgetsProps) 
     myVerses: false,
     memory: false,
     study: false,
+    searchHistory: false,
   });
 
   const toggleWidget = (widgetId: string) => {
@@ -42,6 +45,13 @@ export default function ContextualWidgets({ myVerses }: ContextualWidgetsProps) 
     <div className={styles.widgetsContainer}>
       {/* Usage Indicator */}
       <UsageIndicator />
+
+      {/* Search History Widget */}
+      <SearchHistory
+        onLoadHistory={onLoadHistory}
+        isCollapsed={collapsedWidgets.searchHistory}
+        onToggle={() => toggleWidget('searchHistory')}
+      />
 
       {/* Prayer Journal Widget */}
       <div className={styles.widget}>

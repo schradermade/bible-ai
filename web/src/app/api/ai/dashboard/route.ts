@@ -78,7 +78,7 @@ Given a user query, provide 4 distinct perspectives in this EXACT order:
 2. LIFE: Practical application with relevant scriptures
    - Title describing the life situation
    - Description of the situation or challenge
-   - 3-6 biblical principles with scripture references and full text
+   - 2-4 biblical principles with scripture references and text (keep verses to 1-2 verses each)
    - Practical wisdom for applying these principles
    - Encouragement for the journey
 
@@ -90,7 +90,7 @@ Given a user query, provide 4 distinct perspectives in this EXACT order:
 4. DAILY: Today's devotional with prayer and action step
    - Title for today's reflection
    - Today's date (use current date)
-   - Scripture passage with reference and full text
+   - Scripture passage with reference and text (1-2 verses)
    - Thoughtful reflection connecting Scripture to life
    - A heartfelt prayer
    - One concrete action step
@@ -100,8 +100,7 @@ Follow these rules:
 - Cite Scripture accurately and distinguish text from interpretation
 - Never give commands or prescriptive advice
 - Never claim divine authority or personal prophecy
-- Avoid sensational or alarmist language
-- Always include full Scripture text, not just references
+- Keep Scripture quotations concise (1-2 verses per citation to stay within token limits)
 - Keep tone consistent across all 4 sections
 - Ensure content is substantive and meaningful, not generic
 
@@ -145,7 +144,9 @@ function normalizeError(error: unknown): NormalizedError {
 function buildUserPrompt(query: string) {
   return `User query: ${query}
 
-Provide comprehensive biblical guidance covering all 4 perspectives (Insight, Life, Prophecy, Daily) related to this query.`;
+Provide comprehensive biblical guidance covering all 4 perspectives (Insight, Life, Prophecy, Daily) related to this query.
+
+Note: Keep Scripture quotations concise (1-2 verses per citation) while maintaining depth and substance.`;
 }
 
 export async function POST(request: Request) {
@@ -187,11 +188,11 @@ export async function POST(request: Request) {
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const userPrompt = buildUserPrompt(query);
 
-  const attempt = async () => {
+  const attempt = async (useBackupModel = false) => {
     const completion = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: useBackupModel ? 'gpt-4o' : 'gpt-4o-mini',
       temperature: 0.7,
-      max_tokens: 2500,
+      max_tokens: 4000,
       response_format: {
         type: 'json_schema',
         json_schema: {
@@ -322,7 +323,22 @@ export async function POST(request: Request) {
       ],
     });
 
-    const content = completion.choices[0]?.message?.content ?? '';
+    const message = completion.choices[0]?.message;
+    const finishReason = completion.choices[0]?.finish_reason;
+
+    // Check for content filter
+    if (finishReason === 'content_filter') {
+      console.error('Content filter triggered for query:', query);
+      throw new Error('Unable to generate content for this query. Please try rephrasing or using different keywords.');
+    }
+
+    // Check for refusals
+    if (message?.refusal) {
+      console.error('AI refused to generate content:', message.refusal);
+      throw new Error('AI service declined to generate content for this query.');
+    }
+
+    const content = message?.content ?? '';
     if (!content) {
       throw new Error('AI response was empty.');
     }
@@ -342,9 +358,11 @@ export async function POST(request: Request) {
 
       await incrementUsage(userId, INSIGHT_FEATURE_KEY);
       return NextResponse.json(parsed);
-    } catch {
+    } catch (parseError) {
+      // Try to extract JSON from response
       const match = raw.match(/\{[\s\S]*\}/);
       if (!match) {
+        console.error('JSON parse failed. Raw response length:', raw.length, 'Finish reason:', finishReason);
         throw new Error('AI response was not valid JSON.');
       }
       const parsed = JSON.parse(match[0]) as DashboardResponse;
@@ -367,6 +385,24 @@ export async function POST(request: Request) {
   try {
     return await attempt();
   } catch (error) {
+    // Check if content filter triggered
+    const isContentFilter = error instanceof Error && error.message.includes('Unable to generate content for this query');
+
+    if (isContentFilter) {
+      console.log('Content filter triggered, trying with gpt-4o...');
+      try {
+        return await attempt(true);
+      } catch (retryError) {
+        const normalized = normalizeError(retryError);
+        console.error('AI dashboard error after retry', normalized);
+        return NextResponse.json(
+          { error: normalized.code, message: normalized.message },
+          { status: normalized.status }
+        );
+      }
+    }
+
+    // For other errors, retry once with same model
     try {
       return await attempt();
     } catch (retryError) {
