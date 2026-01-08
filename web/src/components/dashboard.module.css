@@ -55,7 +55,7 @@
 /* Expanded Grid - one large, three small */
 .gridExpanded {
   display: grid;
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 1fr 150px;
   grid-auto-rows: min-content;
   gap: 16px;
   height: auto;
@@ -151,9 +151,9 @@
 .panelCollapsed {
   opacity: 0.7;
   cursor: pointer;
-  padding: 16px;
-  height: 220px;
-  width: 220px;
+  padding: 12px;
+  height: 150px;
+  width: 150px;
 }
 
 .panelCollapsed:hover {
@@ -192,7 +192,7 @@
 }
 
 .panelCollapsed .panelTitle {
-  font-size: 16px;
+  font-size: 12px;
   text-transform: uppercase;
   font-variant: small-caps;
   letter-spacing: 0.08em;
