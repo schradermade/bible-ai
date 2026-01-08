@@ -176,11 +176,17 @@
 @media (max-width: 1320px) {
   .chatInputContainer {
     left: 0;
-    width: calc(100vw - 40px);
+    width: calc(100vw - 40px + 120px);
     padding-left: 40px;
-    padding-right: 0;
-    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
+    padding-right: 120px;
+    -webkit-mask-image:
+      linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
+      linear-gradient(to right, black calc(100% - 120px), transparent 100%);
+    mask-image:
+      linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
+      linear-gradient(to right, black calc(100% - 120px), transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 }
 
