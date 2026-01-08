@@ -32,10 +32,10 @@ export default function ChatInput() {
       const currentScrollY = window.scrollY;
       const scrollingDown = currentScrollY > lastScrollY.current;
 
-      if (currentScrollY <= 100) {
+      if (currentScrollY <= 200) {
         // Always show if near the top
         setIsVisible(true);
-      } else if (scrollingDown && currentScrollY > 20) {
+      } else if (scrollingDown && currentScrollY > 300) {
         // Hide when scrolling down
         setIsVisible(false);
       } else if (!scrollingDown) {
