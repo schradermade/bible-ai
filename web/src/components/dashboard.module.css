@@ -262,7 +262,11 @@
   }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1320px) {
+  .dashboard {
+    padding-top: 200px;
+  }
+
   .dashboardWrapper {
     grid-template-columns: 1fr;
     gap: 20px;

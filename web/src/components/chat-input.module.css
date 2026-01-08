@@ -173,11 +173,14 @@
   }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1320px) {
   .chatInputContainer {
     left: 0;
     width: calc(100vw - 40px);
     padding-left: 40px;
+    padding-right: 0;
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
   }
 }
 
