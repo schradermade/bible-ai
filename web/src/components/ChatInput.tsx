@@ -44,6 +44,8 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [historyLimit, setHistoryLimit] = useState(7);
+  const [hasMoreHistory, setHasMoreHistory] = useState(false);
   const lastScrollY = useRef(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const historyButtonRef = useRef<HTMLButtonElement>(null);
@@ -61,15 +63,25 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     }
   };
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (limit: number = historyLimit) => {
     if (!user) return;
 
     setIsHistoryLoading(true);
     try {
-      const response = await fetch('/api/history?limit=7');
+      // Fetch one extra to check if there are more items
+      const response = await fetch(`/api/history?limit=${limit + 1}`);
       if (response.ok) {
         const data = await response.json();
-        setHistory(data.history || []);
+        const items = data.history || [];
+
+        // Check if there are more items than requested
+        if (items.length > limit) {
+          setHasMoreHistory(true);
+          setHistory(items.slice(0, limit)); // Only show the requested amount
+        } else {
+          setHasMoreHistory(false);
+          setHistory(items);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch history:', error);
@@ -78,11 +90,20 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     }
   };
 
+  const loadMoreHistory = () => {
+    const newLimit = historyLimit + 20;
+    setHistoryLimit(newLimit);
+    fetchHistory(newLimit);
+  };
+
   const toggleHistory = () => {
     if (!isHistoryOpen) {
       // Opening dropdown
+      // Reset to initial limit
+      setHistoryLimit(7);
+
       if (history.length === 0) {
-        fetchHistory();
+        fetchHistory(7);
       }
 
       // Calculate position immediately
@@ -187,6 +208,40 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isHistoryOpen]);
 
+  // Update dropdown position on scroll and close when input goes out of view
+  useEffect(() => {
+    if (!isHistoryOpen || !formRef.current) return;
+
+    const handleScrollUpdate = () => {
+      if (formRef.current) {
+        const rect = formRef.current.getBoundingClientRect();
+
+        // Check if input is out of viewport
+        const isOutOfView = rect.bottom < 0 || rect.top > window.innerHeight;
+
+        if (isOutOfView) {
+          setIsHistoryOpen(false);
+        } else {
+          // Update position to keep dropdown attached
+          const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
+          setDropdownPosition({
+            top: rect.bottom,
+            left: rect.left,
+            width: maxWidth,
+          });
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollUpdate, { passive: true });
+    window.addEventListener('resize', handleScrollUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollUpdate);
+      window.removeEventListener('resize', handleScrollUpdate);
+    };
+  }, [isHistoryOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -287,11 +342,16 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
                 ))
               )}
             </div>
-            {history.length > 0 && (
+            {hasMoreHistory && (
               <div className={styles.historyDropdownFooter}>
-                <a href="/saved" className={styles.viewAllLink}>
-                  View All History →
-                </a>
+                <button
+                  type="button"
+                  className={styles.showMoreButton}
+                  onClick={loadMoreHistory}
+                  disabled={isHistoryLoading}
+                >
+                  {isHistoryLoading ? 'Loading...' : 'Show More'}
+                </button>
               </div>
             )}
           </div>,

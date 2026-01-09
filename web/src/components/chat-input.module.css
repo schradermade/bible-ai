@@ -267,8 +267,27 @@
 }
 
 .historyDropdownContent {
-  max-height: 280px;
+  max-height: 400px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
+}
+
+.historyDropdownContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.historyDropdownContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.historyDropdownContent::-webkit-scrollbar-thumb {
+  background: rgba(176, 123, 76, 0.3);
+  border-radius: 4px;
+}
+
+.historyDropdownContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(176, 123, 76, 0.5);
 }
 
 .historyItem {
@@ -324,18 +343,28 @@
   background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
 }
 
-.viewAllLink {
+.showMoreButton {
   display: block;
+  width: 100%;
   font-size: 13px;
   font-weight: 600;
   color: #c44536;
-  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 8px;
   text-align: center;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.viewAllLink:hover {
+.showMoreButton:hover:not(:disabled) {
   color: #a73529;
+  background: rgba(196, 69, 54, 0.05);
+}
+
+.showMoreButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

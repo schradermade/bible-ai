@@ -150,12 +150,12 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
 
   return (
     <div className={styles.widgetsContainer}>
-      {/* Search History Widget */}
-      <SearchHistory
+      {/* Search History Widget - Moved to input field dropdown */}
+      {/* <SearchHistory
         onLoadHistory={onLoadHistory}
         isCollapsed={collapsedWidgets.searchHistory}
         onToggle={() => toggleWidget('searchHistory')}
-      />
+      /> */}
 
       {/* Prayer Journal Widget */}
       <div className={styles.widget}>
