@@ -9,7 +9,7 @@
 .dashboard {
   width: 100%;
   min-height: 400px;
-  padding-top: 144px;
+  padding-top: 100px;
 }
 
 .panelsContainer {
@@ -124,8 +124,10 @@
 
 /* Expanded Panel - takes up main space */
 .panelExpanded {
-  grid-column: 1;
-  grid-row: 1 / -1;
+  position: fixed;
+  top: 100px;
+  left: calc((100vw - 1680px) / 2);
+  width: calc(1290px - 150px - 16px);
   cursor: default;
   border: 3px solid #b07b4c;
   box-shadow:
@@ -134,9 +136,9 @@
     inset 0 2px 4px rgba(255, 255, 255, 1),
     0 0 0 1px rgba(176, 123, 76, 0.2),
     0 0 32px rgba(176, 123, 76, 0.15);
-  overflow: hidden;
-  height: auto;
-  min-height: 400px;
+  overflow-y: auto;
+  height: calc(100vh - 100px - 200px);
+  max-height: calc(100vh - 100px - 200px);
   padding-top: 28px;
 }
 
@@ -317,6 +319,11 @@
   .collapsedPanelsContainer {
     right: calc(40px + 320px + 24px);
   }
+
+  .panelExpanded {
+    left: 40px;
+    width: calc(100vw - 40px - 320px - 24px - 150px - 16px - 40px);
+  }
 }
 
 @media (max-width: 1320px) {
@@ -340,6 +347,13 @@
     position: static;
     right: auto;
   }
+
+  .panelExpanded {
+    position: static;
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -354,7 +368,10 @@
   }
 
   .panelExpanded {
-    grid-column: 1;
+    position: static;
+    width: 100%;
+    height: auto;
+    max-height: none;
   }
 
   .collapsedPanelsContainer {
