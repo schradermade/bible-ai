@@ -23,14 +23,24 @@ interface LifePanelProps {
   onSaveVerse?: (verse: SavedVerse) => void;
 }
 
-export default function LifePanel({ content, isPreview = false, onSaveVerse }: LifePanelProps) {
+export default function LifePanel({
+  content,
+  isPreview = false,
+  onSaveVerse,
+}: LifePanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [savedVerseIndex, setSavedVerseIndex] = useState<number | null>(null);
-  const [hoveredVerseIndex, setHoveredVerseIndex] = useState<number | null>(null);
-  const [additionalVerses, setAdditionalVerses] = useState<Array<{ reference: string; text: string }>>([]);
+  const [hoveredVerseIndex, setHoveredVerseIndex] = useState<number | null>(
+    null
+  );
+  const [additionalVerses, setAdditionalVerses] = useState<
+    Array<{ reference: string; text: string }>
+  >([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [newlyAddedIndices, setNewlyAddedIndices] = useState<Set<number>>(new Set());
+  const [newlyAddedIndices, setNewlyAddedIndices] = useState<Set<number>>(
+    new Set()
+  );
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -86,7 +96,10 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
     setTimeout(() => {
       // Get 3-5 random verses from the pool that haven't been added yet
       const availableVerses = additionalVersesPool.filter(
-        poolVerse => !additionalVerses.some(added => added.reference === poolVerse.reference)
+        (poolVerse) =>
+          !additionalVerses.some(
+            (added) => added.reference === poolVerse.reference
+          )
       );
 
       const numberOfVersesToAdd = Math.min(
@@ -97,7 +110,9 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
       const versesToAdd = availableVerses.slice(0, numberOfVersesToAdd);
 
       // Calculate the starting index for new verses
-      const currentLength = (displayContent.biblicalPrinciples || []).length + additionalVerses.length;
+      const currentLength =
+        (displayContent.biblicalPrinciples || []).length +
+        additionalVerses.length;
       const newIndices = new Set<number>();
 
       for (let i = 0; i < versesToAdd.length; i++) {
@@ -118,7 +133,8 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
   // Default content for demonstration
   const defaultContent = {
     title: 'Navigating Difficult Relationships',
-    situation: 'When relationships become strained and conflict arises, it\'s easy to become defensive or withdraw. But God calls us to a different way—one marked by humility, forgiveness, and genuine love.',
+    situation:
+      "When relationships become strained and conflict arises, it's easy to become defensive or withdraw. But God calls us to a different way—one marked by humility, forgiveness, and genuine love.",
     biblicalPrinciples: [
       {
         reference: 'Ephesians 4:2-3',
@@ -145,8 +161,10 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
         text: 'Everyone should be quick to listen, slow to speak and slow to become angry.',
       },
     ],
-    practicalWisdom: 'Choose to listen first before defending yourself. Ask God to show you any blind spots in how you\'ve contributed to the conflict. Extend grace remembering how much grace you\'ve received from God.',
-    encouragement: 'Reconciliation is rarely easy, but it\'s always worth it. Your willingness to humble yourself and seek peace reflects the heart of Christ and brings healing to broken relationships.',
+    practicalWisdom:
+      "Choose to listen first before defending yourself. Ask God to show you any blind spots in how you've contributed to the conflict. Extend grace remembering how much grace you've received from God.",
+    encouragement:
+      "Reconciliation is rarely easy, but it's always worth it. Your willingness to humble yourself and seek peace reflects the heart of Christ and brings healing to broken relationships.",
   };
 
   const displayContent = content || defaultContent;
@@ -170,8 +188,10 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
 
   return (
     <div ref={panelRef} className={styles.lifePanel}>
-      <div className={`${styles.header} ${!headerVisible ? styles.headerHidden : ''}`}>
-        <h2 className={styles.panelTitle}>Life</h2>
+      <div
+        className={`${styles.header} ${!headerVisible ? styles.headerHidden : ''}`}
+      >
+        <h2 className={styles.panelTitle}>Life Application</h2>
         <div className={styles.panelSubtitle}>Wisdom for Everyday Living</div>
       </div>
 
@@ -187,10 +207,15 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
           <div className={styles.contentSection}>
             <div className={styles.sectionLabel}>Biblical Principles</div>
             {allBiblicalPrinciples.map((principle, index) => (
-              <div key={index} className={`${styles.verseContainer} ${hoveredVerseIndex === index ? styles.verseHighlighted : ''} ${newlyAddedIndices.has(index) ? styles.verseNewlyAdded : ''}`}>
+              <div
+                key={index}
+                className={`${styles.verseContainer} ${hoveredVerseIndex === index ? styles.verseHighlighted : ''} ${newlyAddedIndices.has(index) ? styles.verseNewlyAdded : ''}`}
+              >
                 <div className={styles.verseWithButton}>
                   <div className={styles.verseContent}>
-                    <div className={styles.scriptureReference}>{principle.reference}</div>
+                    <div className={styles.scriptureReference}>
+                      {principle.reference}
+                    </div>
                     <p className={styles.scriptureText}>"{principle.text}"</p>
                   </div>
                   <div style={{ position: 'relative' }}>
@@ -211,14 +236,38 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
                       }}
                       title="Save to My Verses"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     </button>
                     {savedVerseIndex === index && (
                       <div className={styles.savedToast}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20 6L9 17L4 12"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                         Saved to My Verses
                       </div>
@@ -230,27 +279,78 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
             <button
               className={styles.searchMoreButton}
               onClick={handleSearchMore}
-              disabled={isSearching || additionalVerses.length >= additionalVersesPool.length}
+              disabled={
+                isSearching ||
+                additionalVerses.length >= additionalVersesPool.length
+              }
             >
               {isSearching ? (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="60" strokeDashoffset="40"/>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={styles.spinningIcon}
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeDasharray="60"
+                      strokeDashoffset="40"
+                    />
                   </svg>
                   Searching...
                 </>
               ) : additionalVerses.length >= additionalVersesPool.length ? (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 6L9 17L4 12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   All Relevant Passages Shown
                 </>
               ) : (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="11"
+                      cy="11"
+                      r="8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M21 21L16.65 16.65"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   Search for More Relevant Passages
                 </>

@@ -27,7 +27,10 @@ interface ProphecyPanelProps {
   isPreview?: boolean;
 }
 
-export default function ProphecyPanel({ content, isPreview = false }: ProphecyPanelProps) {
+export default function ProphecyPanel({
+  content,
+  isPreview = false,
+}: ProphecyPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
@@ -64,7 +67,8 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
         reference: 'Isaiah 55:11',
         text: 'So shall my word be that goes out from my mouth; it shall not return to me empty, but it shall accomplish that which I purpose, and shall succeed in the thing for which I sent it.',
       },
-      context: 'Throughout Scripture, God\'s prophetic word has never failed. From the promises to Abraham, through the prophets to Israel, to the fulfillment in Christ—His word always accomplishes its divine purpose.',
+      context:
+        "Throughout Scripture, God's prophetic word has never failed. From the promises to Abraham, through the prophets to Israel, to the fulfillment in Christ—His word always accomplishes its divine purpose.",
     },
     present: {
       title: 'Word for Today',
@@ -72,7 +76,8 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
     },
     future: {
       title: 'The Promise Ahead',
-      promise: 'What God has spoken over your life will come to pass. The seeds planted in prayer, the prophetic words received, the quiet assurances in your spirit—these are not mere hopes, but divine declarations taking root in time.',
+      promise:
+        'What God has spoken over your life will come to pass. The seeds planted in prayer, the prophetic words received, the quiet assurances in your spirit—these are not mere hopes, but divine declarations taking root in time.',
     },
   };
 
@@ -82,7 +87,7 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
     return (
       <div className={styles.prophecyPreview}>
         <div className={styles.previewContent}>
-          <div className={styles.previewLabel}>Prophetic Word</div>
+          <div className={styles.previewLabel}>Prophecy</div>
         </div>
         <div className={styles.previewIcon}>📜</div>
       </div>
@@ -91,16 +96,24 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
 
   return (
     <div ref={panelRef} className={styles.prophecyPanel}>
-      <div className={`${styles.prophecyHeader} ${!headerVisible ? styles.headerHidden : ''}`}>
+      <div
+        className={`${styles.prophecyHeader} ${!headerVisible ? styles.headerHidden : ''}`}
+      >
         <h2 className={styles.prophecyTitle}>Prophecy</h2>
-        <div className={styles.prophecySubtitle}>God's Word Unfolding Through Time</div>
+        <div className={styles.prophecySubtitle}>
+          God's Word Unfolding Through Time
+        </div>
       </div>
 
       <div className={styles.epochSection}>
         <div className={styles.epochLabel}>Past</div>
         <h3 className={styles.epochTitle}>{displayContent.past.title}</h3>
-        <div className={styles.scriptureRef}>{displayContent.past.scripture.reference}</div>
-        <p className={styles.scriptureText}>"{displayContent.past.scripture.text}"</p>
+        <div className={styles.scriptureRef}>
+          {displayContent.past.scripture.reference}
+        </div>
+        <p className={styles.scriptureText}>
+          "{displayContent.past.scripture.text}"
+        </p>
         <p className={styles.contextText}>{displayContent.past.context}</p>
       </div>
 
