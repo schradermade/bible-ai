@@ -3,8 +3,8 @@
   bottom: 0;
   left: calc((100vw - 1680px) / 2);
   transform: translateY(0);
-  width: calc(1680px - 320px - 24px - 150px - 16px);
-  max-width: calc(1680px - 320px - 24px - 150px - 16px);
+  width: calc(1680px - 320px - 24px - 130px - 16px);
+  max-width: calc(1680px - 320px - 24px - 130px - 16px);
   padding: 5px 15px 22px 15px;
   background: #efe6d8;
   border-top: 2px solid rgba(176, 123, 76, 0.25);
@@ -181,7 +181,7 @@
 @media (max-width: 1760px) {
   .chatInputContainer {
     left: 40px;
-    width: calc(100vw - 80px - 320px - 24px - 150px - 16px);
+    width: calc(100vw - 80px - 320px - 24px - 130px - 16px);
     padding-left: 15px;
     padding-right: 15px;
   }

@@ -224,7 +224,7 @@
 }
 
 .previewIcon {
-  font-size: 48px;
+  font-size: 42px;
   filter: drop-shadow(0 4px 8px rgba(176, 123, 76, 0.3));
   animation: pulse 4s ease-in-out infinite;
   flex: 1;
