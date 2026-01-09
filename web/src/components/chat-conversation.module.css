@@ -5,7 +5,8 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 40px 60px;
+  overflow-x: hidden;
+  padding: 40px 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
 }
@@ -43,7 +44,7 @@
   flex: 1;
   max-width: 700px;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 60px 40px;
 }
 
 .welcomeIcon {
@@ -134,8 +135,9 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 15px;
 }
 
 /* Message Styles */
@@ -320,9 +322,29 @@
 }
 
 /* Responsive */
+@media (max-width: 1760px) {
+  .messagesContainer {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 1320px) {
+  .messagesContainer {
+    padding: 0 15px;
+  }
+}
+
 @media (max-width: 768px) {
   .chatContainer {
-    padding: 24px 20px;
+    padding: 24px 0;
+  }
+
+  .messagesContainer {
+    padding: 0 15px;
+  }
+
+  .welcomeContainer {
+    padding: 60px 20px;
   }
 
   .welcomeTitle {
