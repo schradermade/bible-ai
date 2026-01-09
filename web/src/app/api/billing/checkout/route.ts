@@ -6,14 +6,13 @@ import { getStripe } from "@/lib/stripe";
 export const runtime = "nodejs";
 
 function getOrigin(request: Request) {
-  const origin = request.headers.get("origin") ||
+  return (
+    request.headers.get("origin") ||
     request.headers.get("referer")?.replace(/\/$/, '') ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.APP_URL ||
-    "https://bereastudy.com";
-
-  console.log('[Checkout] Origin:', origin);
-  return origin;
+    "https://bereastudy.com"
+  );
 }
 
 export async function POST(request: Request) {
@@ -21,35 +20,26 @@ export async function POST(request: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      console.log('[Checkout] Error: No userId');
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-
-    console.log('[Checkout] UserId:', userId);
 
     const PRICE_ID = process.env.STRIPE_PRICE_ID;
 
     if (!PRICE_ID) {
-      console.log('[Checkout] Error: STRIPE_PRICE_ID not set');
       return NextResponse.json(
         { error: "stripe_price_missing" },
         { status: 500 }
       );
     }
 
-    console.log('[Checkout] Price ID:', PRICE_ID);
-
     const origin = getOrigin(request);
     if (!origin) {
-      console.log('[Checkout] Error: Could not determine origin');
       return NextResponse.json({ error: "app_url_missing" }, { status: 500 });
     }
 
     const stripe = getStripe();
     const user = await currentUser();
     const email = user?.emailAddresses?.[0]?.emailAddress;
-
-    console.log('[Checkout] User email:', email);
 
   const existing = await prisma.userSubscription.findUnique({
     where: { userId },
@@ -88,16 +78,11 @@ export async function POST(request: Request) {
       cancel_url: `${origin}/billing?checkout=cancelled`,
     });
 
-    console.log('[Checkout] Session created:', session.id);
-
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('[Checkout] Error:', error);
+    console.error('Checkout error:', error);
     return NextResponse.json(
-      {
-        error: "checkout_failed",
-        message: error instanceof Error ? error.message : "Unknown error"
-      },
+      { error: "checkout_failed" },
       { status: 500 }
     );
   }
