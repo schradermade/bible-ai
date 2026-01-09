@@ -5,6 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import styles from './dashboard.module.css';
 import ContextualWidgets from './ContextualWidgets';
 import ChatInput from './ChatInput';
+import ChatConversation from './ChatConversation';
 import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
@@ -78,6 +79,13 @@ interface PanelContent {
   daily?: DailyContent;
 }
 
+interface Message {
+  id: string;
+  type: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
 const panels = [
   { id: 'insight' as const, title: 'Insight' },
   { id: 'life' as const, title: 'Life' },
@@ -107,6 +115,7 @@ export default function Dashboard() {
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // Clear user data when signed out
   useEffect(() => {
@@ -114,6 +123,7 @@ export default function Dashboard() {
       setMyVerses([]);
       setPanelContent(null);
       setLastQuery('');
+      setMessages([]);
     }
   }, [user]);
 
@@ -130,11 +140,30 @@ export default function Dashboard() {
   };
 
   const handleSearch = async (query: string) => {
-    setIsLoadingContent(true);
     setLastQuery(query);
+    setIsLoadingContent(true);
+
+    // Add user message to chat
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      type: 'user',
+      content: query,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Create placeholder assistant message
+    const assistantMessageId = `assistant-${Date.now()}`;
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      type: 'assistant',
+      content: '',
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, assistantMessage]);
 
     try {
-      const response = await fetch('/api/ai/dashboard', {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
@@ -145,49 +174,63 @@ export default function Dashboard() {
 
         // Handle specific error types
         if (response.status === 401) {
-          showError('Please sign in to use AI insights.');
+          showError('Please sign in to use AI chat.');
+          // Remove the empty assistant message
+          setMessages(prev => prev.filter(m => m.id !== assistantMessageId));
           return;
         }
 
         if (response.status === 429) {
           showError(errorData.message || 'Monthly insight limit reached. Upgrade to continue.');
+          setMessages(prev => prev.filter(m => m.id !== assistantMessageId));
           return;
         }
 
-        if (response.status === 503) {
-          showError('AI service is temporarily unavailable. Please try again later.');
-          return;
-        }
-
-        // Generic error
-        showError(errorData.message || 'Failed to generate insights. Please try again.');
+        showError(errorData.message || 'Failed to generate response. Please try again.');
+        setMessages(prev => prev.filter(m => m.id !== assistantMessageId));
         return;
       }
 
-      const data = await response.json();
-      setPanelContent(data);
+      // Read the stream
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      let accumulatedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedContent += chunk;
+
+        // Update the assistant message with accumulated content
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: accumulatedContent }
+              : msg
+          )
+        );
+      }
 
       // Trigger usage refresh
       setUsageRefreshTrigger(prev => prev + 1);
     } catch (error) {
-      console.error('Search error:', error);
-
-      // Network or other errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        showError('Network error. Please check your connection and try again.');
-      } else {
-        showError('An unexpected error occurred. Please try again.');
-      }
+      console.error('Chat error:', error);
+      showError('An unexpected error occurred. Please try again.');
+      // Remove the empty assistant message
+      setMessages(prev => prev.filter(m => m.id !== assistantMessageId));
     } finally {
       setIsLoadingContent(false);
     }
   };
 
-  const handleRetry = () => {
-    if (lastQuery) {
-      handleSearch(lastQuery);
-    }
-  };
 
   const handleLoadHistory = (responseString: string) => {
     try {
@@ -199,13 +242,68 @@ export default function Dashboard() {
     }
   };
 
-  const handlePanelClick = (panelId: PanelType) => {
+  const handlePanelClick = async (panelId: PanelType) => {
     if (expandedPanel === panelId) {
       // Do nothing if clicking the already expanded panel
       return;
     }
+
     // Expand the clicked panel
     setExpandedPanel(panelId);
+
+    // If there's a query and we haven't loaded panel content yet, fetch it
+    if (lastQuery && !panelContent) {
+      setIsLoadingContent(true);
+
+      try {
+        const response = await fetch('/api/ai/dashboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: lastQuery }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+
+          // Handle specific error types
+          if (response.status === 401) {
+            showError('Please sign in to use AI insights.');
+            return;
+          }
+
+          if (response.status === 429) {
+            showError(errorData.message || 'Monthly insight limit reached. Upgrade to continue.');
+            return;
+          }
+
+          if (response.status === 503) {
+            showError('AI service is temporarily unavailable. Please try again later.');
+            return;
+          }
+
+          // Generic error
+          showError(errorData.message || 'Failed to generate insights. Please try again.');
+          return;
+        }
+
+        const data = await response.json();
+        setPanelContent(data);
+
+        // Trigger usage refresh
+        setUsageRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        console.error('Panel load error:', error);
+
+        // Network or other errors
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+          showError('Network error. Please check your connection and try again.');
+        } else {
+          showError('An unexpected error occurred. Please try again.');
+        }
+      } finally {
+        setIsLoadingContent(false);
+      }
+    }
   };
 
   const handleClosePanel = (e: React.MouseEvent) => {
@@ -219,6 +317,17 @@ export default function Dashboard() {
       <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
+        {/* Chat Conversation - Show when no panel is expanded */}
+        {!expandedPanel && (
+          <div className={`${styles.chatArea} ${messages.length > 0 ? styles.chatAreaWithMessages : ''}`}>
+            <ChatConversation
+              messages={messages}
+              isStreaming={isLoadingContent}
+              onSuggestionClick={handleSearch}
+            />
+          </div>
+        )}
+
         {/* Expanded Panel - Only show if a panel is selected */}
         {expandedPanel && panels.map((panel) => {
           const isExpanded = expandedPanel === panel.id;
