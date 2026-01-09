@@ -5,7 +5,7 @@
   transform: translateY(0);
   width: calc(1680px - 320px - 24px - 150px - 16px);
   max-width: calc(1680px - 320px - 24px - 150px - 16px);
-  padding: 15px 15px 32px 15px;
+  padding: 5px 15px 22px 15px;
   background: #efe6d8;
   border-top: 2px solid rgba(176, 123, 76, 0.25);
   border-left: 2px solid rgba(176, 123, 76, 0.25);
@@ -15,8 +15,9 @@
   box-shadow: 0 -4px 16px rgba(31, 26, 22, 0.08);
   z-index: 500;
   opacity: 1;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chatInputContainer.hidden {
