@@ -55,7 +55,7 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
             id: v.id,
             reference: v.reference,
             text: v.text || '',
-            memorized: true, // All verses from DB are marked as memorized
+            memorized: v.memorizedAt !== null, // Only marked as memorized if memorizedAt is set
           }));
           setMemoryVerses(verses);
         }
@@ -85,34 +85,35 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
       id: tempId,
       reference: verse.reference,
       text: verse.text,
-      memorized: true, // Mark as memorized immediately
+      memorized: false, // Not yet memorized, just added to practice list
     };
 
     // Optimistically add to UI
     setMemoryVerses([newMemoryVerse, ...memoryVerses]);
 
     try {
-      // Save to database
+      // Save to database immediately (with memorized: false)
       const response = await fetch('/api/verses/memorized', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reference: verse.reference,
           text: verse.text || null,
+          markAsMemorized: false, // Just add to list, not marking as memorized yet
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save verse');
+        throw new Error('Failed to save verse to memory list');
       }
 
       const data = await response.json();
-      // Update with real ID from database
+      // Update with real database ID
       setMemoryVerses(prev =>
         prev.map(v => v.id === tempId ? { ...v, id: data.verse.id } : v)
       );
     } catch (error) {
-      console.error('Failed to memorize verse:', error);
+      console.error('Failed to add verse to memory list:', error);
       // Revert on error
       setMemoryVerses(prev => prev.filter(v => v.id !== tempId));
     }
@@ -132,21 +133,40 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     try {
       if (newMemorizedState) {
         // Mark as memorized in database
-        await fetch('/api/verses/memorized', {
+        const response = await fetch('/api/verses/memorized', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             reference: verse.reference,
             text: verse.text || null,
+            markAsMemorized: true, // Explicitly mark as memorized
           }),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to save memorized verse');
+        }
+
+        const data = await response.json();
+        // Update with real database ID
+        setMemoryVerses(prev =>
+          prev.map(v => v.id === id ? { ...v, id: data.verse.id, memorized: true } : v)
+        );
       } else {
-        // Remove from database
-        await fetch('/api/verses/memorized', {
-          method: 'DELETE',
+        // Unmark as memorized (set memorizedAt to null)
+        const response = await fetch('/api/verses/memorized', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reference: verse.reference }),
+          body: JSON.stringify({
+            reference: verse.reference,
+            text: verse.text || null,
+            markAsMemorized: false, // Unmark as memorized
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to update memorized status');
+        }
       }
     } catch (error) {
       console.error('Failed to update memorized status:', error);

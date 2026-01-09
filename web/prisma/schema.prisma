@@ -44,13 +44,13 @@ model UsageCounter {
 }
 
 model MemorizedVerse {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   reference   String
   text        String?
-  memorizedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  memorizedAt DateTime? // Nullable - only set when user marks as memorized
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([userId, reference])
   @@index([userId])
