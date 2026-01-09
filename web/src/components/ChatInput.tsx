@@ -110,8 +110,9 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
       if (formRef.current) {
         const rect = formRef.current.getBoundingClientRect();
         const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
+        const dropdownHeight = 400; // Approximate max height
         setDropdownPosition({
-          top: rect.bottom,
+          top: rect.top - dropdownHeight,
           left: rect.left,
           width: maxWidth,
         });
@@ -222,10 +223,11 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
         if (isOutOfView) {
           setIsHistoryOpen(false);
         } else {
-          // Update position to keep dropdown attached
+          // Update position to keep dropdown attached (above input)
           const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
+          const dropdownHeight = 400;
           setDropdownPosition({
-            top: rect.bottom,
+            top: rect.top - dropdownHeight,
             left: rect.left,
             width: maxWidth,
           });
