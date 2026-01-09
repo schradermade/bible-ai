@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useUser } from '@clerk/nextjs';
 import styles from './chat-input.module.css';
 
@@ -42,9 +43,11 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const lastScrollY = useRef(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const historyButtonRef = useRef<HTMLButtonElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const fetchUsage = async () => {
     try {
@@ -76,10 +79,31 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   };
 
   const toggleHistory = () => {
-    if (!isHistoryOpen && history.length === 0) {
-      fetchHistory();
+    if (!isHistoryOpen) {
+      // Opening dropdown
+      if (history.length === 0) {
+        fetchHistory();
+      }
+
+      // Calculate position immediately
+      if (formRef.current) {
+        const rect = formRef.current.getBoundingClientRect();
+        const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
+        console.log('Dropdown position:', { top: rect.bottom + 8, left: rect.left, width: maxWidth });
+        setDropdownPosition({
+          top: rect.bottom + 8,
+          left: rect.left,
+          width: maxWidth,
+        });
+      } else {
+        console.error('formRef.current is null');
+      }
+
+      setIsHistoryOpen(true);
+    } else {
+      // Closing dropdown
+      setIsHistoryOpen(false);
     }
-    setIsHistoryOpen(!isHistoryOpen);
   };
 
   const handleSelectHistory = (item: HistoryItem) => {
@@ -185,7 +209,7 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
           </div>
         )}
       </div>
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.inputWrapper}>
           <button
             ref={historyButtonRef}
@@ -221,10 +245,25 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
             )}
           </button>
         </div>
+      </form>
 
-        {/* History Dropdown */}
-        {isHistoryOpen && (
-          <div ref={dropdownRef} className={styles.historyDropdown}>
+      {/* History Dropdown - Rendered via Portal to avoid parent mask clipping */}
+      {isHistoryOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className={styles.historyDropdown}
+            style={
+              dropdownPosition
+                ? {
+                    top: `${dropdownPosition.top}px`,
+                    left: `${dropdownPosition.left}px`,
+                    width: `${dropdownPosition.width}px`,
+                  }
+                : { visibility: 'hidden' }
+            }
+          >
             <div className={styles.historyDropdownHeader}>
               <span className={styles.historyDropdownTitle}>Recent Searches</span>
             </div>
@@ -258,9 +297,9 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
                 </a>
               </div>
             )}
-          </div>
+          </div>,
+          document.body
         )}
-      </form>
     </div>
   );
 }
