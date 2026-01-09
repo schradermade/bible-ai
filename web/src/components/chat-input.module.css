@@ -4,16 +4,14 @@
   left: calc((100vw - 1680px) / 2);
   transform: translateY(0);
   width: 1290px;
-  padding: 40px 120px 32px 0;
+  padding: 15px 15px 32px 15px;
   background: #efe6d8;
-  -webkit-mask-image:
-    linear-gradient(to top, black 0%, black 80%, transparent 100%),
-    linear-gradient(to right, black calc(100% - 120px), transparent 100%);
-  mask-image:
-    linear-gradient(to top, black 0%, black 80%, transparent 100%),
-    linear-gradient(to right, black calc(100% - 120px), transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  border-top: 2px solid rgba(176, 123, 76, 0.25);
+  border-left: 2px solid rgba(176, 123, 76, 0.25);
+  border-right: 2px solid rgba(176, 123, 76, 0.25);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -4px 16px rgba(31, 26, 22, 0.08);
   z-index: 500;
   opacity: 1;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
@@ -181,26 +179,18 @@
 @media (max-width: 1760px) {
   .chatInputContainer {
     left: 40px;
-    width: calc(100vw - 80px - 320px - 24px - 150px - 16px + 120px);
-    padding-left: 0;
-    padding-right: 120px;
+    width: calc(100vw - 80px - 320px - 24px - 150px - 16px);
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 
 @media (max-width: 1320px) {
   .chatInputContainer {
     left: 40px;
-    width: calc(100vw - 40px);
-    padding-left: 0;
-    padding-right: 120px;
-    -webkit-mask-image:
-      linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
-      linear-gradient(to right, black calc(100% - 120px), transparent 100%);
-    mask-image:
-      linear-gradient(to bottom, black 0%, black 80%, transparent 100%),
-      linear-gradient(to right, black calc(100% - 120px), transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+    width: calc(100vw - 80px);
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 
@@ -372,9 +362,10 @@
     left: 0;
     width: 100vw;
     padding: 24px 24px 40px 24px;
-    background: linear-gradient(180deg, #efe6d8 0%, #efe6d8 80%, transparent 100%);
-    -webkit-mask-image: none;
-    mask-image: none;
+    border-left: none;
+    border-right: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   .topRow {
