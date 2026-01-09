@@ -25,7 +25,8 @@ export default function ChatConversation({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
-  const lastScrollTopRef = useRef(0);
+  const userIsScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const suggestions = [
     "How do I deal with anxiety?",
@@ -42,28 +43,47 @@ export default function ChatConversation({
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
 
-      // Detect if user manually scrolled up (not triggered by auto-scroll)
-      if (scrollTop < lastScrollTopRef.current) {
-        // User scrolled up - disable auto-scroll
-        shouldAutoScrollRef.current = false;
-      } else if (isAtBottom) {
-        // User is at bottom - re-enable auto-scroll
-        shouldAutoScrollRef.current = true;
+      // User is actively scrolling
+      userIsScrollingRef.current = true;
+
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
 
-      lastScrollTopRef.current = scrollTop;
+      // After user stops scrolling for 200ms, check position
+      scrollTimeoutRef.current = setTimeout(() => {
+        userIsScrollingRef.current = false;
+        // If they ended at the bottom, re-enable auto-scroll
+        if (isAtBottom) {
+          shouldAutoScrollRef.current = true;
+        } else {
+          // If they're not at bottom, disable auto-scroll
+          shouldAutoScrollRef.current = false;
+        }
+      }, 200);
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       container.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    // Only auto-scroll if enabled and not being manually controlled
-    if (shouldAutoScrollRef.current && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+    // Never auto-scroll while user is actively scrolling
+    if (userIsScrollingRef.current) {
+      return;
+    }
+
+    // Only auto-scroll if explicitly enabled
+    if (shouldAutoScrollRef.current && messagesEndRef.current && containerRef.current) {
+      const { scrollHeight, clientHeight } = containerRef.current;
+      // Use direct scrollTop assignment instead of scrollIntoView to avoid smooth behavior
+      containerRef.current.scrollTop = scrollHeight - clientHeight;
     }
   }, [messages]);
 
