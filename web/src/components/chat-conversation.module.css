@@ -129,6 +129,64 @@
     inset 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
+/* Verse Reference Styles */
+.verseReference {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.verseSaveButton {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.1), rgba(176, 123, 76, 0.05));
+  border: 1px solid rgba(176, 123, 76, 0.3);
+  border-radius: 6px;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #8b6239;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.verseSaveButton:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.1));
+  border-color: rgba(176, 123, 76, 0.5);
+  color: #6b4e2e;
+  transform: scale(1.05);
+}
+
+.verseSaveButton:active {
+  transform: scale(0.95);
+}
+
+.verseSaveButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.verseSaveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Messages Container */
 .messagesContainer {
   display: flex;

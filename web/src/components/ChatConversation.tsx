@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './chat-conversation.module.css';
 
@@ -11,16 +11,237 @@ interface Message {
   timestamp: Date;
 }
 
+interface SavedVerse {
+  reference: string;
+  text: string;
+}
+
 interface ChatConversationProps {
   messages: Message[];
   isStreaming?: boolean;
   onSuggestionClick?: (suggestion: string) => void;
+  onSaveVerse?: (verse: SavedVerse) => void;
+}
+
+// Bible verse reference pattern: Book name (with optional number) followed by chapter:verse
+const VERSE_PATTERN = /\b([1-3]?\s?[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(\d+:\d+(?:-\d+)?(?:,\s?\d+)?)\b/g;
+
+// Component to render verse references with save button
+function VerseReference({
+  reference,
+  fullText,
+  onSave
+}: {
+  reference: string;
+  fullText: string;
+  onSave?: (verse: SavedVerse) => void;
+}) {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!onSave || isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      // Fetch the exact verse text from the Bible API
+      const response = await fetch(`/api/bible/verse?reference=${encodeURIComponent(reference)}`);
+
+      if (!response.ok) {
+        console.error('Failed to fetch verse from API');
+        // Fallback to extraction if API fails
+        const verseText = extractVerseText(reference, fullText);
+        onSave({
+          reference: reference,
+          text: verseText || 'Verse text not available',
+        });
+        return;
+      }
+
+      const data = await response.json();
+
+      onSave({
+        reference: data.reference,
+        text: data.text,
+      });
+    } catch (error) {
+      console.error('Error saving verse:', error);
+      // Fallback to extraction on error
+      const verseText = extractVerseText(reference, fullText);
+      onSave({
+        reference: reference,
+        text: verseText || 'Verse text not available',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <span className={styles.verseReference}>
+      <strong>{reference}</strong>
+      {onSave && (
+        <button
+          onClick={handleSave}
+          className={styles.verseSaveButton}
+          disabled={isSaving}
+          aria-label={`Save ${reference}`}
+          title={`Save ${reference} to My Verses`}
+        >
+          {isSaving ? (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className={styles.spinner}
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="60"
+                strokeDashoffset="20"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </button>
+      )}
+    </span>
+  );
+}
+
+// Extract verse text from the full message content
+function extractVerseText(reference: string, fullText: string): string {
+  // Escape special regex characters in the reference
+  const escapedRef = reference.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // Pattern 1: Reference followed by colon/dash and quoted text
+  // Example: "Matthew 5:5: 'Blessed are the meek...'"
+  const pattern1 = new RegExp(
+    `${escapedRef}\\s*[:-]?\\s*["']([^"']+)["']`,
+    'i'
+  );
+
+  // Pattern 2: Reference followed by "says" or "reads" and quoted text
+  // Example: "Matthew 5:5 says, 'Blessed are the meek...'"
+  const pattern2 = new RegExp(
+    `${escapedRef}\\s+(?:says|reads|states)\\s*,?\\s*["']([^"']+)["']`,
+    'i'
+  );
+
+  // Pattern 3: Reference in parentheses after quoted text
+  // Example: "'Blessed are the meek...' (Matthew 5:5)"
+  const pattern3 = new RegExp(
+    `["']([^"']+)["']\\s*\\(${escapedRef}\\)`,
+    'i'
+  );
+
+  // Pattern 4: Reference followed by just quoted text without punctuation
+  // Example: "Matthew 5:5 'Blessed are the meek...'"
+  const pattern4 = new RegExp(
+    `${escapedRef}\\s+["']([^"']+)["']`,
+    'i'
+  );
+
+  // Try each pattern
+  let match = fullText.match(pattern1);
+  if (match) return match[1].trim();
+
+  match = fullText.match(pattern2);
+  if (match) return match[1].trim();
+
+  match = fullText.match(pattern3);
+  if (match) return match[1].trim();
+
+  match = fullText.match(pattern4);
+  if (match) return match[1].trim();
+
+  // If no pattern matches, return empty string
+  // In the future, this could fetch from a Bible API
+  return '';
+}
+
+// Function to parse text and identify verse references
+function parseVerseReferences(text: string, fullText: string, onSave?: (verse: SavedVerse) => void) {
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+  let match;
+
+  // Reset regex
+  const regex = new RegExp(VERSE_PATTERN);
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    // Add the verse reference component
+    const fullReference = `${match[1]} ${match[2]}`;
+    parts.push(
+      <VerseReference
+        key={match.index}
+        reference={fullReference}
+        fullText={fullText}
+        onSave={onSave}
+      />
+    );
+
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
+// Helper to recursively process children and detect verse references
+function processChildren(children: any, fullText: string, onSave?: (verse: SavedVerse) => void): any {
+  if (typeof children === 'string') {
+    return parseVerseReferences(children, fullText, onSave);
+  }
+
+  if (Array.isArray(children)) {
+    return children.map((child, index) => {
+      if (typeof child === 'string') {
+        return <span key={index}>{parseVerseReferences(child, fullText, onSave)}</span>;
+      }
+      return child;
+    });
+  }
+
+  return children;
 }
 
 export default function ChatConversation({
   messages,
   isStreaming = false,
   onSuggestionClick,
+  onSaveVerse,
 }: ChatConversationProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,7 +364,29 @@ export default function ChatConversation({
             >
               <div className={styles.messageContent}>
                 {message.type === 'assistant' ? (
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => {
+                        // Process text nodes to detect verse references
+                        const processedChildren = processChildren(children, message.content, onSaveVerse);
+                        return <p>{processedChildren}</p>;
+                      },
+                      li: ({ children }) => {
+                        const processedChildren = processChildren(children, message.content, onSaveVerse);
+                        return <li>{processedChildren}</li>;
+                      },
+                      strong: ({ children }) => {
+                        const processedChildren = processChildren(children, message.content, onSaveVerse);
+                        return <strong>{processedChildren}</strong>;
+                      },
+                      em: ({ children }) => {
+                        const processedChildren = processChildren(children, message.content, onSaveVerse);
+                        return <em>{processedChildren}</em>;
+                      },
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
                 ) : (
                   message.content
                 )}

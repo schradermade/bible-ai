@@ -330,6 +330,7 @@ export default function Dashboard() {
               messages={messages}
               isStreaming={isLoadingContent}
               onSuggestionClick={handleSearch}
+              onSaveVerse={addVerse}
             />
           </div>
         )}
