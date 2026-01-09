@@ -23,8 +23,9 @@ interface ChatConversationProps {
   onSaveVerse?: (verse: SavedVerse) => void;
 }
 
-// Bible verse reference pattern: Book name (with optional number) followed by chapter:verse
-const VERSE_PATTERN = /\b([1-3]?\s?[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(\d+:\d+(?:-\d+)?(?:,\s?\d+)?)\b/g;
+// Bible verse reference pattern: Detects [[Book chapter:verse]] format
+// This matches the format that ChatGPT is instructed to use
+const VERSE_PATTERN = /\[\[([^\]]+)\]\]/g;
 
 // Component to render verse references with save button
 function VerseReference({
@@ -134,14 +135,14 @@ function extractVerseText(reference: string, fullText: string): string {
   // Escape special regex characters in the reference
   const escapedRef = reference.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // Pattern 1: Reference followed by colon/dash and quoted text
-  // Example: "Matthew 5:5: 'Blessed are the meek...'"
+  // Pattern 1: [[Reference]] followed by quoted text
+  // Example: "[[Matthew 5:5]] says, 'Blessed are the meek...'"
   const pattern1 = new RegExp(
-    `${escapedRef}\\s*[:-]?\\s*["']([^"']+)["']`,
+    `\\[\\[${escapedRef}\\]\\]\\s*(?:says|reads|states)?\\s*,?\\s*["']([^"']+)["']`,
     'i'
   );
 
-  // Pattern 2: Reference followed by "says" or "reads" and quoted text
+  // Pattern 2: Reference (without brackets) followed by quoted text
   // Example: "Matthew 5:5 says, 'Blessed are the meek...'"
   const pattern2 = new RegExp(
     `${escapedRef}\\s+(?:says|reads|states)\\s*,?\\s*["']([^"']+)["']`,
@@ -155,10 +156,10 @@ function extractVerseText(reference: string, fullText: string): string {
     'i'
   );
 
-  // Pattern 4: Reference followed by just quoted text without punctuation
-  // Example: "Matthew 5:5 'Blessed are the meek...'"
+  // Pattern 4: Reference followed by colon/dash and quoted text
+  // Example: "Matthew 5:5: 'Blessed are the meek...'"
   const pattern4 = new RegExp(
-    `${escapedRef}\\s+["']([^"']+)["']`,
+    `${escapedRef}\\s*[:-]?\\s*["']([^"']+)["']`,
     'i'
   );
 
@@ -176,7 +177,6 @@ function extractVerseText(reference: string, fullText: string): string {
   if (match) return match[1].trim();
 
   // If no pattern matches, return empty string
-  // In the future, this could fetch from a Bible API
   return '';
 }
 
@@ -190,17 +190,19 @@ function parseVerseReferences(text: string, fullText: string, onSave?: (verse: S
   const regex = new RegExp(VERSE_PATTERN);
 
   while ((match = regex.exec(text)) !== null) {
+    // match[1] contains the verse reference (everything between [[ and ]])
+    const reference = match[1].trim();
+
     // Add text before the match
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
 
-    // Add the verse reference component
-    const fullReference = `${match[1]} ${match[2]}`;
+    // Add the verse reference component (displayed without brackets)
     parts.push(
       <VerseReference
         key={match.index}
-        reference={fullReference}
+        reference={reference}
         fullText={fullText}
         onSave={onSave}
       />
