@@ -135,14 +135,14 @@
   border-radius: 24px;
   overflow: hidden;
   overflow-x: hidden;
-  height: auto;
+  height: calc(100vh - 230px);
   min-height: 400px;
   box-shadow:
     0 8px 24px rgba(31, 26, 22, 0.12),
     0 4px 12px rgba(31, 26, 22, 0.06),
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
     0 0 0 1px rgba(176, 123, 76, 0.1);
-  margin-bottom: 250px;
+  margin-bottom: 0;
 }
 
 /* Chat Area with messages - remove container styling */
@@ -167,10 +167,10 @@
     0 0 0 1px rgba(176, 123, 76, 0.2),
     0 0 32px rgba(176, 123, 76, 0.15);
   overflow: visible;
-  height: auto;
+  height: calc(100vh - 230px);
   min-height: 400px;
   padding-top: 28px;
-  margin-bottom: 250px;
+  margin-bottom: 0;
 }
 
 .panelExpanded:hover {
