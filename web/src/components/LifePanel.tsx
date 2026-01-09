@@ -160,11 +160,10 @@ export default function LifePanel({ content, isPreview = false, onSaveVerse }: L
   if (isPreview) {
     return (
       <div className={styles.lifePreview}>
-        <div className={styles.previewIcon}>🌱</div>
         <div className={styles.previewContent}>
           <div className={styles.previewLabel}>Life Application</div>
-          <div className={styles.previewTitle}>{displayContent.title}</div>
         </div>
+        <div className={styles.previewIcon}>🌱</div>
       </div>
     );
   }

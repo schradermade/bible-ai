@@ -61,11 +61,10 @@ export default function InsightPanel({ content, isPreview = false }: InsightPane
   if (isPreview) {
     return (
       <div className={styles.insightPreview}>
-        <div className={styles.previewIcon}>💡</div>
         <div className={styles.previewContent}>
           <div className={styles.previewLabel}>Biblical Insight</div>
-          <div className={styles.previewTitle}>{displayContent.title}</div>
         </div>
+        <div className={styles.previewIcon}>💡</div>
       </div>
     );
   }

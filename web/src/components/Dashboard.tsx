@@ -275,9 +275,6 @@ export default function Dashboard() {
                 }`}
                 onClick={() => handlePanelClick(panel.id)}
               >
-                <div className={styles.panelHeader}>
-                  <h2 className={styles.panelTitle}>{panel.title}</h2>
-                </div>
                 <div className={styles.panelContent}>
                   {panel.id === 'insight' && <InsightPanel isPreview={true} />}
                   {panel.id === 'life' && <LifePanel isPreview={true} />}

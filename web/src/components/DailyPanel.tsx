@@ -68,11 +68,10 @@ export default function DailyPanel({ content, isPreview = false }: DailyPanelPro
   if (isPreview) {
     return (
       <div className={styles.dailyPreview}>
-        <div className={styles.previewIcon}>🙏</div>
         <div className={styles.previewContent}>
           <div className={styles.previewLabel}>Today's Devotional</div>
-          <div className={styles.previewTitle}>{displayContent.title}</div>
         </div>
+        <div className={styles.previewIcon}>🙏</div>
       </div>
     );
   }

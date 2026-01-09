@@ -81,11 +81,10 @@ export default function ProphecyPanel({ content, isPreview = false }: ProphecyPa
   if (isPreview) {
     return (
       <div className={styles.prophecyPreview}>
-        <div className={styles.previewIcon}>📜</div>
         <div className={styles.previewContent}>
           <div className={styles.previewLabel}>Prophetic Word</div>
-          <div className={styles.previewTitle}>Past, Present, Future</div>
         </div>
+        <div className={styles.previewIcon}>📜</div>
       </div>
     );
   }
