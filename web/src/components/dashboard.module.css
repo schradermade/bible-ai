@@ -168,11 +168,22 @@
   padding: 12px;
   height: 150px;
   width: 150px;
+  transition: none !important;
 }
 
 .panelCollapsed:hover {
   opacity: 1;
   border-color: rgba(176, 123, 76, 0.4);
+}
+
+/* Active collapsed panel (currently expanded on left) */
+.panelCollapsedActive {
+  opacity: 1;
+  border-color: #b07b4c;
+  border-width: 3px;
+  box-shadow:
+    0 8px 16px rgba(176, 123, 76, 0.2),
+    0 4px 8px rgba(176, 123, 76, 0.15);
 }
 
 .panelCollapsed .panelContent {

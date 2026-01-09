@@ -258,16 +258,17 @@ export default function Dashboard() {
               );
             })}
 
-            {/* Collapsed Panels Container */}
+            {/* Collapsed Panels Container - Show all 4 panels */}
             <div className={styles.collapsedPanelsContainer}>
               {panels.map((panel) => {
-                const isCollapsed = expandedPanel && expandedPanel !== panel.id;
-                if (!isCollapsed) return null;
+                const isCurrentlyExpanded = expandedPanel === panel.id;
 
                 return (
                   <div
                     key={panel.id}
-                    className={`${styles.panel} ${styles.panelCollapsed}`}
+                    className={`${styles.panel} ${styles.panelCollapsed} ${
+                      isCurrentlyExpanded ? styles.panelCollapsedActive : ''
+                    }`}
                     onClick={() => handlePanelClick(panel.id)}
                   >
                     <div className={styles.panelHeader}>
