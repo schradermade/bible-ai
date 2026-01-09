@@ -89,14 +89,11 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
       if (formRef.current) {
         const rect = formRef.current.getBoundingClientRect();
         const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
-        console.log('Dropdown position:', { top: rect.bottom + 8, left: rect.left, width: maxWidth });
         setDropdownPosition({
-          top: rect.bottom + 8,
+          top: rect.bottom,
           left: rect.left,
           width: maxWidth,
         });
-      } else {
-        console.error('formRef.current is null');
       }
 
       setIsHistoryOpen(true);
