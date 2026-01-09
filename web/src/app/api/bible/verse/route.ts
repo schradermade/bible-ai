@@ -29,10 +29,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Use bible-api.com - it's free and doesn't require authentication
+    // Use bible-api.com with KJV (default, public domain)
     // Format: https://bible-api.com/john+3:16
+    // KJV is public domain - no licensing restrictions
     const encodedReference = encodeURIComponent(reference.replace(/\s+/g, '+'));
-    const response = await fetch(`https://bible-api.com/${encodedReference}`);
+    const apiUrl = `https://bible-api.com/${encodedReference}`;
+
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -50,7 +53,6 @@ export async function GET(request: Request) {
       translation: data.translation_name || 'KJV',
     });
   } catch (error) {
-    console.error('Bible API error:', error);
     return NextResponse.json(
       { error: 'api_error', message: 'Failed to fetch verse from Bible API' },
       { status: 500 }

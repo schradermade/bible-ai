@@ -48,7 +48,6 @@ function VerseReference({
       const response = await fetch(`/api/bible/verse?reference=${encodeURIComponent(reference)}`);
 
       if (!response.ok) {
-        console.error('Failed to fetch verse from API');
         // Fallback to extraction if API fails
         const verseText = extractVerseText(reference, fullText);
         onSave({
@@ -65,7 +64,6 @@ function VerseReference({
         text: data.text,
       });
     } catch (error) {
-      console.error('Error saving verse:', error);
       // Fallback to extraction on error
       const verseText = extractVerseText(reference, fullText);
       onSave({
