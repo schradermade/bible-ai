@@ -182,7 +182,7 @@ function extractVerseText(reference: string, fullText: string): string {
 
 // Function to parse text and identify verse references
 function parseVerseReferences(text: string, fullText: string, onSave?: (verse: SavedVerse) => void) {
-  const parts: (string | JSX.Element)[] = [];
+  const parts: (string | React.ReactElement)[] = [];
   let lastIndex = 0;
   let match;
 
