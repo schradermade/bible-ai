@@ -62,10 +62,21 @@ export async function GET(request: Request) {
       );
     }
 
+    // Format text with verse numbers only if multiple verses
+    let formattedText = data.text.trim();
+
+    if (data.verses && data.verses.length > 1) {
+      // Multiple verses - add verse numbers at the beginning of each
+      formattedText = data.verses
+        .map(v => `${v.verse} ${v.text.trim()}`)
+        .join(' ');
+    }
+    // Single verse: keep as-is (verse number already in reference/title)
+
     // Return formatted verse data
     return NextResponse.json({
       reference: data.reference,
-      text: data.text.trim(),
+      text: formattedText,
       translation: data.translation_name || 'KJV',
     });
   } catch (error) {

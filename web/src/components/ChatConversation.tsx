@@ -43,15 +43,10 @@ function VerseReference({
     if (!onSave || isSaving) return;
 
     setIsSaving(true);
-    console.log('[VerseReference] Saving verse:', reference);
 
     try {
       // Fetch the exact verse text from the Bible API
-      const apiUrl = `/api/bible/verse?reference=${encodeURIComponent(reference)}`;
-      console.log('[VerseReference] Fetching from API:', apiUrl);
-
-      const response = await fetch(apiUrl);
-      console.log('[VerseReference] API response status:', response.status);
+      const response = await fetch(`/api/bible/verse?reference=${encodeURIComponent(reference)}`);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -59,8 +54,6 @@ function VerseReference({
 
         // Fallback to extraction if API fails
         const verseText = extractVerseText(reference, fullText);
-        console.log('[VerseReference] Using fallback extraction. Found text:', verseText ? 'yes' : 'no');
-
         onSave({
           reference: reference,
           text: verseText || 'Verse text not available',
@@ -69,7 +62,6 @@ function VerseReference({
       }
 
       const data = await response.json();
-      console.log('[VerseReference] API success. Verse text length:', data.text?.length || 0);
 
       onSave({
         reference: data.reference,
@@ -80,8 +72,6 @@ function VerseReference({
 
       // Fallback to extraction on error
       const verseText = extractVerseText(reference, fullText);
-      console.log('[VerseReference] Using fallback extraction after error. Found text:', verseText ? 'yes' : 'no');
-
       onSave({
         reference: reference,
         text: verseText || 'Verse text not available',
