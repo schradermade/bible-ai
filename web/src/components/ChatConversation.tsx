@@ -23,6 +23,9 @@ export default function ChatConversation({
   onSuggestionClick,
 }: ChatConversationProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const shouldAutoScrollRef = useRef(true);
+  const lastScrollTopRef = useRef(0);
 
   const suggestions = [
     "How do I deal with anxiety?",
@@ -30,13 +33,42 @@ export default function ChatConversation({
     "Help me understand Romans 8"
   ];
 
+  // Handle scroll events to detect manual scrolling
   useEffect(() => {
-    // Auto-scroll to bottom when new messages arrive
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+      // Detect if user manually scrolled up (not triggered by auto-scroll)
+      if (scrollTop < lastScrollTopRef.current) {
+        // User scrolled up - disable auto-scroll
+        shouldAutoScrollRef.current = false;
+      } else if (isAtBottom) {
+        // User is at bottom - re-enable auto-scroll
+        shouldAutoScrollRef.current = true;
+      }
+
+      lastScrollTopRef.current = scrollTop;
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Only auto-scroll if enabled and not being manually controlled
+    if (shouldAutoScrollRef.current && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }
   }, [messages]);
 
   return (
-    <div className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''}`}>
+    <div ref={containerRef} className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''}`}>
       {messages.length === 0 ? (
         <div className={styles.welcomeContainer}>
           <div className={styles.welcomeIcon}>
