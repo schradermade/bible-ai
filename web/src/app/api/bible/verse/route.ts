@@ -29,11 +29,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Use bible-api.com with KJV (default, public domain)
-    // Format: https://bible-api.com/john+3:16
+    // Use bible-api.com with KJV (public domain)
+    // Format: https://bible-api.com/john+3:16?translation=kjv
     // KJV is public domain - no licensing restrictions
     const encodedReference = encodeURIComponent(reference.replace(/\s+/g, '+'));
-    const apiUrl = `https://bible-api.com/${encodedReference}`;
+    const apiUrl = `https://bible-api.com/${encodedReference}?translation=kjv`;
 
     const response = await fetch(apiUrl, {
       headers: {
