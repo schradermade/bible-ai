@@ -1,7 +1,7 @@
 .dashboardWrapper {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 24px;
+  gap: 20px;
   width: 100%;
   align-items: start;
 }
@@ -69,7 +69,7 @@
   display: grid;
   grid-template-columns: 1fr 130px;
   grid-auto-rows: min-content;
-  gap: 16px;
+  gap: 20px;
   height: auto;
   align-items: start;
   margin: 0;
@@ -158,10 +158,10 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   position: fixed;
   top: 100px;
-  right: calc((100vw - 1680px) / 2 + 320px + 24px);
+  right: calc((100vw - 1680px) / 2 + 320px + 20px);
   align-self: start;
   z-index: 101;
 }
@@ -319,7 +319,7 @@
   }
 
   .collapsedPanelsContainer {
-    right: calc(40px + 320px + 24px);
+    right: calc(40px + 320px + 20px);
   }
 }
 
