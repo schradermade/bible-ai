@@ -74,17 +74,47 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     }));
   };
 
-  const handleMemorizeVerse = (verse: SavedVerse) => {
+  const handleMemorizeVerse = async (verse: SavedVerse) => {
     // Check if verse already exists in memory verses
     const exists = memoryVerses.some(v => v.reference === verse.reference);
-    if (!exists) {
-      const newMemoryVerse: MemoryVerse = {
-        id: `${Date.now()}-${Math.random()}`,
-        reference: verse.reference,
-        text: verse.text,
-        memorized: false,
-      };
-      setMemoryVerses([newMemoryVerse, ...memoryVerses]);
+    if (exists) return;
+
+    // Generate temporary ID for optimistic UI update
+    const tempId = `${Date.now()}-${Math.random()}`;
+    const newMemoryVerse: MemoryVerse = {
+      id: tempId,
+      reference: verse.reference,
+      text: verse.text,
+      memorized: true, // Mark as memorized immediately
+    };
+
+    // Optimistically add to UI
+    setMemoryVerses([newMemoryVerse, ...memoryVerses]);
+
+    try {
+      // Save to database
+      const response = await fetch('/api/verses/memorized', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: verse.reference,
+          text: verse.text || null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save verse');
+      }
+
+      const data = await response.json();
+      // Update with real ID from database
+      setMemoryVerses(prev =>
+        prev.map(v => v.id === tempId ? { ...v, id: data.verse.id } : v)
+      );
+    } catch (error) {
+      console.error('Failed to memorize verse:', error);
+      // Revert on error
+      setMemoryVerses(prev => prev.filter(v => v.id !== tempId));
     }
   };
 
