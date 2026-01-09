@@ -42,6 +42,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const query =
     typeof body.query === 'string' ? body.query.trim() : '';
+  const conversationHistory = Array.isArray(body.messages) ? body.messages : [];
 
   if (!query) {
     return NextResponse.json({ error: 'query_required' }, { status: 400 });
@@ -67,6 +68,14 @@ export async function POST(request: Request) {
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+  // Build conversation messages for OpenAI
+  const conversationMessages = conversationHistory
+    .filter((msg: any) => msg.type && msg.content) // Filter out empty messages
+    .map((msg: any) => ({
+      role: msg.type === 'user' ? 'user' : 'assistant',
+      content: msg.content,
+    }));
+
   try {
     const stream = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -75,10 +84,7 @@ export async function POST(request: Request) {
       stream: true,
       messages: [
         { role: 'system', content: CHAT_SYSTEM_PROMPT },
-        {
-          role: 'user',
-          content: query,
-        },
+        ...conversationMessages,
       ],
     });
 

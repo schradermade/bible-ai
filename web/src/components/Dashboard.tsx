@@ -150,7 +150,10 @@ export default function Dashboard() {
       content: query,
       timestamp: new Date(),
     };
-    setMessages(prev => [...prev, userMessage]);
+
+    // Build conversation history including the new user message
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
 
     // Create placeholder assistant message
     const assistantMessageId = `assistant-${Date.now()}`;
@@ -166,7 +169,10 @@ export default function Dashboard() {
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({
+          query,
+          messages: updatedMessages // Send conversation history including current question
+        }),
       });
 
       if (!response.ok) {
