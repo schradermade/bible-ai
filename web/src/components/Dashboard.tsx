@@ -88,7 +88,7 @@ const panels = [
 export default function Dashboard() {
   const { showError } = useToast();
   const { user } = useUser();
-  const [expandedPanel, setExpandedPanel] = useState<PanelType>('insight');
+  const [expandedPanel, setExpandedPanel] = useState<PanelType>(null);
   const [myVerses, setMyVerses] = useState<SavedVerse[]>([
     {
       reference: 'Ephesians 4:2-3',
@@ -167,9 +167,6 @@ export default function Dashboard() {
       const data = await response.json();
       setPanelContent(data);
 
-      // Expand first panel (Insight) after content loads
-      setExpandedPanel('insight');
-
       // Trigger usage refresh
       setUsageRefreshTrigger(prev => prev + 1);
     } catch (error) {
@@ -196,7 +193,6 @@ export default function Dashboard() {
     try {
       const parsed = JSON.parse(responseString);
       setPanelContent(parsed);
-      setExpandedPanel('insight');
     } catch (error) {
       console.error('Failed to parse history response:', error);
       showError('Failed to load search history item.');
@@ -212,104 +208,91 @@ export default function Dashboard() {
     setExpandedPanel(panelId);
   };
 
+  const handleClosePanel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedPanel(null);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
       <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />
       <div className={styles.panelsContainer}>
-      <div
-        className={
-          expandedPanel ? styles.gridExpanded : styles.gridDefault
-        }
-      >
-        {expandedPanel ? (
-          <>
-            {/* Expanded Panel */}
-            {panels.map((panel) => {
-              const isExpanded = expandedPanel === panel.id;
-              if (!isExpanded) return null;
+      <div className={styles.gridExpanded}>
+        {/* Expanded Panel - Only show if a panel is selected */}
+        {expandedPanel && panels.map((panel) => {
+          const isExpanded = expandedPanel === panel.id;
+          if (!isExpanded) return null;
 
-              return (
-                <div
-                  key={panel.id}
-                  className={`${styles.panel} ${styles.panelExpanded} ${
-                    (panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily')
-                      ? styles.prophecyExpanded
-                      : ''
-                  }`}
-                  onClick={() => handlePanelClick(panel.id)}
-                >
-                  <div className={styles.panelContent}>
-                    {panel.id === 'insight' && <InsightPanel content={panelContent?.insight} />}
-                    {panel.id === 'life' && <LifePanel content={panelContent?.life} onSaveVerse={addVerse} />}
-                    {panel.id === 'prophecy' && <ProphecyPanel content={panelContent?.prophecy} />}
-                    {panel.id === 'daily' && <DailyPanel content={panelContent?.daily} />}
-                  </div>
-                  {isLoadingContent && (
-                    <div className={styles.panelLoadingOverlay}>
-                      <div className={styles.loadingContent}>
-                        <div className={styles.loadingSpinner}></div>
-                        <div className={styles.loadingText}>Seeking wisdom from Scripture...</div>
-                        <div className={styles.loadingSubtext}>Preparing your biblical insights</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Collapsed Panels Container - Show all 4 panels */}
-            <div className={styles.collapsedPanelsContainer}>
-              {panels.map((panel) => {
-                const isCurrentlyExpanded = expandedPanel === panel.id;
-
-                return (
-                  <div
-                    key={panel.id}
-                    className={`${styles.panel} ${styles.panelCollapsed} ${
-                      isCurrentlyExpanded ? styles.panelCollapsedActive : ''
-                    }`}
-                    onClick={() => handlePanelClick(panel.id)}
-                  >
-                    <div className={styles.panelHeader}>
-                      <h2 className={styles.panelTitle}>{panel.title}</h2>
-                    </div>
-                    <div className={styles.panelContent}>
-                      {panel.id === 'insight' && <InsightPanel isPreview={true} />}
-                      {panel.id === 'life' && <LifePanel isPreview={true} />}
-                      {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
-                      {panel.id === 'daily' && <DailyPanel isPreview={true} />}
-                    </div>
-                    {isLoadingContent && (
-                      <div className={styles.collapsedPanelLoadingOverlay}>
-                        <div className={styles.smallLoadingSpinner}></div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          /* Default Grid - All Panels Equal Size */
-          panels.map((panel) => (
+          return (
             <div
               key={panel.id}
-              className={styles.panel}
+              className={`${styles.panel} ${styles.panelExpanded} ${
+                (panel.id === 'prophecy' || panel.id === 'insight' || panel.id === 'life' || panel.id === 'daily')
+                  ? styles.prophecyExpanded
+                  : ''
+              }`}
               onClick={() => handlePanelClick(panel.id)}
             >
-              <div className={styles.panelHeader}>
-                <h2 className={styles.panelTitle}>{panel.title}</h2>
-              </div>
+              <button
+                className={styles.closeButton}
+                onClick={handleClosePanel}
+                aria-label="Close panel"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
               <div className={styles.panelContent}>
-                {panel.id === 'insight' && <InsightPanel content={panelContent?.insight} isPreview={true} />}
-                {panel.id === 'life' && <LifePanel content={panelContent?.life} isPreview={true} />}
-                {panel.id === 'prophecy' && <ProphecyPanel content={panelContent?.prophecy} isPreview={true} />}
-                {panel.id === 'daily' && <DailyPanel content={panelContent?.daily} isPreview={true} />}
+                {panel.id === 'insight' && <InsightPanel content={panelContent?.insight} />}
+                {panel.id === 'life' && <LifePanel content={panelContent?.life} onSaveVerse={addVerse} />}
+                {panel.id === 'prophecy' && <ProphecyPanel content={panelContent?.prophecy} />}
+                {panel.id === 'daily' && <DailyPanel content={panelContent?.daily} />}
               </div>
+              {isLoadingContent && (
+                <div className={styles.panelLoadingOverlay}>
+                  <div className={styles.loadingContent}>
+                    <div className={styles.loadingSpinner}></div>
+                    <div className={styles.loadingText}>Seeking wisdom from Scripture...</div>
+                    <div className={styles.loadingSubtext}>Preparing your biblical insights</div>
+                  </div>
+                </div>
+              )}
             </div>
-          ))
-        )}
+          );
+        })}
+
+        {/* Small Panels Container - Always show all 4 panels */}
+        <div className={styles.collapsedPanelsContainer}>
+          {panels.map((panel) => {
+            const isCurrentlyExpanded = expandedPanel === panel.id;
+
+            return (
+              <div
+                key={panel.id}
+                className={`${styles.panel} ${styles.panelCollapsed} ${
+                  isCurrentlyExpanded ? styles.panelCollapsedActive : ''
+                }`}
+                onClick={() => handlePanelClick(panel.id)}
+              >
+                <div className={styles.panelHeader}>
+                  <h2 className={styles.panelTitle}>{panel.title}</h2>
+                </div>
+                <div className={styles.panelContent}>
+                  {panel.id === 'insight' && <InsightPanel isPreview={true} />}
+                  {panel.id === 'life' && <LifePanel isPreview={true} />}
+                  {panel.id === 'prophecy' && <ProphecyPanel isPreview={true} />}
+                  {panel.id === 'daily' && <DailyPanel isPreview={true} />}
+                </div>
+                {isLoadingContent && (
+                  <div className={styles.collapsedPanelLoadingOverlay}>
+                    <div className={styles.smallLoadingSpinner}></div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
       </div>
       </div>

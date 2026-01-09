@@ -231,6 +231,40 @@
   margin-bottom: 0;
 }
 
+/* Close Button for Expanded Panel */
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #8b6239;
+  box-shadow: 0 2px 8px rgba(31, 26, 22, 0.08);
+  z-index: 100;
+  opacity: 0.7;
+}
+
+.closeButton:hover {
+  background: linear-gradient(135deg, rgba(196, 69, 54, 0.15), rgba(196, 69, 54, 0.1));
+  border-color: rgba(196, 69, 54, 0.35);
+  color: #c44536;
+  opacity: 1;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(196, 69, 54, 0.2);
+}
+
+.closeButton:active {
+  transform: scale(0.98);
+}
+
 /* Collapse Button */
 .collapseButton {
   background: linear-gradient(135deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.08));
