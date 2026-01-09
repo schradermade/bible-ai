@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request: Request) {
   const { userId } = await auth();
 
   if (!userId) {
@@ -15,6 +15,11 @@ export async function GET() {
   }
 
   try {
+    // Parse limit from query params, default to 20
+    const { searchParams } = new URL(request.url);
+    const limitParam = searchParams.get('limit');
+    const limit = limitParam ? Math.min(parseInt(limitParam, 10), 100) : 20;
+
     const history = await prisma.savedAiResponse.findMany({
       where: {
         userId,
@@ -23,7 +28,7 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc',
       },
-      take: 20, // Limit to most recent 20
+      take: limit,
       select: {
         id: true,
         prompt: true,
