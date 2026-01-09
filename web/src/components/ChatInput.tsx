@@ -38,7 +38,6 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const { user } = useUser();
   const [input, setInput] = useState('');
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -46,7 +45,6 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [historyLimit, setHistoryLimit] = useState(7);
   const [hasMoreHistory, setHasMoreHistory] = useState(false);
-  const lastScrollY = useRef(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const historyButtonRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -168,29 +166,6 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     fetchUsage();
   }, [usageRefreshTrigger, user]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollingDown = currentScrollY > lastScrollY.current;
-
-      if (currentScrollY <= 200) {
-        // Always show if near the top
-        setIsVisible(true);
-      } else if (scrollingDown && currentScrollY > 300) {
-        // Hide when scrolling down
-        setIsVisible(false);
-      } else if (!scrollingDown) {
-        // Show when scrolling up
-        setIsVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -248,12 +223,14 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    await onSearch(input.trim());
+    const query = input.trim();
+    setInput(''); // Clear input immediately after submitting
+    await onSearch(query);
   };
 
   return (
     <div
-      className={`${styles.chatInputContainer} ${!isVisible ? styles.hidden : ''}`}
+      className={styles.chatInputContainer}
     >
       <div className={styles.topRow}>
         <div className={styles.promptText}>Ask Berea AI.</div>
