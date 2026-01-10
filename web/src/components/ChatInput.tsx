@@ -112,7 +112,7 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
         const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
         // Position at the top of the form, then CSS transform will move it up by 100% of its own height
         setDropdownPosition({
-          top: rect.top,
+          top: rect.top + 1,
           left: rect.left,
           width: maxWidth,
         });
@@ -204,7 +204,7 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
           const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
           // Position at the top of the form, then CSS transform will move it up by 100% of its own height
           setDropdownPosition({
-            top: rect.top,
+            top: rect.top + 1,
             left: rect.left,
             width: maxWidth,
           });

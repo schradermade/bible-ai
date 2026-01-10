@@ -52,13 +52,11 @@ export async function POST(request: Request) {
     const { verseReference, verseText, chatContext, source } = body;
 
     // Check usage limits
-    const [subscription, usageCount, usageLimit] = await Promise.all([
-      getSubscriptionStatus(userId),
-      getUsageCount(userId, INSIGHT_FEATURE_KEY),
-      getUsageLimit(userId),
-    ]);
+    const subscription = await getSubscriptionStatus(userId);
+    const usageCount = await getUsageCount(userId, INSIGHT_FEATURE_KEY);
+    const usageLimit = getUsageLimit(subscription.isActive);
 
-    if (!subscription.isSubscribed && usageCount >= usageLimit) {
+    if (!subscription.isActive && usageCount >= usageLimit) {
       return NextResponse.json(
         {
           error: 'usage_limit_exceeded',
