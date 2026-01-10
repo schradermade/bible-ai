@@ -536,3 +536,11 @@
   opacity: 0.9;
   font-style: italic;
 }
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 1rem 0.75rem;
+  margin-bottom: 0.5rem;
+}

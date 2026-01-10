@@ -10,6 +10,7 @@ import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
 import LifePanel from './LifePanel';
+import ConversationSelector from './ConversationSelector';
 import { useToast } from '@/contexts/ToastContext';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
   const [prayerRefreshTrigger, setPrayerRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   // Load saved verses on mount and when user changes
   useEffect(() => {
@@ -134,6 +136,7 @@ export default function Dashboard() {
       setPanelContent(null);
       setLastQuery('');
       setMessages([]);
+      setCurrentConversationId(null);
     }
   }, [user]);
 
@@ -228,9 +231,15 @@ export default function Dashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
-          messages: updatedMessages // Send conversation history including current question
+          conversationId: currentConversationId, // Pass current conversation ID
         }),
       });
+
+      // Extract conversation ID from response headers
+      const conversationIdFromResponse = response.headers.get('X-Conversation-Id');
+      if (conversationIdFromResponse && !currentConversationId) {
+        setCurrentConversationId(conversationIdFromResponse);
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -417,9 +426,61 @@ export default function Dashboard() {
     setExpandedPanel(null);
   };
 
+  const handleSelectConversation = async (conversationId: string | null) => {
+    if (!conversationId) return;
+
+    try {
+      // Fetch the conversation with all messages
+      const response = await fetch(`/api/conversations/${conversationId}`);
+
+      if (!response.ok) {
+        showError('Failed to load conversation.');
+        return;
+      }
+
+      const data = await response.json();
+      const conversation = data.conversation;
+
+      // Load messages into the chat
+      const loadedMessages: Message[] = conversation.messages.map((msg: any) => ({
+        id: msg.id,
+        type: msg.role as 'user' | 'assistant',
+        content: msg.content,
+        timestamp: new Date(msg.createdAt),
+      }));
+
+      setMessages(loadedMessages);
+      setCurrentConversationId(conversationId);
+
+      // Close any expanded panel to show the chat
+      setExpandedPanel(null);
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+      showError('An unexpected error occurred while loading the conversation.');
+    }
+  };
+
+  const handleNewConversation = () => {
+    // Clear the current conversation and start fresh
+    setMessages([]);
+    setCurrentConversationId(null);
+    setPanelContent(null);
+    setLastQuery('');
+
+    // Close any expanded panel
+    setExpandedPanel(null);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
+      <div className={styles.chatHeader}>
+        <ConversationSelector
+          currentConversationId={currentConversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+        />
+      </div>
       <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
