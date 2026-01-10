@@ -88,3 +88,27 @@ model PrayerRequest {
   @@index([createdAt])
   @@index([deletedAt])
 }
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?   // Auto-generate: "Conversation about Forgiveness"
+  summary   String?   @db.Text // Compressed history for older messages
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  messages Message[]
+
+  @@index([userId, createdAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String       // "user" or "assistant"
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
