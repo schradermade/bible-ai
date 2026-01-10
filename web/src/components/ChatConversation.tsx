@@ -588,21 +588,23 @@ export default function ChatConversation({
                 className={styles.continueCard}
                 onClick={() => onContinueConversation(recentConversation.id)}
               >
-                <div className={styles.continueHeader}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <div className={styles.continueIcon}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 2.5a10 10 0 1 0 0 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 3" opacity="0.5"/>
                   </svg>
-                  <span className={styles.continueTitle}>
+                </div>
+                <div className={styles.continueContent}>
+                  <div className={styles.continueTitle}>
                     {recentConversation.title || 'Recent Conversation'}
-                  </span>
+                  </div>
+                  <div className={styles.continueMeta}>
+                    {recentConversation.messageCount} {recentConversation.messageCount === 1 ? 'message' : 'messages'} • {formatDate(recentConversation.updatedAt)}
+                  </div>
                 </div>
-                <div className={styles.continueMeta}>
-                  {recentConversation.messageCount} {recentConversation.messageCount === 1 ? 'message' : 'messages'} • {formatDate(recentConversation.updatedAt)}
-                </div>
-                <div className={styles.continueAction}>
-                  <span>Continue Discussion</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className={styles.continueArrow}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
