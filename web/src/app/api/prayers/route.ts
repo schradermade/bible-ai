@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-// GET - Fetch all prayers for the user
+// GET - Fetch all non-deleted prayers for the user
 export async function GET() {
   const { userId } = await auth();
 
@@ -13,7 +13,10 @@ export async function GET() {
   }
 
   const prayers = await prisma.prayerRequest.findMany({
-    where: { userId },
+    where: {
+      userId,
+      deletedAt: null, // Only fetch non-deleted prayers
+    },
     orderBy: [
       { status: 'asc' }, // ongoing first
       { createdAt: 'desc' } // newest first within each status
@@ -110,7 +113,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-// DELETE - Remove a prayer
+// DELETE - Soft delete a prayer (preserves answered prayers for reports)
 export async function DELETE(request: Request) {
   const { userId } = await auth();
 
@@ -125,12 +128,19 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
   }
 
-  // Delete only if belongs to user
-  await prisma.prayerRequest.deleteMany({
-    where: {
-      id,
-      userId,
-    },
+  // Verify the prayer belongs to the user
+  const existing = await prisma.prayerRequest.findFirst({
+    where: { id, userId },
+  });
+
+  if (!existing) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
+  // Soft delete by setting deletedAt timestamp
+  await prisma.prayerRequest.update({
+    where: { id },
+    data: { deletedAt: new Date() },
   });
 
   return NextResponse.json({ success: true });

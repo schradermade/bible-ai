@@ -79,10 +79,12 @@ model PrayerRequest {
   sourceReference String?   // Verse reference if source is "verse"
   status          String    @default("ongoing") // "ongoing" or "answered"
   answeredAt      DateTime? // When marked as answered
+  deletedAt       DateTime? // When soft deleted (preserves answered prayers for reports)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([deletedAt])
 }
