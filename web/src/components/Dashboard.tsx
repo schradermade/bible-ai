@@ -97,25 +97,34 @@ export default function Dashboard() {
   const { showError } = useToast();
   const { user } = useUser();
   const [expandedPanel, setExpandedPanel] = useState<PanelType>(null);
-  const [myVerses, setMyVerses] = useState<SavedVerse[]>([
-    {
-      reference: 'Ephesians 4:2-3',
-      text: 'Be completely humble and gentle; be patient, bearing with one another in love.',
-    },
-    {
-      reference: 'Colossians 3:13',
-      text: 'Bear with each other and forgive one another if any of you has a grievance against someone.',
-    },
-    {
-      reference: 'Proverbs 15:1',
-      text: 'A gentle answer turns away wrath, but a harsh word stirs up anger.',
-    },
-  ]);
+  const [myVerses, setMyVerses] = useState<SavedVerse[]>([]);
   const [panelContent, setPanelContent] = useState<PanelContent | null>(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
+
+  // Load saved verses on mount and when user changes
+  useEffect(() => {
+    const loadSavedVerses = async () => {
+      if (!user) {
+        setMyVerses([]);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/verses/saved');
+        if (response.ok) {
+          const data = await response.json();
+          setMyVerses(data.verses);
+        }
+      } catch (error) {
+        console.error('Failed to load saved verses:', error);
+      }
+    };
+
+    loadSavedVerses();
+  }, [user]);
 
   // Clear user data when signed out
   useEffect(() => {
@@ -127,16 +136,58 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  const addVerse = (verse: SavedVerse) => {
+  const addVerse = async (verse: SavedVerse) => {
     // Check if verse already exists
     const exists = myVerses.some(v => v.reference === verse.reference);
-    if (!exists) {
-      setMyVerses([verse, ...myVerses]); // Add to beginning of array
+    if (exists) return;
+
+    // Optimistically add to UI
+    setMyVerses([verse, ...myVerses]);
+
+    try {
+      // Save to database
+      const response = await fetch('/api/verses/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: verse.reference,
+          text: verse.text,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save verse');
+      }
+    } catch (error) {
+      console.error('Failed to save verse:', error);
+      showError('Failed to save verse. Please try again.');
+      // Revert on error
+      setMyVerses(prev => prev.filter(v => v.reference !== verse.reference));
     }
   };
 
-  const deleteVerse = (verse: SavedVerse) => {
+  const deleteVerse = async (verse: SavedVerse) => {
+    // Optimistically remove from UI
+    const previousVerses = myVerses;
     setMyVerses(myVerses.filter(v => v.reference !== verse.reference));
+
+    try {
+      // Delete from database
+      const response = await fetch('/api/verses/saved', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: verse.reference }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete verse');
+      }
+    } catch (error) {
+      console.error('Failed to delete verse:', error);
+      showError('Failed to delete verse. Please try again.');
+      // Revert on error
+      setMyVerses(previousVerses);
+    }
   };
 
   const handleSearch = async (query: string) => {

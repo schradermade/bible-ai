@@ -44,6 +44,18 @@ model UsageCounter {
   @@index([userId, feature])
 }
 
+model SavedVerse {
+  id        String   @id @default(cuid())
+  userId    String
+  reference String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, reference])
+  @@index([userId])
+}
+
 model MemorizedVerse {
   id          String    @id @default(cuid())
   userId      String
