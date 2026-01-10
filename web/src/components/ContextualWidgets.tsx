@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './contextual-widgets.module.css';
 
@@ -47,6 +47,42 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
     study: false,
     searchHistory: false,
   });
+  const [highlightedItems, setHighlightedItems] = useState<Set<string>>(new Set());
+  const highlightTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const previousVersesRef = useRef<SavedVerse[]>([]);
+  const previousPrayersRef = useRef<Prayer[]>([]);
+  const previousMemoryVersesRef = useRef<MemoryVerse[]>([]);
+
+  // Helper to add highlight
+  const addHighlight = (key: string) => {
+    // Clear any existing timer for this key
+    const existingTimer = highlightTimersRef.current.get(key);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    // Add to highlighted set
+    setHighlightedItems(prev => new Set(prev).add(key));
+
+    // Set timer to remove after 3 seconds
+    const timer = setTimeout(() => {
+      setHighlightedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(key);
+        return newSet;
+      });
+      highlightTimersRef.current.delete(key);
+    }, 3000);
+
+    highlightTimersRef.current.set(key, timer);
+  };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      highlightTimersRef.current.forEach(timer => clearTimeout(timer));
+    };
+  }, []);
 
   // Load prayers on mount, when user changes, or when refresh is triggered
   useEffect(() => {
@@ -69,6 +105,82 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
 
     loadPrayers();
   }, [user, prayerRefreshTrigger]);
+
+  // Detect newly added prayers
+  useEffect(() => {
+    if (previousPrayersRef.current.length === 0 && prayers.length > 0) {
+      // Initial load - don't highlight
+      previousPrayersRef.current = prayers;
+      return;
+    }
+
+    if (prayers.length > previousPrayersRef.current.length) {
+      // New prayer(s) added
+      const newPrayers = prayers.filter(
+        p => !previousPrayersRef.current.some(prev => prev.id === p.id)
+      );
+
+      newPrayers.forEach(prayer => {
+        const key = `prayer-${prayer.id}`;
+        // Only add if not already highlighted
+        if (!highlightTimersRef.current.has(key)) {
+          addHighlight(key);
+        }
+      });
+    }
+
+    previousPrayersRef.current = prayers;
+  }, [prayers]);
+
+  // Detect newly added verses in myVerses prop
+  useEffect(() => {
+    if (previousVersesRef.current.length === 0 && myVerses.length > 0) {
+      // Initial load - don't highlight
+      previousVersesRef.current = myVerses;
+      return;
+    }
+
+    if (myVerses.length > previousVersesRef.current.length) {
+      // New verse(s) added
+      const newVerses = myVerses.filter(
+        v => !previousVersesRef.current.some(prev => prev.reference === v.reference)
+      );
+
+      newVerses.forEach(verse => {
+        const key = `verse-${verse.reference}`;
+        if (!highlightTimersRef.current.has(key)) {
+          addHighlight(key);
+        }
+      });
+    }
+
+    previousVersesRef.current = myVerses;
+  }, [myVerses]);
+
+  // Detect newly added memory verses
+  useEffect(() => {
+    if (previousMemoryVersesRef.current.length === 0 && memoryVerses.length > 0) {
+      // Initial load - don't highlight
+      previousMemoryVersesRef.current = memoryVerses;
+      return;
+    }
+
+    if (memoryVerses.length > previousMemoryVersesRef.current.length) {
+      // New memory verse(s) added - use reference as stable identifier
+      const newVerses = memoryVerses.filter(
+        v => !previousMemoryVersesRef.current.some(prev => prev.reference === v.reference)
+      );
+
+      newVerses.forEach(verse => {
+        const key = `memory-${verse.reference}`;
+        if (!highlightTimersRef.current.has(key)) {
+          addHighlight(key);
+        }
+      });
+    }
+
+    previousMemoryVersesRef.current = memoryVerses;
+  }, [memoryVerses]);
 
   // Load memorized verses on mount and when user changes
   useEffect(() => {
@@ -121,7 +233,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       memorized: false, // Not yet memorized, just added to practice list
     };
 
-    // Optimistically add to UI
+    // Optimistically add to UI (highlight will be handled by useEffect)
     setMemoryVerses([newMemoryVerse, ...memoryVerses]);
 
     try {
@@ -141,7 +253,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       }
 
       const data = await response.json();
-      // Update with real database ID
+      // Update with real database ID (keeping same reference so animation continues)
       setMemoryVerses(prev =>
         prev.map(v => v.id === tempId ? { ...v, id: data.verse.id } : v)
       );
@@ -324,7 +436,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
 
       const { prayer: savedPrayer } = await saveResponse.json();
 
-      // Add to prayers list
+      // Add to prayers list (highlight will be handled by useEffect)
       setPrayers([savedPrayer, ...prayers]);
     } catch (error) {
       console.error('Failed to generate prayer:', error);
@@ -374,7 +486,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           ) : (
             <div className={styles.versesList}>
               {prayers.map((prayer) => (
-                <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''}`}>
+                <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''} ${highlightedItems.has(`prayer-${prayer.id}`) ? styles.itemNewlyAdded : ''}`}>
                   <div className={styles.prayerCardHeader}>
                     <span className={styles.prayerTitle}>
                       {prayer.title || prayer.sourceReference || 'Prayer Request'}
@@ -448,7 +560,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           ) : (
             <div className={styles.versesList}>
               {myVerses.map((verse, index) => (
-                <div key={index} className={styles.verseCard}>
+                <div key={index} className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
                   <div className={styles.verseCardHeader}>
                     <span className={styles.verseReference}>{verse.reference}</span>
                     <button
@@ -534,7 +646,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           ) : (
             <div className={styles.versesList}>
               {memoryVerses.map((verse) => (
-                <div key={verse.id} className={styles.verseCard}>
+                <div key={verse.reference} className={`${styles.verseCard} ${highlightedItems.has(`memory-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
                   <div className={styles.verseCardHeader}>
                     <span className={styles.verseReference}>{verse.reference}</span>
                     <button
