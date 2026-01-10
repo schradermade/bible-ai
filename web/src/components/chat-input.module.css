@@ -305,6 +305,9 @@
 }
 
 .historyDropdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(176, 123, 76, 0.2);
   background: linear-gradient(145deg, #f9f6f0 0%, #ffffff 100%);
@@ -316,6 +319,26 @@
   color: #5a4a30;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.historyCloseButton {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #8b6239;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.historyCloseButton:hover {
+  background: rgba(176, 123, 76, 0.1);
+  color: #5a4a30;
+  opacity: 1;
 }
 
 .historyDropdownContent {
