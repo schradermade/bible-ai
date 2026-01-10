@@ -45,6 +45,7 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const [historyLimit, setHistoryLimit] = useState(7);
   const [hasMoreHistory, setHasMoreHistory] = useState(false);
+  const [showCharLimitWarning, setShowCharLimitWarning] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const historyButtonRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -228,6 +229,15 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     }
   }, [input]);
 
+  // Show warning when character limit is reached
+  useEffect(() => {
+    if (input.length >= 500) {
+      setShowCharLimitWarning(true);
+    } else {
+      setShowCharLimitWarning(false);
+    }
+  }, [input]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -295,6 +305,11 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
             )}
           </button>
         </div>
+        {showCharLimitWarning && (
+          <div className={styles.charLimitWarning}>
+            Character limit reached (500 max)
+          </div>
+        )}
       </form>
 
       {/* History Dropdown - Rendered via Portal to avoid parent mask clipping */}

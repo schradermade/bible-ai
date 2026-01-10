@@ -186,12 +186,11 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 0;
+  gap: 20px;
   position: fixed;
   top: 100px;
   right: calc((100vw - 1680px) / 2 + 320px + 20px);
-  height: calc(100vh - 250px);
+  height: auto;
   align-self: start;
   z-index: 101;
 }
