@@ -16,12 +16,21 @@ interface SavedVerse {
   text: string;
 }
 
+interface RecentConversation {
+  id: string;
+  title: string | null;
+  messageCount: number;
+  updatedAt: string;
+}
+
 interface ChatConversationProps {
   messages: Message[];
   isStreaming?: boolean;
   onSuggestionClick?: (suggestion: string) => void;
   onSaveVerse?: (verse: SavedVerse) => void;
   onGeneratePrayerFromChat?: (context: string) => Promise<void>;
+  recentConversation?: RecentConversation | null;
+  onContinueConversation?: (conversationId: string) => void;
 }
 
 // Bible verse reference pattern: Detects [[Book chapter:verse]] format
@@ -447,6 +456,8 @@ export default function ChatConversation({
   onSuggestionClick,
   onSaveVerse,
   onGeneratePrayerFromChat,
+  recentConversation,
+  onContinueConversation,
 }: ChatConversationProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -459,6 +470,24 @@ export default function ChatConversation({
     'What does the Bible say about forgiveness?',
     'Help me understand Romans 8',
   ];
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 1) {
+      return 'just now';
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)} ${Math.floor(diffInHours) === 1 ? 'hour' : 'hours'} ago`;
+    } else if (diffInHours < 48) {
+      return 'yesterday';
+    } else if (diffInHours < 168) {
+      return `${Math.floor(diffInHours / 24)} days ago`;
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  };
 
   // Handle scroll events to detect manual scrolling
   useEffect(() => {
@@ -551,8 +580,40 @@ export default function ChatConversation({
             Ask me anything about Scripture, theology, or how God's Word applies
             to your life.
           </p>
+
+          {recentConversation && onContinueConversation && (
+            <div className={styles.continueSection}>
+              <p className={styles.continueLabel}>Continue Your Journey</p>
+              <div
+                className={styles.continueCard}
+                onClick={() => onContinueConversation(recentConversation.id)}
+              >
+                <div className={styles.continueHeader}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className={styles.continueTitle}>
+                    {recentConversation.title || 'Recent Conversation'}
+                  </span>
+                </div>
+                <div className={styles.continueMeta}>
+                  {recentConversation.messageCount} {recentConversation.messageCount === 1 ? 'message' : 'messages'} • {formatDate(recentConversation.updatedAt)}
+                </div>
+                <div className={styles.continueAction}>
+                  <span>Continue Discussion</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={styles.welcomeSuggestions}>
-            <p className={styles.suggestionsLabel}>Try asking:</p>
+            <p className={styles.suggestionsLabel}>
+              {recentConversation ? 'Or try asking:' : 'Try asking:'}
+            </p>
             <div className={styles.suggestionCards}>
               {suggestions.map((suggestion, index) => (
                 <div
