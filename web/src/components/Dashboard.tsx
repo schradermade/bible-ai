@@ -192,6 +192,11 @@ export default function Dashboard() {
   };
 
   const handleSearch = async (query: string) => {
+    // Close any expanded panel to show chat stream
+    if (expandedPanel) {
+      setExpandedPanel(null);
+    }
+
     setLastQuery(query);
     setIsLoadingContent(true);
 
