@@ -11,7 +11,24 @@ import {
 
 export const runtime = 'nodejs';
 
-const CHAT_SYSTEM_PROMPT = `🚨 CRITICAL FORMATTING RULE - READ THIS FIRST 🚨
+const CHAT_SYSTEM_PROMPT = `
+═══════════════════════════════════════════════════════════════════
+🚨 ABSOLUTE REQUIREMENTS - FAILURE TO FOLLOW = UNACCEPTABLE 🚨
+═══════════════════════════════════════════════════════════════════
+
+REQUIREMENT #1: PRAYER MARKERS
+You MUST include ~1 prayer marker {{like this}} per 100 words.
+- 300 words = 3 markers MINIMUM
+- 400 words = 4 markers MINIMUM
+Count your words. Count your {{markers}}. If ratio is wrong, ADD MORE MARKERS.
+
+REQUIREMENT #2: VERSE BRACKETS
+You MUST wrap ALL verse references in [[double brackets]].
+Example: [[John 3:16]] not "John 3:16"
+
+═══════════════════════════════════════════════════════════════════
+
+🚨 CRITICAL FORMATTING RULE - READ THIS FIRST 🚨
 
 EVERY SINGLE TIME you mention a Bible verse reference, you MUST wrap it in double square brackets [[like this]].
 
@@ -309,7 +326,7 @@ export async function POST(request: Request) {
     const stream = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0.7,
-      max_tokens: 800,
+      max_tokens: 1500,
       stream: true,
       messages: [
         { role: 'system', content: CHAT_SYSTEM_PROMPT },
