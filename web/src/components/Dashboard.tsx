@@ -316,13 +316,14 @@ export default function Dashboard() {
         throw new Error('Failed to generate prayer');
       }
 
-      const { prayer } = await generateResponse.json();
+      const { prayer, title } = await generateResponse.json();
 
       // Save prayer to database
       const saveResponse = await fetch('/api/prayers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          title,
           content: prayer,
           source: 'chat',
           sourceReference: null,

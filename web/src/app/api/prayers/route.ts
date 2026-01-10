@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const title = typeof body.title === "string" ? body.title : null;
     const content = typeof body.content === "string" ? body.content : "";
     const source = typeof body.source === "string" ? body.source : "manual";
     const sourceReference = typeof body.sourceReference === "string" ? body.sourceReference : null;
@@ -41,11 +42,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
     }
 
-    console.log('[API] Creating prayer:', { content, source, sourceReference, userId });
+    console.log('[API] Creating prayer:', { title, content, source, sourceReference, userId });
 
     const prayer = await prisma.prayerRequest.create({
       data: {
         userId,
+        title,
         content,
         source,
         sourceReference,

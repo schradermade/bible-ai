@@ -13,18 +13,29 @@ export const runtime = 'nodejs';
 
 const PRAYER_GENERATION_PROMPT = `You are a prayer guide helping believers craft heartfelt, biblically-grounded prayers.
 
-When given a Bible verse or spiritual context, generate a personal, authentic prayer that:
-- Reflects on the Scripture's meaning and applies it to life
-- Uses conversational, sincere language (not overly formal or King James style)
-- Is 3-5 sentences long (concise but meaningful)
-- Addresses God directly in second person (You/Your)
-- Includes specific thanksgiving, confession, petition, or praise as appropriate
-- Stays humble and genuine - avoid clichés or overly dramatic language
+When given a Bible verse or spiritual context, generate:
+1. A SHORT TITLE (1-2 words max) that captures the prayer's focus
+2. A personal, authentic prayer
 
-Example style (for John 3:16):
-"Father, thank You for loving me so deeply that You gave Your Son for my salvation. Help me to truly grasp the magnitude of this gift and live in the freedom it brings. I believe in Jesus and trust in Your promise of eternal life. May this truth transform how I live each day."
+The prayer should:
+- Reflect on the Scripture's meaning and applies it to life
+- Use conversational, sincere language (not overly formal or King James style)
+- Be 3-5 sentences long (concise but meaningful)
+- Address God directly in second person (You/Your)
+- Include specific thanksgiving, confession, petition, or praise as appropriate
+- Stay humble and genuine - avoid clichés or overly dramatic language
 
-Generate ONE prayer based on the provided verse or context. Make it personal, warm, and Spirit-led.`;
+Example for John 3:16:
+Title: "Eternal Love"
+Prayer: "Father, thank You for loving me so deeply that You gave Your Son for my salvation. Help me to truly grasp the magnitude of this gift and live in the freedom it brings. I believe in Jesus and trust in Your promise of eternal life. May this truth transform how I live each day."
+
+CRITICAL: The title must be 1-2 words maximum. Examples: "God's Love", "Forgiveness", "Guidance", "Peace", "Strength", "Trust"
+
+Return your response as JSON in this exact format:
+{
+  "title": "1-2 word title here",
+  "prayer": "the full prayer text here"
+}`;
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -88,12 +99,21 @@ export async function POST(request: Request) {
       ],
       temperature: 0.8, // More creative for prayers
       max_tokens: 300,
+      response_format: { type: 'json_object' },
     });
 
-    const prayer = completion.choices[0]?.message?.content?.trim();
+    const responseContent = completion.choices[0]?.message?.content?.trim();
 
-    if (!prayer) {
+    if (!responseContent) {
       throw new Error('No prayer generated');
+    }
+
+    // Parse JSON response
+    const parsedResponse = JSON.parse(responseContent);
+    const { title, prayer } = parsedResponse;
+
+    if (!prayer || !title) {
+      throw new Error('Invalid prayer response format');
     }
 
     // Increment usage
@@ -101,6 +121,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      title: title.substring(0, 50), // Cap at 50 chars as safeguard
       prayer,
       source,
       sourceReference: verseReference || null,

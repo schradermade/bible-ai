@@ -18,6 +18,7 @@ interface MemoryVerse {
 
 interface Prayer {
   id: string;
+  title: string | null;
   content: string;
   source: string;
   sourceReference: string | null;
@@ -303,13 +304,14 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
         throw new Error('Failed to generate prayer');
       }
 
-      const { prayer, sourceReference } = await generateResponse.json();
+      const { prayer, title, sourceReference } = await generateResponse.json();
 
       // Save prayer to database
       const saveResponse = await fetch('/api/prayers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          title,
           content: prayer,
           source: 'verse',
           sourceReference,
@@ -374,9 +376,9 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
               {prayers.map((prayer) => (
                 <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''}`}>
                   <div className={styles.prayerCardHeader}>
-                    {prayer.sourceReference && (
-                      <span className={styles.prayerSource}>{prayer.sourceReference}</span>
-                    )}
+                    <span className={styles.prayerTitle}>
+                      {prayer.title || prayer.sourceReference || 'Prayer Request'}
+                    </span>
                     <button
                       className={styles.deleteButton}
                       onClick={() => deletePrayer(prayer.id)}

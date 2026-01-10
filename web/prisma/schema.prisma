@@ -73,6 +73,7 @@ model MemorizedVerse {
 model PrayerRequest {
   id              String    @id @default(cuid())
   userId          String
+  title           String?   // 1-2 word summary of the prayer
   content         String    // The prayer text
   source          String    // "verse", "chat", or "manual"
   sourceReference String?   // Verse reference if source is "verse"
