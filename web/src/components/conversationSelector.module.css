@@ -36,7 +36,7 @@
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  bottom: calc(100% + 0.5rem);
   left: 0;
   width: 400px;
   max-width: 90vw;
