@@ -10,7 +10,6 @@ import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
 import LifePanel from './LifePanel';
-import ConversationSelector from './ConversationSelector';
 import { useToast } from '@/contexts/ToastContext';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
@@ -514,15 +513,15 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
-      <div className={styles.chatHeader}>
-        <ConversationSelector
-          currentConversationId={currentConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewConversation={handleNewConversation}
-          refreshTrigger={conversationRefreshTrigger}
-        />
-      </div>
-      <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />
+      <ChatInput
+        onSearch={handleSearch}
+        isLoading={isLoadingContent}
+        usageRefreshTrigger={usageRefreshTrigger}
+        currentConversationId={currentConversationId}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        conversationRefreshTrigger={conversationRefreshTrigger}
+      />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
         {/* Chat Conversation - Show when no panel is expanded */}

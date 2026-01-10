@@ -494,3 +494,8 @@
     width: 40px;
   }
 }
+
+.conversationSelectorWrapper {
+  display: flex;
+  align-items: center;
+}
