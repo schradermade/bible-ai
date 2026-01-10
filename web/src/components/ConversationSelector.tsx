@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './conversationSelector.module.css';
 
@@ -29,6 +29,8 @@ export default function ConversationSelector({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -37,6 +39,24 @@ export default function ConversationSelector({
       setConversations([]);
     }
   }, [user, refreshTrigger]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        dropdownRef.current &&
+        toggleButtonRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !toggleButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   const loadConversations = async () => {
     setIsLoading(true);
@@ -116,6 +136,7 @@ export default function ConversationSelector({
   return (
     <div className={styles.conversationSelector}>
       <button
+        ref={toggleButtonRef}
         className={styles.toggleButton}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle conversation list"
@@ -127,7 +148,16 @@ export default function ConversationSelector({
 
       {isOpen && (
         <>
-          <div className={styles.dropdown}>
+          <div ref={dropdownRef} className={styles.dropdown}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setIsOpen(false)}
+              aria-label="Close conversation list"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
             <div className={styles.header}>
               <h3>My Conversations</h3>
               <button
