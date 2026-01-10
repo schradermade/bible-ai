@@ -1,6 +1,65 @@
 # Bible AI - Development Log
 
-## 2026-01-10 - Conversations Modal Polish & UI Refinements
+## 2026-01-10 (Evening) - Personalized Suggestion System
+
+### Completed Tasks
+
+#### Intelligent Suggestion Generation
+1. **Created `/api/suggestions` endpoint**
+   - Fetches user's last 5 conversations with messages
+   - Analyzes conversation themes and topics
+   - Uses OpenAI GPT-4o to generate 3 personalized follow-up questions
+   - Returns default suggestions if user has < 2 conversations
+   - Graceful fallback to defaults on any API errors
+   - File: `src/app/api/suggestions/route.ts`
+
+2. **Updated ChatConversation component**
+   - Fetches personalized suggestions when showing welcome screen
+   - Added loading state with typing dots animation
+   - Dynamic label changes based on personalization:
+     - "Based on your journey, you might explore:" (personalized + recent conversation)
+     - "Based on your recent conversations:" (personalized, no recent)
+     - Default labels for non-personalized suggestions
+   - Fallback to default suggestions on fetch errors
+   - File: `src/components/ChatConversation.tsx`
+
+3. **Added loading UI**
+   - Shows "Loading suggestions..." label while fetching
+   - Displays typing dots animation during load
+   - Seamless transition to personalized or default suggestions
+   - File: `src/components/chat-conversation.module.css`
+
+### AI Prompt Design
+The system uses a carefully crafted prompt that instructs GPT-4o to:
+- Build naturally on themes from recent conversations
+- Encourage deeper biblical understanding or practical application
+- Keep suggestions conversational and inviting (not academic)
+- Limit to 12 words per suggestion for readability
+- Focus on meaningful spiritual growth
+
+### Files Modified/Created
+- `src/app/api/suggestions/route.ts` (NEW) - Personalized suggestion generation endpoint
+- `src/components/ChatConversation.tsx` - Integrated suggestion fetching and display
+- `src/components/chat-conversation.module.css` - Loading state styles
+
+### User Experience Flow
+1. User opens app to welcome screen
+2. System immediately shows default suggestions
+3. In background, fetches personalized suggestions based on conversation history
+4. Smoothly transitions to personalized suggestions when ready
+5. If user has < 2 conversations, shows defaults (no API call needed)
+6. All errors gracefully fallback to default suggestions
+
+### Status
+- ✅ API endpoint working correctly
+- ✅ Frontend integration complete
+- ✅ Loading states implemented
+- ✅ Fallback logic in place
+- ✅ No compilation errors
+
+---
+
+## 2026-01-10 (Afternoon) - Conversations Modal Polish & UI Refinements
 
 ### Completed Tasks
 

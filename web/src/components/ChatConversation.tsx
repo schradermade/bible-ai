@@ -465,11 +465,15 @@ export default function ChatConversation({
   const userIsScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const suggestions = [
+  const defaultSuggestions = [
     'How do I deal with anxiety?',
     'What does the Bible say about forgiveness?',
     'Help me understand Romans 8',
   ];
+
+  const [suggestions, setSuggestions] = useState<string[]>(defaultSuggestions);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [suggestionsPersonalized, setSuggestionsPersonalized] = useState(false);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -488,6 +492,39 @@ export default function ChatConversation({
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   };
+
+  // Fetch personalized suggestions when showing welcome screen
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      // Only fetch when showing welcome screen (no messages)
+      if (messages.length > 0) {
+        return;
+      }
+
+      setLoadingSuggestions(true);
+
+      try {
+        const response = await fetch('/api/suggestions');
+        if (response.ok) {
+          const data = await response.json();
+          setSuggestions(data.suggestions);
+          setSuggestionsPersonalized(data.personalized);
+        } else {
+          // Fallback to defaults on error
+          setSuggestions(defaultSuggestions);
+          setSuggestionsPersonalized(false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch suggestions:', error);
+        setSuggestions(defaultSuggestions);
+        setSuggestionsPersonalized(false);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [messages.length]);
 
   // Handle scroll events to detect manual scrolling
   useEffect(() => {
@@ -614,18 +651,34 @@ export default function ChatConversation({
 
           <div className={styles.welcomeSuggestions}>
             <p className={styles.suggestionsLabel}>
-              {recentConversation ? 'Or try asking:' : 'Try asking:'}
+              {loadingSuggestions ? (
+                'Loading suggestions...'
+              ) : suggestionsPersonalized ? (
+                recentConversation ? 'Based on your journey, you might explore:' : 'Based on your recent conversations:'
+              ) : (
+                recentConversation ? 'Or try asking:' : 'Try asking:'
+              )}
             </p>
             <div className={styles.suggestionCards}>
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className={styles.suggestionCard}
-                  onClick={() => onSuggestionClick?.(suggestion)}
-                >
-                  "{suggestion}"
+              {loadingSuggestions ? (
+                <div className={styles.loadingSuggestions}>
+                  <div className={styles.typingDots}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className={styles.suggestionCard}
+                    onClick={() => onSuggestionClick?.(suggestion)}
+                  >
+                    "{suggestion}"
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
