@@ -8,6 +8,7 @@ import {
   incrementUsage,
   INSIGHT_FEATURE_KEY,
 } from '@/lib/billing';
+import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
@@ -327,9 +328,8 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const query =
-    typeof body.query === 'string' ? body.query.trim() : '';
-  const conversationHistory = Array.isArray(body.messages) ? body.messages : [];
+  const query = typeof body.query === 'string' ? body.query.trim() : '';
+  const conversationId = typeof body.conversationId === 'string' ? body.conversationId : null;
 
   if (!query) {
     return NextResponse.json({ error: 'query_required' }, { status: 400 });
@@ -355,15 +355,59 @@ export async function POST(request: Request) {
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  // Build conversation messages for OpenAI
-  const conversationMessages = conversationHistory
-    .filter((msg: any) => msg.type && msg.content) // Filter out empty messages
-    .map((msg: any) => ({
-      role: msg.type === 'user' ? 'user' : 'assistant',
+  try {
+    // Get or create conversation
+    let currentConversationId = conversationId;
+
+    if (conversationId) {
+      // Verify conversation exists and belongs to user
+      const existingConv = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+      });
+
+      if (!existingConv || existingConv.userId !== userId) {
+        return NextResponse.json(
+          { error: 'conversation_not_found', message: 'Conversation not found.' },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Create new conversation
+      const newConv = await prisma.conversation.create({
+        data: { userId },
+      });
+      currentConversationId = newConv.id;
+    }
+
+    // Load conversation history from database (last 25 messages for sliding window)
+    const dbMessages = await prisma.message.findMany({
+      where: { conversationId: currentConversationId },
+      orderBy: { createdAt: 'asc' },
+      take: 25, // Sliding window: keep last 25 messages
+    });
+
+    // Build conversation messages for OpenAI
+    const conversationMessages = dbMessages.map(msg => ({
+      role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }));
 
-  try {
+    // Add current user query as a message
+    conversationMessages.push({
+      role: 'user',
+      content: query,
+    });
+
+    // Save user message to database
+    await prisma.message.create({
+      data: {
+        conversationId: currentConversationId,
+        role: 'user',
+        content: query,
+      },
+    });
+
+    // Stream response from OpenAI
     const stream = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0.7,
@@ -375,8 +419,11 @@ export async function POST(request: Request) {
       ],
     });
 
-    // Increment usage (we count this as one insight usage)
+    // Increment usage
     await incrementUsage(userId, INSIGHT_FEATURE_KEY);
+
+    // Accumulate response for saving to database
+    let fullResponse = '';
 
     // Create a ReadableStream to stream the response
     const encoder = new TextEncoder();
@@ -386,9 +433,26 @@ export async function POST(request: Request) {
           for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
+              fullResponse += content;
               controller.enqueue(encoder.encode(content));
             }
           }
+
+          // Save assistant response to database after streaming completes
+          await prisma.message.create({
+            data: {
+              conversationId: currentConversationId,
+              role: 'assistant',
+              content: fullResponse,
+            },
+          });
+
+          // Update conversation's updatedAt timestamp
+          await prisma.conversation.update({
+            where: { id: currentConversationId },
+            data: { updatedAt: new Date() },
+          });
+
           controller.close();
         } catch (error) {
           controller.error(error);
@@ -400,6 +464,7 @@ export async function POST(request: Request) {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
+        'X-Conversation-Id': currentConversationId, // Return conversation ID in header
       },
     });
   } catch (error) {
