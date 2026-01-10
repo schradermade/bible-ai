@@ -110,9 +110,9 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
       if (formRef.current) {
         const rect = formRef.current.getBoundingClientRect();
         const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
-        const dropdownHeight = 400; // Approximate max height
+        // Position at the top of the form, then CSS transform will move it up by 100% of its own height
         setDropdownPosition({
-          top: rect.top - dropdownHeight,
+          top: rect.top,
           left: rect.left,
           width: maxWidth,
         });
@@ -202,9 +202,9 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
         } else {
           // Update position to keep dropdown attached (above input)
           const maxWidth = Math.min(rect.width, 500, window.innerWidth - 48);
-          const dropdownHeight = 400;
+          // Position at the top of the form, then CSS transform will move it up by 100% of its own height
           setDropdownPosition({
-            top: rect.top - dropdownHeight,
+            top: rect.top,
             left: rect.left,
             width: maxWidth,
           });
