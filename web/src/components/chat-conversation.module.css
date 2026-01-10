@@ -513,37 +513,68 @@
 /* Continue Your Journey Section */
 .continueSection {
   margin: 32px 0 24px;
-  padding-top: 24px;
-  border-top: 2px solid rgba(176, 123, 76, 0.15);
+  padding-top: 28px;
+  border-top: 2px solid rgba(176, 123, 76, 0.2);
+  position: relative;
+}
+
+.continueSection::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(176, 123, 76, 0.4), transparent);
 }
 
 .continueLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: #8b7355;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b07b4c;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 12px;
+  letter-spacing: 1px;
+  margin: 0 0 14px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .continueCard {
   display: flex;
   align-items: center;
-  gap: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7) 0%, rgba(250, 247, 240, 0.7) 100%);
-  border: 2px solid rgba(139, 115, 85, 0.25);
-  border-radius: 16px;
-  padding: 24px 28px;
+  gap: 22px;
+  background: linear-gradient(145deg, #fdfcfa 0%, #f9f6f0 100%);
+  border: 2px solid rgba(176, 123, 76, 0.3);
+  border-radius: 18px;
+  padding: 26px 30px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(93, 78, 55, 0.08);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 3px 12px rgba(176, 123, 76, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 0 0 1px rgba(176, 123, 76, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.continueCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
 }
 
 .continueCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(93, 78, 55, 0.15);
-  border-color: rgba(139, 115, 85, 0.4);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.85) 0%, rgba(250, 247, 240, 0.85) 100%);
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 24px rgba(176, 123, 76, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(176, 123, 76, 0.15);
+  border-color: rgba(176, 123, 76, 0.45);
+  background: linear-gradient(145deg, #ffffff 0%, #faf7f0 100%);
 }
 
 .continueIcon {
@@ -551,17 +582,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: rgba(139, 115, 85, 0.12);
-  border-radius: 12px;
-  color: #8b7355;
-  transition: all 0.3s ease;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(145deg, #f5e6d3 0%, #e8d4bc 100%);
+  border: 2px solid rgba(176, 123, 76, 0.25);
+  border-radius: 14px;
+  color: #b07b4c;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 2px 8px rgba(176, 123, 76, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+.continueIcon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 12px 12px 0 0;
 }
 
 .continueCard:hover .continueIcon {
-  background: rgba(139, 115, 85, 0.18);
-  transform: scale(1.05);
+  background: linear-gradient(145deg, #f8eadb 0%, #ebd8c4 100%);
+  border-color: rgba(176, 123, 76, 0.4);
+  transform: scale(1.08);
+  box-shadow:
+    0 4px 12px rgba(176, 123, 76, 0.25),
+    inset 0 1px 3px rgba(255, 255, 255, 0.6);
 }
 
 .continueContent {
@@ -569,23 +620,27 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .continueTitle {
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   color: #5d4e37;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.01em;
 }
 
 .continueMeta {
   font-size: 14px;
-  color: #8b7355;
+  color: #9d7f5f;
   line-height: 1.4;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .continueArrow {
@@ -593,28 +648,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  color: #8b7355;
-  background: rgba(139, 115, 85, 0.08);
-  transition: all 0.3s ease;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: #b07b4c;
+  background: linear-gradient(145deg, rgba(245, 230, 211, 0.6) 0%, rgba(232, 212, 188, 0.6) 100%);
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(176, 123, 76, 0.1);
 }
 
 .continueCard:hover .continueArrow {
-  background: rgba(139, 115, 85, 0.15);
-  transform: translateX(4px);
+  background: linear-gradient(145deg, rgba(248, 234, 219, 0.8) 0%, rgba(235, 216, 196, 0.8) 100%);
+  border-color: rgba(176, 123, 76, 0.35);
+  transform: translateX(5px);
+  box-shadow: 0 3px 10px rgba(176, 123, 76, 0.2);
 }
 
 @media (max-width: 640px) {
+  .continueSection {
+    padding-top: 24px;
+  }
+
+  .continueLabel {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
   .continueCard {
-    gap: 16px;
-    padding: 20px;
+    gap: 18px;
+    padding: 22px 24px;
+    border-radius: 16px;
   }
 
   .continueIcon {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
   }
 
   .continueIcon svg {
@@ -631,8 +701,9 @@
   }
 
   .continueArrow {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
   }
 
   .continueArrow svg {
