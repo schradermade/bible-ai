@@ -30,9 +30,10 @@ interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
   onDeleteVerse: (verse: SavedVerse) => void;
+  prayerRefreshTrigger?: number;
 }
 
-export default function ContextualWidgets({ myVerses, onDeleteVerse }: ContextualWidgetsProps) {
+export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefreshTrigger }: ContextualWidgetsProps) {
   const { user } = useUser();
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<MemoryVerse[]>([]);
@@ -46,7 +47,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse }: Contextua
     searchHistory: false,
   });
 
-  // Load prayers on mount and when user changes
+  // Load prayers on mount, when user changes, or when refresh is triggered
   useEffect(() => {
     const loadPrayers = async () => {
       if (!user) {
@@ -66,7 +67,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse }: Contextua
     };
 
     loadPrayers();
-  }, [user]);
+  }, [user, prayerRefreshTrigger]);
 
   // Load memorized verses on mount and when user changes
   useEffect(() => {

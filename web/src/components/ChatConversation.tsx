@@ -21,17 +21,22 @@ interface ChatConversationProps {
   isStreaming?: boolean;
   onSuggestionClick?: (suggestion: string) => void;
   onSaveVerse?: (verse: SavedVerse) => void;
+  onGeneratePrayerFromChat?: (context: string) => Promise<void>;
 }
 
 // Bible verse reference pattern: Detects [[Book chapter:verse]] format
 // This matches the format that ChatGPT is instructed to use
 const VERSE_PATTERN = /\[\[([^\]]+)\]\]/g;
 
+// Prayer marker pattern: Detects {{prayer-worthy text}} format
+// ChatGPT wraps prayer-worthy content in double curly braces
+const PRAYER_PATTERN = /\{\{([^}]+)\}\}/g;
+
 // Component to render verse references with save button
 function VerseReference({
   reference,
   fullText,
-  onSave
+  onSave,
 }: {
   reference: string;
   fullText: string;
@@ -46,7 +51,9 @@ function VerseReference({
 
     try {
       // Fetch the exact verse text from the Bible API
-      const response = await fetch(`/api/bible/verse?reference=${encodeURIComponent(reference)}`);
+      const response = await fetch(
+        `/api/bible/verse?reference=${encodeURIComponent(reference)}`
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -135,6 +142,111 @@ function VerseReference({
   );
 }
 
+// Component to render prayer markers with create prayer button
+function PrayerMarker({
+  prayerText,
+  onCreatePrayer,
+}: {
+  prayerText: string;
+  onCreatePrayer?: (text: string) => Promise<void>;
+}) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleCreatePrayer = async () => {
+    if (!onCreatePrayer || isGenerating) return;
+
+    setIsGenerating(true);
+    try {
+      await onCreatePrayer(prayerText);
+    } catch (error) {
+      console.error('[PrayerMarker] Failed to create prayer:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <span className={styles.prayerMarker}>
+      <span className={styles.prayerText}>{prayerText}</span>
+      {onCreatePrayer && (
+        <button
+          onClick={handleCreatePrayer}
+          className={styles.prayerCreateButton}
+          disabled={isGenerating}
+          aria-label="Create prayer for this"
+          title="Create a prayer for this moment"
+        >
+          {isGenerating ? (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className={styles.spinner}
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="60"
+                strokeDashoffset="20"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 36 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {/* Left hand outline with fill */}
+              <path
+                d="M17 8C17 6 16 4 14 4C12 4 10 5 9 7C8 9 7 12 7 15C7 18 7 22 9 25C10 27 12 28 14 28C15 28 16 27 17 26V8Z"
+                fill="currentColor"
+                opacity="0.25"
+              />
+              {/* Right hand outline with fill */}
+              <path
+                d="M19 8C19 6 20 4 22 4C24 4 26 5 27 7C28 9 29 12 29 15C29 18 29 22 27 25C26 27 24 28 22 28C21 28 20 27 19 26V8Z"
+                fill="currentColor"
+                opacity="0.25"
+              />
+              {/* Left hand stroke */}
+              <path
+                d="M17 8C17 6 16 4 14 4C12 4 10 5 9 7C8 9 7 12 7 15C7 18 7 22 9 25C10 27 12 28 14 28C15 28 16 27 17 26V8Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Right hand stroke */}
+              <path
+                d="M19 8C19 6 20 4 22 4C24 4 26 5 27 7C28 9 29 12 29 15C29 18 29 22 27 25C26 27 24 28 22 28C21 28 20 27 19 26V8Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Center dividing line */}
+              <path
+                d="M18 4L18 28"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          )}
+        </button>
+      )}
+    </span>
+  );
+}
+
 // Extract verse text from the full message content
 function extractVerseText(reference: string, fullText: string): string {
   // Escape special regex characters in the reference
@@ -156,10 +268,7 @@ function extractVerseText(reference: string, fullText: string): string {
 
   // Pattern 3: Reference in parentheses after quoted text
   // Example: "'Blessed are the meek...' (Matthew 5:5)"
-  const pattern3 = new RegExp(
-    `["']([^"']+)["']\\s*\\(${escapedRef}\\)`,
-    'i'
-  );
+  const pattern3 = new RegExp(`["']([^"']+)["']\\s*\\(${escapedRef}\\)`, 'i');
 
   // Pattern 4: Reference followed by colon/dash and quoted text
   // Example: "Matthew 5:5: 'Blessed are the meek...'"
@@ -186,7 +295,11 @@ function extractVerseText(reference: string, fullText: string): string {
 }
 
 // Function to parse text and identify verse references
-function parseVerseReferences(text: string, fullText: string, onSave?: (verse: SavedVerse) => void) {
+function parseVerseReferences(
+  text: string,
+  fullText: string,
+  onSave?: (verse: SavedVerse) => void
+) {
   const parts: (string | React.ReactElement)[] = [];
   let lastIndex = 0;
   let match;
@@ -224,16 +337,102 @@ function parseVerseReferences(text: string, fullText: string, onSave?: (verse: S
   return parts.length > 0 ? parts : text;
 }
 
-// Helper to recursively process children and detect verse references
-function processChildren(children: any, fullText: string, onSave?: (verse: SavedVerse) => void): any {
+// Function to parse text and identify prayer markers
+function parsePrayerMarkers(
+  text: string,
+  onCreatePrayer?: (text: string) => Promise<void>
+) {
+  const parts: (string | React.ReactElement)[] = [];
+  let lastIndex = 0;
+  let match;
+
+  // Reset regex
+  const regex = new RegExp(PRAYER_PATTERN);
+
+  while ((match = regex.exec(text)) !== null) {
+    // match[1] contains the prayer text (everything between {{ and }})
+    const prayerText = match[1].trim();
+
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    // Add the prayer marker component (displayed without braces)
+    parts.push(
+      <PrayerMarker
+        key={`prayer-${match.index}`}
+        prayerText={prayerText}
+        onCreatePrayer={onCreatePrayer}
+      />
+    );
+
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
+// Helper to recursively process children and detect verse references and prayer markers
+function processChildren(
+  children: any,
+  fullText: string,
+  onSave?: (verse: SavedVerse) => void,
+  onCreatePrayer?: (text: string) => Promise<void>
+): any {
   if (typeof children === 'string') {
-    return parseVerseReferences(children, fullText, onSave);
+    // First parse verse references
+    let result = parseVerseReferences(children, fullText, onSave);
+
+    // Then parse prayer markers from the result
+    if (Array.isArray(result)) {
+      return result.map((part, index) => {
+        if (typeof part === 'string') {
+          return (
+            <span key={`part-${index}`}>
+              {parsePrayerMarkers(part, onCreatePrayer)}
+            </span>
+          );
+        }
+        return part;
+      });
+    } else if (typeof result === 'string') {
+      return parsePrayerMarkers(result, onCreatePrayer);
+    }
+
+    return result;
   }
 
   if (Array.isArray(children)) {
     return children.map((child, index) => {
       if (typeof child === 'string') {
-        return <span key={index}>{parseVerseReferences(child, fullText, onSave)}</span>;
+        let result = parseVerseReferences(child, fullText, onSave);
+
+        if (Array.isArray(result)) {
+          return result.map((part, pIndex) => {
+            if (typeof part === 'string') {
+              return (
+                <span key={`${index}-${pIndex}`}>
+                  {parsePrayerMarkers(part, onCreatePrayer)}
+                </span>
+              );
+            }
+            return part;
+          });
+        } else if (typeof result === 'string') {
+          return (
+            <span key={index}>
+              {parsePrayerMarkers(result, onCreatePrayer)}
+            </span>
+          );
+        }
+
+        return <span key={index}>{result}</span>;
       }
       return child;
     });
@@ -247,6 +446,7 @@ export default function ChatConversation({
   isStreaming = false,
   onSuggestionClick,
   onSaveVerse,
+  onGeneratePrayerFromChat,
 }: ChatConversationProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -255,9 +455,9 @@ export default function ChatConversation({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const suggestions = [
-    "How do I deal with anxiety?",
-    "What does the Bible say about forgiveness?",
-    "Help me understand Romans 8"
+    'How do I deal with anxiety?',
+    'What does the Bible say about forgiveness?',
+    'Help me understand Romans 8',
   ];
 
   // Handle scroll events to detect manual scrolling
@@ -306,7 +506,11 @@ export default function ChatConversation({
     }
 
     // Only auto-scroll if explicitly enabled
-    if (shouldAutoScrollRef.current && messagesEndRef.current && containerRef.current) {
+    if (
+      shouldAutoScrollRef.current &&
+      messagesEndRef.current &&
+      containerRef.current
+    ) {
       const { scrollHeight, clientHeight } = containerRef.current;
       // Use direct scrollTop assignment instead of scrollIntoView to avoid smooth behavior
       containerRef.current.scrollTop = scrollHeight - clientHeight;
@@ -314,7 +518,10 @@ export default function ChatConversation({
   }, [messages]);
 
   return (
-    <div ref={containerRef} className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''}`}>
+    <div
+      ref={containerRef}
+      className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''}`}
+    >
       {messages.length === 0 ? (
         <div className={styles.welcomeContainer}>
           <div className={styles.welcomeIcon}>
@@ -339,9 +546,10 @@ export default function ChatConversation({
               />
             </svg>
           </div>
-          <h2 className={styles.welcomeTitle}>Welcome to Berea</h2>
+          <h2 className={styles.welcomeTitle}>Welcome to Berea Study</h2>
           <p className={styles.welcomeMessage}>
-            Ask me anything about Scripture, theology, or how God's Word applies to your life.
+            Ask me anything about Scripture, theology, or how God's Word applies
+            to your life.
           </p>
           <div className={styles.welcomeSuggestions}>
             <p className={styles.suggestionsLabel}>Try asking:</p>
@@ -361,42 +569,65 @@ export default function ChatConversation({
       ) : (
         <div className={styles.messagesContainer}>
           {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`${styles.message} ${
-                message.type === 'user' ? styles.userMessage : styles.assistantMessage
-              }`}
-            >
-              <div className={styles.messageContent}>
-                {message.type === 'assistant' ? (
-                  <ReactMarkdown
-                    components={{
-                      p: ({ children }) => {
-                        // Process text nodes to detect verse references
-                        const processedChildren = processChildren(children, message.content, onSaveVerse);
-                        return <p>{processedChildren}</p>;
-                      },
-                      li: ({ children }) => {
-                        const processedChildren = processChildren(children, message.content, onSaveVerse);
-                        return <li>{processedChildren}</li>;
-                      },
-                      strong: ({ children }) => {
-                        const processedChildren = processChildren(children, message.content, onSaveVerse);
-                        return <strong>{processedChildren}</strong>;
-                      },
-                      em: ({ children }) => {
-                        const processedChildren = processChildren(children, message.content, onSaveVerse);
-                        return <em>{processedChildren}</em>;
-                      },
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                ) : (
-                  message.content
-                )}
+            <React.Fragment key={message.id}>
+              <div
+                className={`${styles.message} ${
+                  message.type === 'user'
+                    ? styles.userMessage
+                    : styles.assistantMessage
+                }`}
+              >
+                <div className={styles.messageContent}>
+                  {message.type === 'assistant' ? (
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => {
+                          // Process text nodes to detect verse references and prayer markers
+                          const processedChildren = processChildren(
+                            children,
+                            message.content,
+                            onSaveVerse,
+                            onGeneratePrayerFromChat
+                          );
+                          return <p>{processedChildren}</p>;
+                        },
+                        li: ({ children }) => {
+                          const processedChildren = processChildren(
+                            children,
+                            message.content,
+                            onSaveVerse,
+                            onGeneratePrayerFromChat
+                          );
+                          return <li>{processedChildren}</li>;
+                        },
+                        strong: ({ children }) => {
+                          const processedChildren = processChildren(
+                            children,
+                            message.content,
+                            onSaveVerse,
+                            onGeneratePrayerFromChat
+                          );
+                          return <strong>{processedChildren}</strong>;
+                        },
+                        em: ({ children }) => {
+                          const processedChildren = processChildren(
+                            children,
+                            message.content,
+                            onSaveVerse,
+                            onGeneratePrayerFromChat
+                          );
+                          return <em>{processedChildren}</em>;
+                        },
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    message.content
+                  )}
+                </div>
               </div>
-            </div>
+            </React.Fragment>
           ))}
           {isStreaming && (
             <div className={styles.streamingIndicator}>

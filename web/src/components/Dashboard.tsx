@@ -102,6 +102,7 @@ export default function Dashboard() {
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [lastQuery, setLastQuery] = useState<string>('');
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
+  const [prayerRefreshTrigger, setPrayerRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
 
   // Load saved verses on mount and when user changes
@@ -299,6 +300,48 @@ export default function Dashboard() {
     }
   };
 
+  const handleGeneratePrayerFromChat = async (chatContext: string) => {
+    try {
+      // Generate prayer using AI
+      const generateResponse = await fetch('/api/ai/generate-prayer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'chat',
+          chatContext,
+        }),
+      });
+
+      if (!generateResponse.ok) {
+        throw new Error('Failed to generate prayer');
+      }
+
+      const { prayer } = await generateResponse.json();
+
+      // Save prayer to database
+      const saveResponse = await fetch('/api/prayers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: prayer,
+          source: 'chat',
+          sourceReference: null,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save prayer');
+      }
+
+      // Trigger prayer journal refresh
+      setPrayerRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to generate prayer:', error);
+      showError('Failed to generate prayer. Please try again.');
+      throw error;
+    }
+  };
+
   const handlePanelClick = async (panelId: PanelType) => {
     if (expandedPanel === panelId) {
       // Do nothing if clicking the already expanded panel
@@ -382,6 +425,7 @@ export default function Dashboard() {
               isStreaming={isLoadingContent}
               onSuggestionClick={handleSearch}
               onSaveVerse={addVerse}
+              onGeneratePrayerFromChat={handleGeneratePrayerFromChat}
             />
           </div>
         )}
@@ -462,7 +506,7 @@ export default function Dashboard() {
       </div>
 
       <aside className={styles.widgetsSidebar}>
-        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} />
+        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
       </aside>
     </div>
   );
