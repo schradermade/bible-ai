@@ -377,7 +377,14 @@
   letter-spacing: 0.01em;
 }
 
-.memorizeButton {
+.verseActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.memorizeButton,
+.createPrayerButton {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -390,11 +397,12 @@
   color: #8b6239;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 100%;
+  flex: 1;
   justify-content: center;
 }
 
-.memorizeButton:hover {
+.memorizeButton:hover,
+.createPrayerButton:hover:not(:disabled) {
   background: linear-gradient(135deg, rgba(176, 123, 76, 0.18), rgba(176, 123, 76, 0.12));
   border-color: rgba(176, 123, 76, 0.4);
   color: #6d5228;
@@ -402,12 +410,32 @@
   box-shadow: 0 2px 6px rgba(139, 98, 57, 0.15);
 }
 
-.memorizeButton:active {
+.memorizeButton:active,
+.createPrayerButton:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.memorizeButton svg {
+.memorizeButton svg,
+.createPrayerButton svg {
   flex-shrink: 0;
+}
+
+.createPrayerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinningIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .memorizedButton {
@@ -450,6 +478,96 @@
 }
 
 .memorizedActive:hover {
+  background: linear-gradient(135deg, #35705f 0%, #2a5a4d 100%);
+  border-color: #35705f;
+  color: #ffffff;
+}
+
+/* Prayer Cards */
+.prayerCard {
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border: 2px solid rgba(176, 123, 76, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow:
+    0 2px 8px rgba(31, 26, 22, 0.06),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.prayerCard:last-child {
+  margin-bottom: 0;
+}
+
+.prayerAnswered {
+  background: linear-gradient(145deg, #f0f7f4 0%, #e6f2ed 100%);
+  border-color: rgba(42, 90, 77, 0.3);
+  opacity: 0.85;
+}
+
+.prayerCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.prayerSource {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6239;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(176, 123, 76, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.prayerText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3a2f26;
+  margin: 0 0 12px 0;
+  font-style: italic;
+}
+
+.prayerStatusButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+  border: 1.5px solid rgba(176, 123, 76, 0.25);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6d5228;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  justify-content: center;
+}
+
+.prayerStatusButton:hover {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.18), rgba(176, 123, 76, 0.12));
+  border-color: rgba(176, 123, 76, 0.4);
+  color: #5a4320;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.15);
+}
+
+.prayerStatusButton svg {
+  flex-shrink: 0;
+}
+
+.prayerStatusButtonAnswered {
+  background: linear-gradient(135deg, #2a5a4d 0%, #1e4239 100%);
+  border-color: #2a5a4d;
+  color: #f0e6d2;
+}
+
+.prayerStatusButtonAnswered:hover {
   background: linear-gradient(135deg, #35705f 0%, #2a5a4d 100%);
   border-color: #35705f;
   color: #ffffff;

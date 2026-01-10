@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './contextual-widgets.module.css';
-import SearchHistory from './SearchHistory';
 
 interface SavedVerse {
   reference: string;
@@ -17,17 +16,28 @@ interface MemoryVerse {
   memorized: boolean;
 }
 
+interface Prayer {
+  id: string;
+  content: string;
+  source: string;
+  sourceReference: string | null;
+  status: string;
+  answeredAt: string | null;
+  createdAt: string;
+}
+
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
   onDeleteVerse: (verse: SavedVerse) => void;
 }
 
-export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVerse }: ContextualWidgetsProps) {
+export default function ContextualWidgets({ myVerses, onDeleteVerse }: ContextualWidgetsProps) {
   const { user } = useUser();
-  const [prayerNotes, setPrayerNotes] = useState<string[]>([]);
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<MemoryVerse[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
+  const [generatingPrayerForVerse, setGeneratingPrayerForVerse] = useState<string | null>(null);
   const [collapsedWidgets, setCollapsedWidgets] = useState<Record<string, boolean>>({
     prayer: false,
     myVerses: false,
@@ -36,13 +46,34 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     searchHistory: false,
   });
 
+  // Load prayers on mount and when user changes
+  useEffect(() => {
+    const loadPrayers = async () => {
+      if (!user) {
+        setPrayers([]);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/prayers');
+        if (response.ok) {
+          const data = await response.json();
+          setPrayers(data.prayers);
+        }
+      } catch (error) {
+        console.error('Failed to load prayers:', error);
+      }
+    };
+
+    loadPrayers();
+  }, [user]);
+
   // Load memorized verses on mount and when user changes
   useEffect(() => {
     const loadMemorizedVerses = async () => {
       if (!user) {
         // Clear data when user signs out
         setMemoryVerses([]);
-        setPrayerNotes([]);
         setStudyProgress(0);
         return;
       }
@@ -198,6 +229,108 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
     }
   };
 
+  const togglePrayerStatus = async (id: string) => {
+    const prayer = prayers.find(p => p.id === id);
+    if (!prayer) return;
+
+    const newStatus = prayer.status === 'ongoing' ? 'answered' : 'ongoing';
+
+    // Optimistically update UI
+    setPrayers(prayers.map(p =>
+      p.id === id ? { ...p, status: newStatus, answeredAt: newStatus === 'answered' ? new Date().toISOString() : null } : p
+    ));
+
+    try {
+      const response = await fetch('/api/prayers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update prayer status');
+      }
+    } catch (error) {
+      console.error('Failed to update prayer status:', error);
+      // Revert on error
+      setPrayers(prayers.map(p =>
+        p.id === id ? { ...p, status: prayer.status, answeredAt: prayer.answeredAt } : p
+      ));
+    }
+  };
+
+  const deletePrayer = async (id: string) => {
+    // Optimistically remove from UI
+    const previousPrayers = prayers;
+    setPrayers(prayers.filter(p => p.id !== id));
+
+    try {
+      const response = await fetch('/api/prayers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete prayer');
+      }
+    } catch (error) {
+      console.error('Failed to delete prayer:', error);
+      // Revert on error
+      setPrayers(previousPrayers);
+    }
+  };
+
+  const generatePrayerFromVerse = async (verse: SavedVerse) => {
+    if (generatingPrayerForVerse) return; // Prevent multiple simultaneous generations
+
+    setGeneratingPrayerForVerse(verse.reference);
+
+    try {
+      // Generate prayer using AI
+      const generateResponse = await fetch('/api/ai/generate-prayer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'verse',
+          verseReference: verse.reference,
+          verseText: verse.text,
+        }),
+      });
+
+      if (!generateResponse.ok) {
+        throw new Error('Failed to generate prayer');
+      }
+
+      const { prayer, sourceReference } = await generateResponse.json();
+
+      // Save prayer to database
+      const saveResponse = await fetch('/api/prayers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: prayer,
+          source: 'verse',
+          sourceReference,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save prayer');
+      }
+
+      const { prayer: savedPrayer } = await saveResponse.json();
+
+      // Add to prayers list
+      setPrayers([savedPrayer, ...prayers]);
+    } catch (error) {
+      console.error('Failed to generate prayer:', error);
+      alert('Failed to generate prayer. Please try again.');
+    } finally {
+      setGeneratingPrayerForVerse(null);
+    }
+  };
+
   return (
     <div className={styles.widgetsContainer}>
       {/* Search History Widget - Moved to input field dropdown */}
@@ -230,28 +363,53 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
               </svg>
             </button>
           </div>
-          <button className={styles.addButton} onClick={(e) => e.stopPropagation()}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M8 3V13M3 8H13"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
+          <span className={styles.countBadge}>{prayers.filter(p => p.status === 'ongoing').length}</span>
         </div>
         <div className={`${styles.widgetContent} ${collapsedWidgets.prayer ? styles.collapsed : ''}`}>
-          {prayerNotes.length === 0 ? (
-            <p className={styles.emptyState}>No prayer notes yet</p>
+          {prayers.length === 0 ? (
+            <p className={styles.emptyState}>No prayers yet. Save a verse and create a prayer!</p>
           ) : (
-            <ul className={styles.list}>
-              {prayerNotes.map((note, index) => (
-                <li key={index} className={styles.listItem}>
-                  {note}
-                </li>
+            <div className={styles.versesList}>
+              {prayers.map((prayer) => (
+                <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''}`}>
+                  <div className={styles.prayerCardHeader}>
+                    {prayer.sourceReference && (
+                      <span className={styles.prayerSource}>{prayer.sourceReference}</span>
+                    )}
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => deletePrayer(prayer.id)}
+                      aria-label="Delete prayer"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <p className={styles.prayerText}>{prayer.content}</p>
+                  <button
+                    className={`${styles.prayerStatusButton} ${prayer.status === 'answered' ? styles.prayerStatusButtonAnswered : ''}`}
+                    onClick={() => togglePrayerStatus(prayer.id)}
+                  >
+                    {prayer.status === 'answered' ? (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Answered {prayer.answeredAt && `• ${new Date(prayer.answeredAt).toLocaleDateString()}`}
+                      </>
+                    ) : (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                        Mark as Answered
+                      </>
+                    )}
+                  </button>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>
@@ -300,16 +458,41 @@ export default function ContextualWidgets({ myVerses, onLoadHistory, onDeleteVer
                       </svg>
                     </button>
                   </div>
-                  <p className={styles.verseText}>"{verse.text}"</p>
-                  <button
-                    className={styles.memorizeButton}
-                    onClick={() => handleMemorizeVerse(verse)}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Memorize
-                  </button>
+                  <p className={styles.verseText}>&quot;{verse.text}&quot;</p>
+                  <div className={styles.verseActions}>
+                    <button
+                      className={styles.memorizeButton}
+                      onClick={() => handleMemorizeVerse(verse)}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Memorize
+                    </button>
+                    <button
+                      className={styles.createPrayerButton}
+                      onClick={() => generatePrayerFromVerse(verse)}
+                      disabled={generatingPrayerForVerse === verse.reference}
+                    >
+                      {generatingPrayerForVerse === verse.reference ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" strokeWidth="2"/>
+                            <path d="M8 2h8M8 22h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                          Create Prayer
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
