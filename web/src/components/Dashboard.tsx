@@ -104,6 +104,7 @@ export default function Dashboard() {
   const [lastQuery, setLastQuery] = useState<string>('');
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
   const [prayerRefreshTrigger, setPrayerRefreshTrigger] = useState(0);
+  const [conversationRefreshTrigger, setConversationRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
@@ -293,6 +294,9 @@ export default function Dashboard() {
 
       // Trigger usage refresh
       setUsageRefreshTrigger(prev => prev + 1);
+
+      // Trigger conversation list refresh (to update title and timestamp)
+      setConversationRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Chat error:', error);
       showError('An unexpected error occurred. Please try again.');
@@ -479,6 +483,7 @@ export default function Dashboard() {
           currentConversationId={currentConversationId}
           onSelectConversation={handleSelectConversation}
           onNewConversation={handleNewConversation}
+          refreshTrigger={conversationRefreshTrigger}
         />
       </div>
       <ChatInput onSearch={handleSearch} isLoading={isLoadingContent} usageRefreshTrigger={usageRefreshTrigger} />

@@ -12,6 +12,19 @@ import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
+// Helper function to generate conversation title from first user message
+function generateConversationTitle(query: string): string {
+  // Truncate to first 60 chars and clean up
+  const cleaned = query.trim().slice(0, 60);
+
+  // If it ends mid-word, truncate to last complete word
+  const lastSpace = cleaned.lastIndexOf(' ');
+  const title = lastSpace > 30 ? cleaned.slice(0, lastSpace) : cleaned;
+
+  // Add ellipsis if truncated
+  return query.length > 60 ? `${title}...` : title;
+}
+
 const CHAT_SYSTEM_PROMPT = `
 ═══════════════════════════════════════════════════════════════════
 🚨 ABSOLUTE REQUIREMENTS - FAILURE TO FOLLOW = UNACCEPTABLE 🚨
@@ -447,11 +460,29 @@ export async function POST(request: Request) {
             },
           });
 
-          // Update conversation's updatedAt timestamp
-          await prisma.conversation.update({
-            where: { id: currentConversationId },
-            data: { updatedAt: new Date() },
+          // Check if this is a new conversation (only has 2 messages: user + assistant)
+          const messageCount = await prisma.message.count({
+            where: { conversationId: currentConversationId },
           });
+
+          // Update conversation's updatedAt timestamp and set title if it's a new conversation
+          if (messageCount === 2) {
+            // This is the first exchange, generate a title from the user's first message
+            const title = generateConversationTitle(query);
+            await prisma.conversation.update({
+              where: { id: currentConversationId },
+              data: {
+                title,
+                updatedAt: new Date(),
+              },
+            });
+          } else {
+            // Just update the timestamp
+            await prisma.conversation.update({
+              where: { id: currentConversationId },
+              data: { updatedAt: new Date() },
+            });
+          }
 
           controller.close();
         } catch (error) {

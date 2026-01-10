@@ -16,12 +16,14 @@ interface ConversationSelectorProps {
   currentConversationId: string | null;
   onSelectConversation: (conversationId: string | null) => void;
   onNewConversation: () => void;
+  refreshTrigger?: number;
 }
 
 export default function ConversationSelector({
   currentConversationId,
   onSelectConversation,
   onNewConversation,
+  refreshTrigger,
 }: ConversationSelectorProps) {
   const { user } = useUser();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -34,7 +36,7 @@ export default function ConversationSelector({
     } else {
       setConversations([]);
     }
-  }, [user]);
+  }, [user, refreshTrigger]);
 
   const loadConversations = async () => {
     setIsLoading(true);
