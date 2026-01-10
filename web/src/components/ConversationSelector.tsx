@@ -127,7 +127,6 @@ export default function ConversationSelector({
 
       {isOpen && (
         <>
-          <div className={styles.backdrop} onClick={() => setIsOpen(false)} />
           <div className={styles.dropdown}>
             <div className={styles.header}>
               <h3>My Conversations</h3>
