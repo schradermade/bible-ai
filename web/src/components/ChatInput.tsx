@@ -48,6 +48,7 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
   const dropdownRef = useRef<HTMLDivElement>(null);
   const historyButtonRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const fetchUsage = async () => {
     try {
@@ -219,6 +220,14 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     };
   }, [isHistoryOpen]);
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -226,6 +235,13 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
     const query = input.trim();
     setInput(''); // Clear input immediately after submitting
     await onSearch(query);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
   };
 
   return (
@@ -256,13 +272,16 @@ export default function ChatInput({ onSearch, isLoading, usageRefreshTrigger = 0
               <path d="M3 13V11H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={prompts[currentPromptIndex]}
             className={styles.input}
             disabled={isLoading}
+            rows={1}
+            maxLength={500}
           />
           <button
             type="submit"
