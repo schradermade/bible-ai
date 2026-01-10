@@ -167,10 +167,10 @@
     0 0 0 1px rgba(176, 123, 76, 0.2),
     0 0 32px rgba(176, 123, 76, 0.15);
   overflow: visible;
-  height: calc(100vh - 250px);
-  min-height: 400px;
+  height: auto;
+  min-height: 1000px;
   padding-top: 28px;
-  margin-bottom: 0;
+  margin-bottom: 150px;
 }
 
 .panelExpanded:hover {
