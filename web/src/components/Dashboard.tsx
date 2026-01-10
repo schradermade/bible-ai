@@ -11,6 +11,7 @@ import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
 import LifePanel from './LifePanel';
 import ConversationSelector from './ConversationSelector';
+import WelcomeScreen from './WelcomeScreen';
 import { useToast } from '@/contexts/ToastContext';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
@@ -107,6 +108,7 @@ export default function Dashboard() {
   const [conversationRefreshTrigger, setConversationRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
 
   // Load saved verses on mount and when user changes
   useEffect(() => {
@@ -475,8 +477,26 @@ export default function Dashboard() {
     setExpandedPanel(null);
   };
 
+  const handleWelcomeContinue = (conversationId: string) => {
+    // Load the conversation and hide welcome screen
+    handleSelectConversation(conversationId);
+    setShowWelcomeScreen(false);
+  };
+
+  const handleWelcomeStartFresh = () => {
+    // Start a new conversation and hide welcome screen
+    handleNewConversation();
+    setShowWelcomeScreen(false);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
+      {showWelcomeScreen && (
+        <WelcomeScreen
+          onContinueConversation={handleWelcomeContinue}
+          onStartFresh={handleWelcomeStartFresh}
+        />
+      )}
       <div className={styles.dashboard}>
       <div className={styles.chatHeader}>
         <ConversationSelector

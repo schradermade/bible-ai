@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 // GET /api/conversations/[id] - Get a specific conversation with all messages
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -18,9 +18,11 @@ export async function GET(
     );
   }
 
+  const { id } = await params;
+
   try {
     const conversation = await prisma.conversation.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         messages: {
           orderBy: { createdAt: 'asc' },
@@ -71,7 +73,7 @@ export async function GET(
 // DELETE /api/conversations/[id] - Delete a conversation (cascade deletes messages)
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -82,10 +84,12 @@ export async function DELETE(
     );
   }
 
+  const { id } = await params;
+
   try {
     // First verify the conversation exists and belongs to the user
     const conversation = await prisma.conversation.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!conversation) {
@@ -104,7 +108,7 @@ export async function DELETE(
 
     // Delete the conversation (messages will be cascade deleted)
     await prisma.conversation.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({
