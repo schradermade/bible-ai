@@ -1,8 +1,10 @@
 .dashboardWrapper {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 480px;
   gap: 20px;
   width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   align-items: start;
 }
 
@@ -21,9 +23,9 @@
 
 .widgetsSidebar {
   position: fixed;
-  right: calc((100vw - 1680px) / 2);
+  right: calc((100vw - 1400px) / 2);
   top: 100px;
-  width: 320px;
+  width: 480px;
   height: fit-content;
   max-height: calc(100vh - 124px);
   overflow-y: auto;
@@ -189,7 +191,7 @@
   gap: 20px;
   position: fixed;
   top: 100px;
-  right: calc((100vw - 1680px) / 2 + 320px + 20px);
+  right: calc((100vw - 1400px) / 2 + 480px + 20px);
   height: auto;
   align-self: start;
   z-index: 101;
@@ -342,13 +344,13 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1760px) {
+@media (max-width: 1480px) {
   .widgetsSidebar {
     right: 40px;
   }
 
   .collapsedPanelsContainer {
-    right: calc(40px + 320px + 20px);
+    right: calc(40px + 480px + 20px);
   }
 }
 

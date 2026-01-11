@@ -86,11 +86,12 @@ interface Message {
   timestamp: Date;
 }
 
+// Temporarily disabled - Biblical Insight, Life Application, Prophecy, Daily Devotional panels
 const panels = [
-  { id: 'insight' as const, title: 'Insight' },
-  { id: 'life' as const, title: 'Life' },
-  { id: 'prophecy' as const, title: 'Prophecy' },
-  { id: 'daily' as const, title: 'Daily' },
+  // { id: 'insight' as const, title: 'Insight' },
+  // { id: 'life' as const, title: 'Life' },
+  // { id: 'prophecy' as const, title: 'Prophecy' },
+  // { id: 'daily' as const, title: 'Daily' },
 ];
 
 export default function Dashboard() {
