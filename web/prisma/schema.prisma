@@ -112,3 +112,69 @@ model Message {
 
   @@index([conversationId, createdAt])
 }
+
+model StudyPlan {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String    // "7-Day Journey: Understanding Grace"
+  description String?   @db.Text
+  duration    Int       // 7 or 21 days
+  source      String    // "ai_personalized", "template_grace", etc.
+  status      String    @default("active") // "active", "completed", "archived"
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  deletedAt   DateTime? // Soft delete
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  days StudyPlanDay[]
+
+  @@index([userId, status])
+  @@index([userId, createdAt])
+}
+
+model StudyPlanDay {
+  id              String    @id @default(cuid())
+  studyPlanId     String
+  studyPlan       StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  dayNumber       Int       // 1-7 or 1-21
+  title           String
+  content         String    @db.Text // Rich reflection
+  reflection      String    @db.Text // Questions
+  verseReference  String?
+  verseText       String?   @db.Text
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+
+  // Engagement tracking for gamification
+  verseSaved      Boolean   @default(false)
+  prayerGenerated Boolean   @default(false)
+  chatEngaged     Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([studyPlanId, dayNumber])
+  @@index([studyPlanId, dayNumber])
+}
+
+model StudyStreak {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  lastCompletedAt DateTime?
+
+  // Gamification stats
+  totalPlansCompleted   Int @default(0)
+  total7DayCompleted    Int @default(0)
+  total21DayCompleted   Int @default(0)
+  totalDaysStudied      Int @default(0)
+  totalVersesFromPlans  Int @default(0)
+  totalPrayersFromPlans Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

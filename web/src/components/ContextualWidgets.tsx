@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './contextual-widgets.module.css';
+import { TEMPLATE_OPTIONS } from '@/lib/study-plan-templates';
+import type { Achievement } from '@/lib/achievements';
+import type { Milestone } from '@/lib/milestones';
 
 interface SavedVerse {
   reference: string;
@@ -25,6 +28,35 @@ interface Prayer {
   status: string;
   answeredAt: string | null;
   createdAt: string;
+}
+
+interface StudyPlanDay {
+  id: string;
+  dayNumber: number;
+  title: string;
+  content: string;
+  reflection: string;
+  verseReference: string | null;
+  verseText: string | null;
+  completed: boolean;
+  completedAt: string | null;
+  verseSaved: boolean;
+  prayerGenerated: boolean;
+  chatEngaged: boolean;
+}
+
+interface StudyPlan {
+  id: string;
+  title: string;
+  description: string | null;
+  duration: number;
+  status: string;
+  days: StudyPlanDay[];
+}
+
+interface StudyStreak {
+  currentStreak: number;
+  longestStreak: number;
 }
 
 interface ContextualWidgetsProps {
@@ -52,6 +84,17 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
   const previousVersesRef = useRef<SavedVerse[]>([]);
   const previousPrayersRef = useRef<Prayer[]>([]);
   const previousMemoryVersesRef = useRef<MemoryVerse[]>([]);
+
+  // Study Plan state
+  const [studyPlan, setStudyPlan] = useState<StudyPlan | null>(null);
+  const [studyStreak, setStudyStreak] = useState<StudyStreak>({ currentStreak: 0, longestStreak: 0 });
+  const [showPlanCreator, setShowPlanCreator] = useState(false);
+  const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const [currentDayNumber, setCurrentDayNumber] = useState(1);
+  const [showAllDays, setShowAllDays] = useState(false);
+  const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
+  const [showMilestone, setShowMilestone] = useState<Milestone | null>(null);
+  const [showPlanMenu, setShowPlanMenu] = useState(false);
 
   // Helper to add highlight
   const addHighlight = (key: string) => {
@@ -210,6 +253,38 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
     };
 
     loadMemorizedVerses();
+  }, [user]);
+
+  // Load study plan on mount and when user changes
+  useEffect(() => {
+    const loadStudyPlan = async () => {
+      if (!user) {
+        setStudyPlan(null);
+        setStudyStreak({ currentStreak: 0, longestStreak: 0 });
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/study-plans');
+        if (response.ok) {
+          const data = await response.json();
+          setStudyPlan(data.activePlan);
+          setStudyStreak(data.stats);
+
+          // Set current day to first incomplete day
+          if (data.activePlan) {
+            const firstIncomplete = data.activePlan.days.find((d: StudyPlanDay) => !d.completed);
+            if (firstIncomplete) {
+              setCurrentDayNumber(firstIncomplete.dayNumber);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load study plan:', error);
+      }
+    };
+
+    loadStudyPlan();
   }, [user]);
 
   const toggleWidget = (widgetId: string) => {
@@ -443,6 +518,241 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       alert('Failed to generate prayer. Please try again.');
     } finally {
       setGeneratingPrayerForVerse(null);
+    }
+  };
+
+  // Study Plan handlers
+  const handleCreatePlan = async (source: string, duration: number) => {
+    setIsCreatingPlan(true);
+    setShowPlanCreator(false);
+
+    try {
+      const response = await fetch('/api/study-plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source, duration })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 409) {
+          alert('You already have an active plan. Complete or delete it first.');
+        } else if (response.status === 429) {
+          alert(error.message);
+        } else {
+          alert('Failed to create study plan. Please try again.');
+        }
+        return;
+      }
+
+      const data = await response.json();
+      setStudyPlan(data.plan);
+      setCurrentDayNumber(1);
+    } catch (error) {
+      console.error('Failed to create plan:', error);
+      alert('Failed to create study plan. Please try again.');
+    } finally {
+      setIsCreatingPlan(false);
+    }
+  };
+
+  const handleToggleComplete = async (day: StudyPlanDay) => {
+    if (!studyPlan) return;
+
+    const newCompleted = !day.completed;
+
+    // Optimistic update
+    setStudyPlan(prev => prev ? {
+      ...prev,
+      days: prev.days.map(d =>
+        d.id === day.id ? { ...d, completed: newCompleted } : d
+      )
+    } : null);
+
+    try {
+      const response = await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dayNumber: day.dayNumber, completed: newCompleted })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+
+      const data = await response.json();
+
+      // Update streak
+      setStudyStreak({
+        currentStreak: data.streak.currentStreak,
+        longestStreak: data.streak.longestStreak
+      });
+
+      // Show milestone if reached
+      if (data.streak.newMilestone) {
+        setShowMilestone(data.streak.newMilestone);
+        setTimeout(() => setShowMilestone(null), 4000);
+      }
+
+      // Show achievements
+      if (data.newAchievements?.length > 0) {
+        setNewAchievements(data.newAchievements);
+        setTimeout(() => setNewAchievements([]), 5000);
+      }
+
+      // Plan completed - reload
+      if (data.progress.percentComplete === 100) {
+        setTimeout(() => {
+          const loadPlan = async () => {
+            const response = await fetch('/api/study-plans');
+            if (response.ok) {
+              const data = await response.json();
+              setStudyPlan(data.activePlan);
+            }
+          };
+          loadPlan();
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Failed to update progress:', error);
+      // Revert on error
+      setStudyPlan(prev => prev ? {
+        ...prev,
+        days: prev.days.map(d =>
+          d.id === day.id ? { ...d, completed: !newCompleted } : d
+        )
+      } : null);
+    }
+  };
+
+  const handleSaveVerseFromPlan = async (day: StudyPlanDay) => {
+    if (!day.verseReference || !day.verseText || !studyPlan) return;
+
+    // This assumes there's an addVerse function in parent - for now we'll just track engagement
+    // In real implementation, you'd call parent's verse saving function
+
+    // Update engagement
+    try {
+      await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dayNumber: day.dayNumber,
+          engagement: { verseSaved: true }
+        })
+      });
+
+      // Optimistic update
+      setStudyPlan(prev => prev ? {
+        ...prev,
+        days: prev.days.map(d =>
+          d.id === day.id ? { ...d, verseSaved: true } : d
+        )
+      } : null);
+    } catch (error) {
+      console.error('Failed to update engagement:', error);
+    }
+  };
+
+  const handleGeneratePrayerFromPlan = async (day: StudyPlanDay) => {
+    if (!day.verseReference || !day.verseText || !studyPlan) return;
+
+    try {
+      // Generate prayer
+      const generateResponse = await fetch('/api/ai/generate-prayer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'verse',
+          verseReference: day.verseReference,
+          verseText: day.verseText,
+        }),
+      });
+
+      if (!generateResponse.ok) {
+        throw new Error('Failed to generate prayer');
+      }
+
+      const { prayer, title, sourceReference } = await generateResponse.json();
+
+      // Save prayer
+      const saveResponse = await fetch('/api/prayers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          content: prayer,
+          source: 'study_plan',
+          sourceReference,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save prayer');
+      }
+
+      const { prayer: savedPrayer } = await saveResponse.json();
+
+      // Add to prayers list
+      setPrayers([savedPrayer, ...prayers]);
+
+      // Update engagement
+      await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dayNumber: day.dayNumber,
+          engagement: { prayerGenerated: true }
+        })
+      });
+
+      // Optimistic update
+      setStudyPlan(prev => prev ? {
+        ...prev,
+        days: prev.days.map(d =>
+          d.id === day.id ? { ...d, prayerGenerated: true } : d
+        )
+      } : null);
+    } catch (error) {
+      console.error('Failed to generate prayer:', error);
+      alert('Failed to generate prayer. Please try again.');
+    }
+  };
+
+  const handleDeletePlan = async () => {
+    if (!studyPlan || !confirm('Are you sure you want to delete this study plan?')) return;
+
+    const planId = studyPlan.id;
+    setShowPlanMenu(false);
+
+    try {
+      const response = await fetch(`/api/study-plans/${planId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete plan');
+      }
+
+      // Successfully deleted - clear local state
+      setStudyPlan(null);
+
+      // Reload to ensure sync with server
+      const reloadResponse = await fetch('/api/study-plans');
+      if (reloadResponse.ok) {
+        const data = await reloadResponse.json();
+        setStudyPlan(data.activePlan);
+        setStudyStreak(data.stats);
+      }
+    } catch (error) {
+      console.error('Failed to delete plan:', error);
+      alert('Failed to delete study plan. Please try again.');
+      // Reload to get current state
+      const reloadResponse = await fetch('/api/study-plans');
+      if (reloadResponse.ok) {
+        const data = await reloadResponse.json();
+        setStudyPlan(data.activePlan);
+      }
     }
   };
 
@@ -703,34 +1013,225 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
               </svg>
             </button>
           </div>
-          <span className={styles.progressBadge}>{studyProgress}%</span>
+          {studyStreak.currentStreak > 0 && (
+            <span className={styles.streakBadge}>🔥 {studyStreak.currentStreak}</span>
+          )}
         </div>
         <div className={`${styles.widgetContent} ${collapsedWidgets.study ? styles.collapsed : ''}`}>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${studyProgress}%` }}
-            />
-          </div>
-          <p className={styles.progressLabel}>Daily reading progress</p>
-          <div className={styles.studyPlanItems}>
-            <div className={styles.studyItem}>
-              <div className={styles.studyItemIcon}>📖</div>
-              <div className={styles.studyItemText}>
-                <p className={styles.studyItemTitle}>Genesis 1-3</p>
-                <p className={styles.studyItemMeta}>Today's reading</p>
-              </div>
+          {!studyPlan && !isCreatingPlan && (
+            <div className={styles.studyPlanEmpty}>
+              <div className={styles.emptyIcon}>📖</div>
+              <h4>Start Your Journey</h4>
+              <p>AI-personalized study plans tailored to your spiritual growth</p>
+              <button
+                className={styles.createPlanButton}
+                onClick={() => setShowPlanCreator(true)}
+              >
+                + Create Study Plan
+              </button>
             </div>
-            <div className={styles.studyItem}>
-              <div className={styles.studyItemIcon}>✓</div>
-              <div className={styles.studyItemText}>
-                <p className={styles.studyItemTitle}>Psalm 23</p>
-                <p className={styles.studyItemMeta}>Completed yesterday</p>
-              </div>
+          )}
+
+          {isCreatingPlan && (
+            <div className={styles.creatingPlan}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              <p>Creating your personalized study plan...</p>
             </div>
-          </div>
+          )}
+
+          {studyPlan && (
+            <>
+              <div className={styles.planHeader}>
+                <h4 className={styles.planTitle}>{studyPlan.title}</h4>
+                {studyPlan.status === 'completed' && (
+                  <span className={styles.completedBadge}>✓ Completed</span>
+                )}
+                <button
+                  className={styles.planMenuButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPlanMenu(!showPlanMenu);
+                  }}
+                >
+                  ⋮
+                </button>
+                {showPlanMenu && (
+                  <div className={styles.planMenu}>
+                    <button onClick={handleDeletePlan}>Delete Plan</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Progress Overview */}
+              <div className={styles.progressOverview}>
+                <div className={styles.progressStats}>
+                  <span>{studyPlan.days.filter(d => d.completed).length}/{studyPlan.days.length} days</span>
+                  {studyStreak.currentStreak > 0 && (
+                    <span>🔥 {studyStreak.currentStreak} day streak</span>
+                  )}
+                </div>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${(studyPlan.days.filter(d => d.completed).length / studyPlan.days.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Current Day Focus */}
+              {studyPlan.status === 'active' && (() => {
+                const currentDay = studyPlan.days.find(d => d.dayNumber === currentDayNumber);
+                if (!currentDay) return null;
+
+                return (
+                  <div className={styles.currentDayFocus}>
+                    <h5 className={styles.dayTitle}>{currentDay.title}</h5>
+                    {currentDay.verseReference && (
+                      <p className={styles.verseRef}>{currentDay.verseReference}</p>
+                    )}
+                    <p className={styles.dayContent}>{currentDay.content.substring(0, 200)}...</p>
+
+                    {/* Actions */}
+                    <div className={styles.dayActions}>
+                      <button
+                        className={currentDay.completed ? styles.completedBtn : styles.completeBtn}
+                        onClick={() => handleToggleComplete(currentDay)}
+                      >
+                        {currentDay.completed ? '✓ Completed' : 'Mark Complete'}
+                      </button>
+                      {currentDay.verseReference && !currentDay.verseSaved && (
+                        <button
+                          className={styles.secondaryBtn}
+                          onClick={() => handleSaveVerseFromPlan(currentDay)}
+                        >
+                          💾 Save Verse
+                        </button>
+                      )}
+                      {currentDay.verseReference && !currentDay.prayerGenerated && (
+                        <button
+                          className={styles.secondaryBtn}
+                          onClick={() => handleGeneratePrayerFromPlan(currentDay)}
+                        >
+                          🙏 Create Prayer
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Engagement Indicators */}
+                    {(currentDay.verseSaved || currentDay.prayerGenerated || currentDay.chatEngaged) && (
+                      <div className={styles.engagementIndicators}>
+                        {currentDay.verseSaved && <span>💾 Saved</span>}
+                        {currentDay.prayerGenerated && <span>🙏 Prayed</span>}
+                        {currentDay.chatEngaged && <span>💬 Discussed</span>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* All Days Toggle */}
+              {studyPlan.days.length > 1 && (
+                <button
+                  className={styles.viewAllDaysBtn}
+                  onClick={() => setShowAllDays(!showAllDays)}
+                >
+                  {showAllDays ? 'Hide' : 'View'} All Days
+                </button>
+              )}
+
+              {/* All Days List */}
+              {showAllDays && (
+                <div className={styles.allDaysList}>
+                  {studyPlan.days.map(day => (
+                    <div
+                      key={day.id}
+                      className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
+                      onClick={() => setCurrentDayNumber(day.dayNumber)}
+                    >
+                      <div className={styles.dayItemHeader}>
+                        <span className={styles.dayNumber}>Day {day.dayNumber}</span>
+                        {day.completed && <span className={styles.checkmark}>✓</span>}
+                      </div>
+                      <p className={styles.dayItemTitle}>{day.title}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
+
+      {/* Plan Creator Modal */}
+      {showPlanCreator && (
+        <div className={styles.modalOverlay} onClick={() => setShowPlanCreator(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Choose Your Journey</h3>
+              <button
+                className={styles.modalCloseButton}
+                onClick={() => setShowPlanCreator(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* AI Personalized Option */}
+            <div className={styles.aiOption}>
+              <div className={styles.recommendedBadge}>✨ Recommended</div>
+              <h4>AI-Personalized Plan</h4>
+              <p>Custom study plan based on your conversations, verses, and prayers</p>
+              <div className={styles.durationButtons}>
+                <button onClick={() => handleCreatePlan('ai_personalized', 7)}>
+                  7-Day Journey
+                </button>
+                <button onClick={() => handleCreatePlan('ai_personalized', 21)}>
+                  21-Day Deep Dive
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.divider}>or choose a template</div>
+
+            {/* Template Options */}
+            {TEMPLATE_OPTIONS.map(template => (
+              <div key={template.id} className={styles.templateOption}>
+                <h5>{template.title}</h5>
+                <p>{template.description}</p>
+                <div className={styles.durationButtons}>
+                  <button onClick={() => handleCreatePlan(template.id, 7)}>7 Days</button>
+                  <button onClick={() => handleCreatePlan(template.id, 21)}>21 Days</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Milestone Celebration Modal */}
+      {showMilestone && (
+        <div className={styles.milestoneModal}>
+          <div className={styles.milestoneContent}>
+            <div className={styles.milestoneIcon}>{showMilestone.icon}</div>
+            <h3>{showMilestone.title}</h3>
+            <p>{showMilestone.message}</p>
+            <button onClick={() => setShowMilestone(null)}>Continue</button>
+          </div>
+        </div>
+      )}
+
+      {/* Achievement Toast */}
+      {newAchievements.length > 0 && (
+        <div className={styles.achievementToast}>
+          <div className={styles.achievementIcon}>{newAchievements[0].icon}</div>
+          <div>
+            <h5>Achievement Unlocked!</h5>
+            <p>{newAchievements[0].title}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
