@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useUser } from '@clerk/nextjs';
 import styles from './contextual-widgets.module.css';
 import { TEMPLATE_OPTIONS } from '@/lib/study-plan-templates';
@@ -95,6 +96,12 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
   const [showMilestone, setShowMilestone] = useState<Milestone | null>(null);
   const [showPlanMenu, setShowPlanMenu] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Handle client-side mounting for portal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Helper to add highlight
   const addHighlight = (key: string) => {
@@ -757,6 +764,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
   };
 
   return (
+    <>
     <div className={styles.widgetsContainer}>
       {/* Search History Widget - Moved to input field dropdown */}
       {/* <SearchHistory
@@ -1165,9 +1173,10 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           )}
         </div>
       </div>
+    </div>
 
       {/* Plan Creator Modal */}
-      {showPlanCreator && (
+      {isMounted && showPlanCreator && createPortal(
         <div className={styles.modalOverlay} onClick={() => setShowPlanCreator(false)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
@@ -1209,11 +1218,12 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
               </div>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Milestone Celebration Modal */}
-      {showMilestone && (
+      {isMounted && showMilestone && createPortal(
         <div className={styles.milestoneModal}>
           <div className={styles.milestoneContent}>
             <div className={styles.milestoneIcon}>{showMilestone.icon}</div>
@@ -1221,19 +1231,21 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
             <p>{showMilestone.message}</p>
             <button onClick={() => setShowMilestone(null)}>Continue</button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Achievement Toast */}
-      {newAchievements.length > 0 && (
+      {isMounted && newAchievements.length > 0 && createPortal(
         <div className={styles.achievementToast}>
           <div className={styles.achievementIcon}>{newAchievements[0].icon}</div>
           <div>
             <h5>Achievement Unlocked!</h5>
             <p>{newAchievements[0].title}</p>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 }
