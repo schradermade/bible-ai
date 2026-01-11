@@ -758,6 +758,7 @@
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(176, 123, 76, 0.15);
+  width: 100%;
 }
 
 .planHeaderTop {
@@ -882,6 +883,8 @@
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dayTitle {
@@ -1014,6 +1017,7 @@
   padding: 4px;
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
+  width: 100%;
 }
 
 .allDaysList::-webkit-scrollbar {
@@ -1031,12 +1035,14 @@
 }
 
 .dayItem {
+  width: 100%;
   padding: 10px 12px;
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(176, 123, 76, 0.15);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .dayItem:hover {
