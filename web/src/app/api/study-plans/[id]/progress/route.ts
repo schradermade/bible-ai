@@ -122,22 +122,40 @@ export async function PATCH(
 
     if (completed) {
       // User is checking off a day
+      let isNewDay = false;
+
       if (streak.lastCompletedAt) {
         const lastDate = new Date(streak.lastCompletedAt);
         lastDate.setUTCHours(0, 0, 0, 0);
         const daysDiff = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
 
-        if (daysDiff === 1) {
+        console.log('[STREAK DEBUG]', {
+          today: today.toISOString(),
+          lastDate: lastDate.toISOString(),
+          daysDiff,
+          currentStreak: streak.currentStreak
+        });
+
+        if (daysDiff === 0) {
+          // Same day - ensure streak is at least 1, don't increment
+          if (newStreak.currentStreak === 0) {
+            newStreak.currentStreak = 1;
+          }
+          isNewDay = false;
+        } else if (daysDiff === 1) {
           // Consecutive day - increment streak
           newStreak.currentStreak += 1;
-        } else if (daysDiff > 1) {
+          isNewDay = true;
+        } else {
           // Streak broken - reset to 1
           newStreak.currentStreak = 1;
+          isNewDay = true;
         }
-        // daysDiff === 0: Same day, don't increment
       } else {
         // First completion ever
+        console.log('[STREAK DEBUG] First completion, setting streak to 1');
         newStreak.currentStreak = 1;
+        isNewDay = true;
       }
 
       // Update longest streak if needed
@@ -146,7 +164,11 @@ export async function PATCH(
       }
 
       newStreak.lastCompletedAt = today;
-      newStreak.totalDaysStudied += 1;
+
+      // Only increment totalDaysStudied for new calendar days
+      if (isNewDay) {
+        newStreak.totalDaysStudied += 1;
+      }
 
       // Check for milestone
       const MILESTONES = [
@@ -214,7 +236,12 @@ export async function PATCH(
       newStreak = { ...newStreak, ...updateData };
     }
 
-    console.log('[API] Progress updated successfully');
+    console.log('[API] Progress updated successfully', {
+      returnedStreak: {
+        currentStreak: newStreak.currentStreak,
+        longestStreak: newStreak.longestStreak
+      }
+    });
 
     return NextResponse.json({
       success: true,

@@ -589,8 +589,15 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
 
       const data = await response.json();
 
+      console.log('[FRONTEND] Received streak update:', data.streak);
+
       // Update streak
       setStudyStreak({
+        currentStreak: data.streak.currentStreak,
+        longestStreak: data.streak.longestStreak
+      });
+
+      console.log('[FRONTEND] Updated streak state:', {
         currentStreak: data.streak.currentStreak,
         longestStreak: data.streak.longestStreak
       });
