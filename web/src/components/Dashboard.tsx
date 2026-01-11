@@ -87,7 +87,7 @@ interface Message {
 }
 
 // Temporarily disabled - Biblical Insight, Life Application, Prophecy, Daily Devotional panels
-const panels = [
+const panels: Array<{ id: Exclude<PanelType, null>; title: string }> = [
   // { id: 'insight' as const, title: 'Insight' },
   // { id: 'life' as const, title: 'Life' },
   // { id: 'prophecy' as const, title: 'Prophecy' },
