@@ -93,6 +93,7 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
   const [studyStreak, setStudyStreak] = useState<StudyStreak>({ currentStreak: 0, longestStreak: 0 });
   const [showPlanCreator, setShowPlanCreator] = useState(false);
   const [isCreatingPlan, setIsCreatingPlan] = useState(false);
+  const [isLoadingStudyPlan, setIsLoadingStudyPlan] = useState(true);
   const [currentDayNumber, setCurrentDayNumber] = useState(1);
   const [showAllDays, setShowAllDays] = useState(false);
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
@@ -277,9 +278,11 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
       if (!user) {
         setStudyPlan(null);
         setStudyStreak({ currentStreak: 0, longestStreak: 0 });
+        setIsLoadingStudyPlan(false);
         return;
       }
 
+      setIsLoadingStudyPlan(true);
       try {
         const response = await fetch('/api/study-plans');
         if (response.ok) {
@@ -297,6 +300,8 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
         }
       } catch (error) {
         console.error('Failed to load study plan:', error);
+      } finally {
+        setIsLoadingStudyPlan(false);
       }
     };
 
@@ -960,7 +965,16 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
           )}
         </div>
         <div className={`${styles.widgetContent} ${collapsedWidgets.study ? styles.collapsed : ''}`}>
-          {!studyPlan && !isCreatingPlan && (
+          {isLoadingStudyPlan && (
+            <div className={styles.creatingPlan}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              <p>Loading study plan...</p>
+            </div>
+          )}
+
+          {!isLoadingStudyPlan && !studyPlan && !isCreatingPlan && (
             <div className={styles.studyPlanEmpty}>
               <div className={styles.emptyIcon}>📖</div>
               <h4>Start Your Journey</h4>
@@ -983,7 +997,7 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
             </div>
           )}
 
-          {studyPlan && (
+          {!isLoadingStudyPlan && studyPlan && (
             <>
               <div className={styles.planHeader}>
                 <div className={styles.planHeaderTop}>
