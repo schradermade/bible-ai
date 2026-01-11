@@ -30,8 +30,8 @@
   height: fit-content;
   max-height: calc(100vh - 124px);
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
+  scrollbar-width: auto;
+  scrollbar-color: #b07b4c rgba(176, 123, 76, 0.08);
   padding-right: 8px;
 }
 
@@ -83,23 +83,27 @@
 }
 
 .widgetsSidebar::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 .widgetsSidebar::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(176, 123, 76, 0.08);
+  border-radius: 6px;
+  margin: 8px 0;
 }
 
 .widgetsSidebar::-webkit-scrollbar-thumb {
-  background: rgba(176, 123, 76, 0.3);
-  border-radius: 4px;
-  border: 2px solid transparent;
+  background: linear-gradient(180deg, #b07b4c 0%, #8b6239 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(249, 246, 240, 0.5);
   background-clip: padding-box;
+  box-shadow: 0 2px 4px rgba(176, 123, 76, 0.2);
 }
 
 .widgetsSidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(176, 123, 76, 0.5);
+  background: linear-gradient(180deg, #c4915f 0%, #9b7653 100%);
   background-clip: padding-box;
+  box-shadow: 0 2px 6px rgba(176, 123, 76, 0.3);
 }
 
 /* Default Grid - 4 equal containers */

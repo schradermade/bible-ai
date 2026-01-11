@@ -298,34 +298,33 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
   padding: 0 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
+  width: 100%;
 }
 
-/* Custom Scrollbar for My Verses */
-.versesList::-webkit-scrollbar {
-  width: 8px;
+.showMoreButton {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.08), rgba(176, 123, 76, 0.04));
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 4px;
 }
 
-.versesList::-webkit-scrollbar-track {
-  background: rgba(176, 123, 76, 0.08);
-  border-radius: 4px;
-  margin: 4px 0;
+.showMoreButton:hover {
+  background: linear-gradient(135deg, rgba(176, 123, 76, 0.15), rgba(176, 123, 76, 0.08));
+  border-color: rgba(176, 123, 76, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.1);
 }
 
-.versesList::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #b07b4c 0%, #8b6239 100%);
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-.versesList::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #c4915f 0%, #9b7653 100%);
-  background-clip: padding-box;
+.showMoreButton:active {
+  transform: translateY(0);
 }
 
 .verseCard {
@@ -1244,28 +1243,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 500px;
-  overflow-y: auto;
-  overflow-x: hidden;
   padding: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(176, 123, 76, 0.5) rgba(176, 123, 76, 0.1);
   width: 100%;
-  flex-shrink: 0;
-}
-
-.allDaysList::-webkit-scrollbar {
-  width: 6px;
-}
-
-.allDaysList::-webkit-scrollbar-track {
-  background: rgba(176, 123, 76, 0.08);
-  border-radius: 3px;
-}
-
-.allDaysList::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #b07b4c 0%, #8b6239 100%);
-  border-radius: 3px;
 }
 
 .dayItem {

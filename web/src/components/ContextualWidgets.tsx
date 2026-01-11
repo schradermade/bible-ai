@@ -101,6 +101,12 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
   const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Pagination state for widgets
+  const [visibleVersesCount, setVisibleVersesCount] = useState(5);
+  const [visiblePrayersCount, setVisiblePrayersCount] = useState(5);
+  const [visibleMemoryCount, setVisibleMemoryCount] = useState(5);
+  const [visibleDaysCount, setVisibleDaysCount] = useState(7);
+
   // Handle client-side mounting for portal
   useEffect(() => {
     setIsMounted(true);
@@ -1156,21 +1162,39 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
 
               {/* All Days List */}
               {showAllDays && (
-                <div className={styles.allDaysList}>
-                  {studyPlan.days.map(day => (
-                    <div
-                      key={day.id}
-                      className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
-                      onClick={() => setCurrentDayNumber(day.dayNumber)}
-                    >
-                      <div className={styles.dayItemHeader}>
-                        <span className={styles.dayNumber}>Day {day.dayNumber}</span>
-                        {day.completed && <span className={styles.checkmark}>✓</span>}
+                <>
+                  <div className={styles.allDaysList}>
+                    {studyPlan.days.slice(0, visibleDaysCount).map(day => (
+                      <div
+                        key={day.id}
+                        className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
+                        onClick={() => setCurrentDayNumber(day.dayNumber)}
+                      >
+                        <div className={styles.dayItemHeader}>
+                          <span className={styles.dayNumber}>Day {day.dayNumber}</span>
+                          {day.completed && <span className={styles.checkmark}>✓</span>}
+                        </div>
+                        <p className={styles.dayItemTitle}>{day.title}</p>
                       </div>
-                      <p className={styles.dayItemTitle}>{day.title}</p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  {studyPlan.days.length > visibleDaysCount && (
+                    <button
+                      className={styles.showMoreButton}
+                      onClick={() => setVisibleDaysCount(prev => prev + 7)}
+                    >
+                      Show More ({studyPlan.days.length - visibleDaysCount} more days)
+                    </button>
+                  )}
+                  {visibleDaysCount > 7 && studyPlan.days.length > 7 && (
+                    <button
+                      className={styles.showMoreButton}
+                      onClick={() => setVisibleDaysCount(7)}
+                    >
+                      Show Less
+                    </button>
+                  )}
+                </>
               )}
 
               {/* Archive Plan Button for Completed Plans */}
@@ -1221,47 +1245,65 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
           {prayers.length === 0 ? (
             <p className={styles.emptyState}>No prayers yet. Save a verse and create a prayer!</p>
           ) : (
-            <div className={styles.versesList}>
-              {prayers.map((prayer) => (
-                <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''} ${highlightedItems.has(`prayer-${prayer.id}`) ? styles.itemNewlyAdded : ''}`}>
-                  <div className={styles.prayerCardHeader}>
-                    <span className={styles.prayerTitle}>
-                      {prayer.title || prayer.sourceReference || 'Prayer Request'}
-                    </span>
+            <>
+              <div className={styles.versesList}>
+                {prayers.slice(0, visiblePrayersCount).map((prayer) => (
+                  <div key={prayer.id} className={`${styles.prayerCard} ${prayer.status === 'answered' ? styles.prayerAnswered : ''} ${highlightedItems.has(`prayer-${prayer.id}`) ? styles.itemNewlyAdded : ''}`}>
+                    <div className={styles.prayerCardHeader}>
+                      <span className={styles.prayerTitle}>
+                        {prayer.title || prayer.sourceReference || 'Prayer Request'}
+                      </span>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => deletePrayer(prayer.id)}
+                        aria-label="Delete prayer"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p className={styles.prayerText}>{prayer.content}</p>
                     <button
-                      className={styles.deleteButton}
-                      onClick={() => deletePrayer(prayer.id)}
-                      aria-label="Delete prayer"
+                      className={`${styles.prayerStatusButton} ${prayer.status === 'answered' ? styles.prayerStatusButtonAnswered : ''}`}
+                      onClick={() => togglePrayerStatus(prayer.id)}
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      {prayer.status === 'answered' ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Answered {prayer.answeredAt && `• ${new Date(prayer.answeredAt).toLocaleDateString()}`}
+                        </>
+                      ) : (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+                          </svg>
+                          Mark as Answered
+                        </>
+                      )}
                     </button>
                   </div>
-                  <p className={styles.prayerText}>{prayer.content}</p>
-                  <button
-                    className={`${styles.prayerStatusButton} ${prayer.status === 'answered' ? styles.prayerStatusButtonAnswered : ''}`}
-                    onClick={() => togglePrayerStatus(prayer.id)}
-                  >
-                    {prayer.status === 'answered' ? (
-                      <>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Answered {prayer.answeredAt && `• ${new Date(prayer.answeredAt).toLocaleDateString()}`}
-                      </>
-                    ) : (
-                      <>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-                        </svg>
-                        Mark as Answered
-                      </>
-                    )}
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {prayers.length > visiblePrayersCount && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisiblePrayersCount(prev => prev + 5)}
+                >
+                  Show More ({prayers.length - visiblePrayersCount} more)
+                </button>
+              )}
+              {visiblePrayersCount > 5 && prayers.length > 5 && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisiblePrayersCount(5)}
+                >
+                  Show Less
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -1295,59 +1337,77 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
           {myVerses.length === 0 ? (
             <p className={styles.emptyState}>No verses saved yet</p>
           ) : (
-            <div className={styles.versesList}>
-              {myVerses.map((verse, index) => (
-                <div key={index} className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
-                  <div className={styles.verseCardHeader}>
-                    <span className={styles.verseReference}>{verse.reference}</span>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => onDeleteVerse(verse)}
-                      aria-label="Delete verse"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
+            <>
+              <div className={styles.versesList}>
+                {myVerses.slice(0, visibleVersesCount).map((verse, index) => (
+                  <div key={index} className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
+                    <div className={styles.verseCardHeader}>
+                      <span className={styles.verseReference}>{verse.reference}</span>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => onDeleteVerse(verse)}
+                        aria-label="Delete verse"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p className={styles.verseText}>&quot;{verse.text}&quot;</p>
+                    <div className={styles.verseActions}>
+                      <button
+                        className={styles.memorizeButton}
+                        onClick={() => handleMemorizeVerse(verse)}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Memorize
+                      </button>
+                      <button
+                        className={styles.createPrayerButton}
+                        onClick={() => generatePrayerFromVerse(verse)}
+                        disabled={generatingPrayerForVerse === verse.reference}
+                      >
+                        {generatingPrayerForVerse === verse.reference ? (
+                          <>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            </svg>
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" strokeWidth="2"/>
+                              <path d="M8 2h8M8 22h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            </svg>
+                            Create Prayer
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <p className={styles.verseText}>&quot;{verse.text}&quot;</p>
-                  <div className={styles.verseActions}>
-                    <button
-                      className={styles.memorizeButton}
-                      onClick={() => handleMemorizeVerse(verse)}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Memorize
-                    </button>
-                    <button
-                      className={styles.createPrayerButton}
-                      onClick={() => generatePrayerFromVerse(verse)}
-                      disabled={generatingPrayerForVerse === verse.reference}
-                    >
-                      {generatingPrayerForVerse === verse.reference ? (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
-                            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" strokeWidth="2"/>
-                            <path d="M8 2h8M8 22h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                          Create Prayer
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {myVerses.length > visibleVersesCount && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisibleVersesCount(prev => prev + 5)}
+                >
+                  Show More ({myVerses.length - visibleVersesCount} more)
+                </button>
+              )}
+              {visibleVersesCount > 5 && myVerses.length > 5 && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisibleVersesCount(5)}
+                >
+                  Show Less
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -1381,38 +1441,56 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
           {memoryVerses.length === 0 ? (
             <p className={styles.emptyState}>No verses saved yet</p>
           ) : (
-            <div className={styles.versesList}>
-              {memoryVerses.map((verse) => (
-                <div key={verse.reference} className={`${styles.verseCard} ${highlightedItems.has(`memory-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
-                  <div className={styles.verseCardHeader}>
-                    <span className={styles.verseReference}>{verse.reference}</span>
+            <>
+              <div className={styles.versesList}>
+                {memoryVerses.slice(0, visibleMemoryCount).map((verse) => (
+                  <div key={verse.reference} className={`${styles.verseCard} ${highlightedItems.has(`memory-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}>
+                    <div className={styles.verseCardHeader}>
+                      <span className={styles.verseReference}>{verse.reference}</span>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => deleteMemoryVerse(verse.id)}
+                        aria-label="Delete verse"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p className={styles.verseText}>&quot;{verse.text}&quot;</p>
                     <button
-                      className={styles.deleteButton}
-                      onClick={() => deleteMemoryVerse(verse.id)}
-                      aria-label="Delete verse"
+                      className={`${styles.memorizedButton} ${verse.memorized ? styles.memorizedActive : ''}`}
+                      onClick={() => toggleMemorized(verse.id)}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        {verse.memorized ? (
+                          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        ) : (
+                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+                        )}
                       </svg>
+                      {verse.memorized ? 'Memorized!' : 'Mark as Memorized'}
                     </button>
                   </div>
-                  <p className={styles.verseText}>"{verse.text}"</p>
-                  <button
-                    className={`${styles.memorizedButton} ${verse.memorized ? styles.memorizedActive : ''}`}
-                    onClick={() => toggleMemorized(verse.id)}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {verse.memorized ? (
-                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      ) : (
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-                      )}
-                    </svg>
-                    {verse.memorized ? 'Memorized!' : 'Mark as Memorized'}
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {memoryVerses.length > visibleMemoryCount && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisibleMemoryCount(prev => prev + 5)}
+                >
+                  Show More ({memoryVerses.length - visibleMemoryCount} more)
+                </button>
+              )}
+              {visibleMemoryCount > 5 && memoryVerses.length > 5 && (
+                <button
+                  className={styles.showMoreButton}
+                  onClick={() => setVisibleMemoryCount(5)}
+                >
+                  Show Less
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
