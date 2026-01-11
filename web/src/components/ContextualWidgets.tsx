@@ -765,6 +765,180 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
         onToggle={() => toggleWidget('searchHistory')}
       /> */}
 
+      {/* Study Plan Widget */}
+      <div className={styles.widget}>
+        <div className={styles.widgetHeader} onClick={() => toggleWidget('study')}>
+          <div className={styles.widgetTitleRow}>
+            <h3 className={styles.widgetTitle}>Study Plan</h3>
+            <button className={styles.chevronButton}>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                style={{ transform: collapsedWidgets.study ? 'rotate(-90deg)' : 'rotate(0deg)' }}
+              >
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          {studyStreak.currentStreak > 0 && (
+            <span className={styles.streakBadge}>🔥 {studyStreak.currentStreak}</span>
+          )}
+        </div>
+        <div className={`${styles.widgetContent} ${collapsedWidgets.study ? styles.collapsed : ''}`}>
+          {!studyPlan && !isCreatingPlan && (
+            <div className={styles.studyPlanEmpty}>
+              <div className={styles.emptyIcon}>📖</div>
+              <h4>Start Your Journey</h4>
+              <p>AI-personalized study plans tailored to your spiritual growth</p>
+              <button
+                className={styles.createPlanButton}
+                onClick={() => setShowPlanCreator(true)}
+              >
+                + Create Study Plan
+              </button>
+            </div>
+          )}
+
+          {isCreatingPlan && (
+            <div className={styles.creatingPlan}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
+                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              <p>Creating your personalized study plan...</p>
+            </div>
+          )}
+
+          {studyPlan && (
+            <>
+              <div className={styles.planHeader}>
+                <h4 className={styles.planTitle}>{studyPlan.title}</h4>
+                {studyPlan.status === 'completed' && (
+                  <span className={styles.completedBadge}>✓ Completed</span>
+                )}
+                <button
+                  className={styles.planMenuButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPlanMenu(!showPlanMenu);
+                  }}
+                >
+                  ⋮
+                </button>
+                {showPlanMenu && (
+                  <div className={styles.planMenu}>
+                    <button onClick={handleDeletePlan}>Delete Plan</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Progress Overview */}
+              <div className={styles.progressOverview}>
+                <div className={styles.progressStats}>
+                  <span>{studyPlan.days.filter(d => d.completed).length}/{studyPlan.days.length} days</span>
+                  {studyStreak.currentStreak > 0 && (
+                    <span>🔥 {studyStreak.currentStreak} day streak</span>
+                  )}
+                </div>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${(studyPlan.days.filter(d => d.completed).length / studyPlan.days.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Current Day Focus */}
+              {studyPlan.status === 'active' && (() => {
+                const currentDay = studyPlan.days.find(d => d.dayNumber === currentDayNumber);
+                if (!currentDay) return null;
+
+                return (
+                  <div className={styles.currentDayFocus}>
+                    <h5 className={styles.dayTitle}>{currentDay.title}</h5>
+                    {currentDay.verseReference && (
+                      <p className={styles.verseRef}>{currentDay.verseReference}</p>
+                    )}
+                    <p className={styles.dayContent}>{currentDay.content.substring(0, 200)}...</p>
+
+                    {/* Actions */}
+                    <div className={styles.dayActions}>
+                      <button
+                        className={currentDay.completed ? styles.completedBtn : styles.completeBtn}
+                        onClick={() => handleToggleComplete(currentDay)}
+                      >
+                        {currentDay.completed ? '✓ Completed' : 'Mark Complete'}
+                      </button>
+                      {currentDay.verseReference && !currentDay.verseSaved && (
+                        <button
+                          className={styles.secondaryBtn}
+                          onClick={() => handleSaveVerseFromPlan(currentDay)}
+                        >
+                          💾 Save Verse
+                        </button>
+                      )}
+                      {currentDay.verseReference && !currentDay.prayerGenerated && (
+                        <button
+                          className={styles.secondaryBtn}
+                          onClick={() => handleGeneratePrayerFromPlan(currentDay)}
+                        >
+                          🙏 Create Prayer
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Engagement Indicators */}
+                    {(currentDay.verseSaved || currentDay.prayerGenerated || currentDay.chatEngaged) && (
+                      <div className={styles.engagementIndicators}>
+                        {currentDay.verseSaved && <span>💾 Saved</span>}
+                        {currentDay.prayerGenerated && <span>🙏 Prayed</span>}
+                        {currentDay.chatEngaged && <span>💬 Discussed</span>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* All Days Toggle */}
+              {studyPlan.days.length > 1 && (
+                <button
+                  className={styles.viewAllDaysBtn}
+                  onClick={() => setShowAllDays(!showAllDays)}
+                >
+                  {showAllDays ? 'Hide' : 'View'} All Days
+                </button>
+              )}
+
+              {/* All Days List */}
+              {showAllDays && (
+                <div className={styles.allDaysList}>
+                  {studyPlan.days.map(day => (
+                    <div
+                      key={day.id}
+                      className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
+                      onClick={() => setCurrentDayNumber(day.dayNumber)}
+                    >
+                      <div className={styles.dayItemHeader}>
+                        <span className={styles.dayNumber}>Day {day.dayNumber}</span>
+                        {day.completed && <span className={styles.checkmark}>✓</span>}
+                      </div>
+                      <p className={styles.dayItemTitle}>{day.title}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
       {/* Prayer Journal Widget */}
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('prayer')}>
@@ -986,180 +1160,6 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Study Plan Widget */}
-      <div className={styles.widget}>
-        <div className={styles.widgetHeader} onClick={() => toggleWidget('study')}>
-          <div className={styles.widgetTitleRow}>
-            <h3 className={styles.widgetTitle}>Study Plan</h3>
-            <button className={styles.chevronButton}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                style={{ transform: collapsedWidgets.study ? 'rotate(-90deg)' : 'rotate(0deg)' }}
-              >
-                <path
-                  d="M4 6L8 10L12 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-          {studyStreak.currentStreak > 0 && (
-            <span className={styles.streakBadge}>🔥 {studyStreak.currentStreak}</span>
-          )}
-        </div>
-        <div className={`${styles.widgetContent} ${collapsedWidgets.study ? styles.collapsed : ''}`}>
-          {!studyPlan && !isCreatingPlan && (
-            <div className={styles.studyPlanEmpty}>
-              <div className={styles.emptyIcon}>📖</div>
-              <h4>Start Your Journey</h4>
-              <p>AI-personalized study plans tailored to your spiritual growth</p>
-              <button
-                className={styles.createPlanButton}
-                onClick={() => setShowPlanCreator(true)}
-              >
-                + Create Study Plan
-              </button>
-            </div>
-          )}
-
-          {isCreatingPlan && (
-            <div className={styles.creatingPlan}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={styles.spinningIcon}>
-                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <p>Creating your personalized study plan...</p>
-            </div>
-          )}
-
-          {studyPlan && (
-            <>
-              <div className={styles.planHeader}>
-                <h4 className={styles.planTitle}>{studyPlan.title}</h4>
-                {studyPlan.status === 'completed' && (
-                  <span className={styles.completedBadge}>✓ Completed</span>
-                )}
-                <button
-                  className={styles.planMenuButton}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowPlanMenu(!showPlanMenu);
-                  }}
-                >
-                  ⋮
-                </button>
-                {showPlanMenu && (
-                  <div className={styles.planMenu}>
-                    <button onClick={handleDeletePlan}>Delete Plan</button>
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Overview */}
-              <div className={styles.progressOverview}>
-                <div className={styles.progressStats}>
-                  <span>{studyPlan.days.filter(d => d.completed).length}/{studyPlan.days.length} days</span>
-                  {studyStreak.currentStreak > 0 && (
-                    <span>🔥 {studyStreak.currentStreak} day streak</span>
-                  )}
-                </div>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: `${(studyPlan.days.filter(d => d.completed).length / studyPlan.days.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Current Day Focus */}
-              {studyPlan.status === 'active' && (() => {
-                const currentDay = studyPlan.days.find(d => d.dayNumber === currentDayNumber);
-                if (!currentDay) return null;
-
-                return (
-                  <div className={styles.currentDayFocus}>
-                    <h5 className={styles.dayTitle}>{currentDay.title}</h5>
-                    {currentDay.verseReference && (
-                      <p className={styles.verseRef}>{currentDay.verseReference}</p>
-                    )}
-                    <p className={styles.dayContent}>{currentDay.content.substring(0, 200)}...</p>
-
-                    {/* Actions */}
-                    <div className={styles.dayActions}>
-                      <button
-                        className={currentDay.completed ? styles.completedBtn : styles.completeBtn}
-                        onClick={() => handleToggleComplete(currentDay)}
-                      >
-                        {currentDay.completed ? '✓ Completed' : 'Mark Complete'}
-                      </button>
-                      {currentDay.verseReference && !currentDay.verseSaved && (
-                        <button
-                          className={styles.secondaryBtn}
-                          onClick={() => handleSaveVerseFromPlan(currentDay)}
-                        >
-                          💾 Save Verse
-                        </button>
-                      )}
-                      {currentDay.verseReference && !currentDay.prayerGenerated && (
-                        <button
-                          className={styles.secondaryBtn}
-                          onClick={() => handleGeneratePrayerFromPlan(currentDay)}
-                        >
-                          🙏 Create Prayer
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Engagement Indicators */}
-                    {(currentDay.verseSaved || currentDay.prayerGenerated || currentDay.chatEngaged) && (
-                      <div className={styles.engagementIndicators}>
-                        {currentDay.verseSaved && <span>💾 Saved</span>}
-                        {currentDay.prayerGenerated && <span>🙏 Prayed</span>}
-                        {currentDay.chatEngaged && <span>💬 Discussed</span>}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* All Days Toggle */}
-              {studyPlan.days.length > 1 && (
-                <button
-                  className={styles.viewAllDaysBtn}
-                  onClick={() => setShowAllDays(!showAllDays)}
-                >
-                  {showAllDays ? 'Hide' : 'View'} All Days
-                </button>
-              )}
-
-              {/* All Days List */}
-              {showAllDays && (
-                <div className={styles.allDaysList}>
-                  {studyPlan.days.map(day => (
-                    <div
-                      key={day.id}
-                      className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
-                      onClick={() => setCurrentDayNumber(day.dayNumber)}
-                    >
-                      <div className={styles.dayItemHeader}>
-                        <span className={styles.dayNumber}>Day {day.dayNumber}</span>
-                        {day.completed && <span className={styles.checkmark}>✓</span>}
-                      </div>
-                      <p className={styles.dayItemTitle}>{day.title}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
           )}
         </div>
       </div>
