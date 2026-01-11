@@ -33,6 +33,24 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
   padding-right: 8px;
+}
+
+.widgetsSidebarScrolled {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20px,
+    black 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20px,
+    black 100%
+  );
+}
+
+.widgetsSidebarHasMore {
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0%,
@@ -47,7 +65,7 @@
   );
 }
 
-.widgetsSidebarScrolled {
+.widgetsSidebarScrolled.widgetsSidebarHasMore {
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,

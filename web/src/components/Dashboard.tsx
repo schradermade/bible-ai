@@ -114,6 +114,7 @@ export default function Dashboard() {
     updatedAt: string;
   } | null>(null);
   const [isWidgetsSidebarScrolled, setIsWidgetsSidebarScrolled] = useState(false);
+  const [hasWidgetsScrollableContent, setHasWidgetsScrollableContent] = useState(false);
   const widgetsSidebarRef = useRef<HTMLElement>(null);
 
   // Scroll detection for widgets sidebar
@@ -123,11 +124,33 @@ export default function Dashboard() {
 
     const handleScroll = () => {
       const scrollTop = sidebar.scrollTop;
+      const scrollHeight = sidebar.scrollHeight;
+      const clientHeight = sidebar.clientHeight;
+
+      // Check if scrolled from top
       setIsWidgetsSidebarScrolled(scrollTop > 0);
+
+      // Check if there's more content below (not at bottom)
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      setHasWidgetsScrollableContent(!isAtBottom && scrollHeight > clientHeight);
     };
 
+    const checkScrollable = () => {
+      const scrollHeight = sidebar.scrollHeight;
+      const clientHeight = sidebar.clientHeight;
+      setHasWidgetsScrollableContent(scrollHeight > clientHeight);
+    };
+
+    handleScroll();
+    checkScrollable();
+
     sidebar.addEventListener('scroll', handleScroll);
-    return () => sidebar.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', checkScrollable);
+
+    return () => {
+      sidebar.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', checkScrollable);
+    };
   }, []);
 
   // Load saved verses on mount and when user changes
@@ -633,7 +656,7 @@ export default function Dashboard() {
 
       <aside
         ref={widgetsSidebarRef}
-        className={`${styles.widgetsSidebar} ${isWidgetsSidebarScrolled ? styles.widgetsSidebarScrolled : ''}`}
+        className={`${styles.widgetsSidebar} ${isWidgetsSidebarScrolled ? styles.widgetsSidebarScrolled : ''} ${hasWidgetsScrollableContent ? styles.widgetsSidebarHasMore : ''}`}
       >
         <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
       </aside>
