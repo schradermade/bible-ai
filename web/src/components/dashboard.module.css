@@ -17,6 +17,7 @@
 .panelsContainer {
   position: relative;
   width: 100%;
+  max-width: 900px;
   margin: 0;
   padding: 0;
 }
@@ -69,7 +70,7 @@
 /* Expanded Grid - one large, three small */
 .gridExpanded {
   display: grid;
-  grid-template-columns: 1fr 130px;
+  grid-template-columns: 1fr;
   grid-auto-rows: min-content;
   gap: 20px;
   height: auto;
