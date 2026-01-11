@@ -1139,11 +1139,9 @@ export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse
                     </div>
 
                     {/* Engagement Indicators */}
-                    {(currentDay.verseSaved || currentDay.prayerGenerated || currentDay.chatEngaged) && (
+                    {currentDay.chatEngaged && (
                       <div className={styles.engagementIndicators}>
-                        {currentDay.verseSaved && <span>💾 Saved</span>}
-                        {currentDay.prayerGenerated && <span>🙏 Prayed</span>}
-                        {currentDay.chatEngaged && <span>💬 Discussed</span>}
+                        <span>💬 Discussed</span>
                       </div>
                     )}
                   </div>
