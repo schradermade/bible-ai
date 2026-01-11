@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
+import { checkNewAchievements, type StudyStreakStats } from '@/lib/achievements';
 
 export const runtime = 'nodejs';
 
@@ -117,6 +118,18 @@ export async function PATCH(
       }
     });
 
+    // Store previous stats for achievement comparison
+    const previousStats: StudyStreakStats = {
+      currentStreak: streak.currentStreak,
+      longestStreak: streak.longestStreak,
+      totalPlansCompleted: streak.totalPlansCompleted,
+      total7DayCompleted: streak.total7DayCompleted,
+      total21DayCompleted: streak.total21DayCompleted,
+      totalDaysStudied: streak.totalDaysStudied,
+      totalVersesFromPlans: streak.totalVersesFromPlans,
+      totalPrayersFromPlans: streak.totalPrayersFromPlans
+    };
+
     let newStreak = { ...streak };
     let newMilestone: { days: number; title: string; message: string; icon: string } | null = null;
 
@@ -207,8 +220,11 @@ export async function PATCH(
       }
     });
 
+    // Check if plan was just completed for celebration (BEFORE updating status)
+    const planJustCompleted = percentComplete === 100 && plan.status === 'active';
+
     // If plan is fully completed, update plan status
-    if (percentComplete === 100 && plan.status === 'active') {
+    if (planJustCompleted) {
       await prisma.studyPlan.update({
         where: { id: planId },
         data: {
@@ -236,11 +252,42 @@ export async function PATCH(
       newStreak = { ...newStreak, ...updateData };
     }
 
+    // Check for newly unlocked achievements
+    const newStats: StudyStreakStats = {
+      currentStreak: newStreak.currentStreak,
+      longestStreak: newStreak.longestStreak,
+      totalPlansCompleted: newStreak.totalPlansCompleted,
+      total7DayCompleted: newStreak.total7DayCompleted,
+      total21DayCompleted: newStreak.total21DayCompleted,
+      totalDaysStudied: newStreak.totalDaysStudied,
+      totalVersesFromPlans: newStreak.totalVersesFromPlans,
+      totalPrayersFromPlans: newStreak.totalPrayersFromPlans
+    };
+
+    const unlockedAchievements = (streak as any).unlockedAchievements || [];
+    const newAchievements = checkNewAchievements(previousStats, newStats, unlockedAchievements);
+
+    // Update unlocked achievements if any new ones
+    if (newAchievements.length > 0) {
+      const updatedUnlockedList = [...unlockedAchievements, ...newAchievements.map(a => a.id)];
+      try {
+        await prisma.studyStreak.update({
+          where: { userId },
+          data: { unlockedAchievements: updatedUnlockedList } as any
+        });
+      } catch (error) {
+        // Silently fail if field doesn't exist yet (backward compatible)
+        console.log('[API] Achievement tracking not available yet');
+      }
+    }
+
     console.log('[API] Progress updated successfully', {
       returnedStreak: {
         currentStreak: newStreak.currentStreak,
         longestStreak: newStreak.longestStreak
-      }
+      },
+      newAchievements: newAchievements.map(a => a.title),
+      planJustCompleted
     });
 
     return NextResponse.json({
@@ -256,7 +303,9 @@ export async function PATCH(
         currentStreak: newStreak.currentStreak,
         longestStreak: newStreak.longestStreak,
         newMilestone
-      }
+      },
+      newAchievements,
+      planCompleted: planJustCompleted
     });
   } catch (error) {
     console.error('[API] Failed to update progress:', error);

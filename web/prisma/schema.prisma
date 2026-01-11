@@ -166,12 +166,13 @@ model StudyStreak {
   lastCompletedAt DateTime?
 
   // Gamification stats
-  totalPlansCompleted   Int @default(0)
-  total7DayCompleted    Int @default(0)
-  total21DayCompleted   Int @default(0)
-  totalDaysStudied      Int @default(0)
-  totalVersesFromPlans  Int @default(0)
-  totalPrayersFromPlans Int @default(0)
+  totalPlansCompleted   Int      @default(0)
+  total7DayCompleted    Int      @default(0)
+  total21DayCompleted   Int      @default(0)
+  totalDaysStudied      Int      @default(0)
+  totalVersesFromPlans  Int      @default(0)
+  totalPrayersFromPlans Int      @default(0)
+  unlockedAchievements  String[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

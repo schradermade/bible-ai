@@ -96,6 +96,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
   const [showMilestone, setShowMilestone] = useState<Milestone | null>(null);
   const [showPlanMenu, setShowPlanMenu] = useState(false);
+  const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   // Handle client-side mounting for portal
@@ -614,18 +615,22 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
         setTimeout(() => setNewAchievements([]), 5000);
       }
 
-      // Plan completed - reload
-      if (data.progress.percentComplete === 100) {
+      // Plan completed celebration
+      if (data.planCompleted) {
+        setShowPlanCompletion(true);
+        // Wait for celebration before reloading
         setTimeout(() => {
+          setShowPlanCompletion(false);
           const loadPlan = async () => {
             const response = await fetch('/api/study-plans');
             if (response.ok) {
               const data = await response.json();
               setStudyPlan(data.activePlan);
+              setStudyStreak(data.stats);
             }
           };
           loadPlan();
-        }, 2000);
+        }, 6000);
       }
     } catch (error) {
       console.error('Failed to update progress:', error);
@@ -730,6 +735,49 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
     } catch (error) {
       console.error('Failed to generate prayer:', error);
       alert('Failed to generate prayer. Please try again.');
+    }
+  };
+
+  const handleAskBereaAboutDay = async (day: StudyPlanDay) => {
+    if (!studyPlan) return;
+
+    // Compose question for Berea
+    const question = `I'm studying day ${day.dayNumber} of my study plan: "${day.title}". ${day.verseReference ? `The scripture is ${day.verseReference}: "${day.verseText}"` : ''}\n\n${day.content}\n\nReflection: ${day.reflection}`;
+
+    // Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(question);
+
+      // Track engagement
+      await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dayNumber: day.dayNumber,
+          engagement: { chatEngaged: true }
+        })
+      });
+
+      // Optimistic update
+      setStudyPlan(prev => prev ? {
+        ...prev,
+        days: prev.days.map(d =>
+          d.id === day.id ? { ...d, chatEngaged: true } : d
+        )
+      } : null);
+
+      // Show success message
+      alert('Study plan content copied to clipboard! Paste it into the chat below to discuss with Berea.');
+
+      // Scroll to chat input
+      const chatInput = document.querySelector('textarea[placeholder*="Ask"]');
+      if (chatInput) {
+        chatInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        (chatInput as HTMLTextAreaElement).focus();
+      }
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      alert('Please scroll down to the chat and ask Berea about today\'s study content.');
     }
   };
 
@@ -926,6 +974,14 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                           onClick={() => handleGeneratePrayerFromPlan(currentDay)}
                         >
                           🙏 Create Prayer
+                        </button>
+                      )}
+                      {!currentDay.chatEngaged && (
+                        <button
+                          className={styles.secondaryBtn}
+                          onClick={() => handleAskBereaAboutDay(currentDay)}
+                        >
+                          💬 Ask Berea
                         </button>
                       )}
                     </div>
@@ -1256,6 +1312,22 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
             <h3>{showMilestone.title}</h3>
             <p>{showMilestone.message}</p>
             <button onClick={() => setShowMilestone(null)}>Continue</button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Plan Completion Celebration */}
+      {isMounted && showPlanCompletion && createPortal(
+        <div className={styles.planCompletionModal}>
+          <div className={styles.planCompletionContent}>
+            <div className={styles.completionIcon}>🎉</div>
+            <h2>Journey Complete!</h2>
+            <p>Congratulations on completing your {studyPlan?.duration}-day study plan!</p>
+            <p className={styles.completionEncouragement}>
+              You've taken meaningful steps in your spiritual growth. Keep building on this momentum!
+            </p>
+            <button onClick={() => setShowPlanCompletion(false)}>Continue</button>
           </div>
         </div>,
         document.body
