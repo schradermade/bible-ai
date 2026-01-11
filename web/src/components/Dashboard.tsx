@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './dashboard.module.css';
 import ContextualWidgets from './ContextualWidgets';
@@ -113,6 +113,22 @@ export default function Dashboard() {
     messageCount: number;
     updatedAt: string;
   } | null>(null);
+  const [isWidgetsSidebarScrolled, setIsWidgetsSidebarScrolled] = useState(false);
+  const widgetsSidebarRef = useRef<HTMLElement>(null);
+
+  // Scroll detection for widgets sidebar
+  useEffect(() => {
+    const sidebar = widgetsSidebarRef.current;
+    if (!sidebar) return;
+
+    const handleScroll = () => {
+      const scrollTop = sidebar.scrollTop;
+      setIsWidgetsSidebarScrolled(scrollTop > 0);
+    };
+
+    sidebar.addEventListener('scroll', handleScroll);
+    return () => sidebar.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Load saved verses on mount and when user changes
   useEffect(() => {
@@ -615,7 +631,10 @@ export default function Dashboard() {
       </div>
       </div>
 
-      <aside className={styles.widgetsSidebar}>
+      <aside
+        ref={widgetsSidebarRef}
+        className={`${styles.widgetsSidebar} ${isWidgetsSidebarScrolled ? styles.widgetsSidebarScrolled : ''}`}
+      >
         <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
       </aside>
     </div>

@@ -33,6 +33,35 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
   padding-right: 8px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 20px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 20px),
+    transparent 100%
+  );
+}
+
+.widgetsSidebarScrolled {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20px,
+    black calc(100% - 20px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20px,
+    black calc(100% - 20px),
+    transparent 100%
+  );
 }
 
 .widgetsSidebar::-webkit-scrollbar {
@@ -41,7 +70,6 @@
 
 .widgetsSidebar::-webkit-scrollbar-track {
   background: transparent;
-  margin: 4px 0;
 }
 
 .widgetsSidebar::-webkit-scrollbar-thumb {
