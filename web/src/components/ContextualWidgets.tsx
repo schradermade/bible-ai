@@ -37,6 +37,7 @@ interface StudyPlanDay {
   title: string;
   content: string;
   reflection: string;
+  prayer: string | null;
   verseReference: string | null;
   verseText: string | null;
   completed: boolean;
