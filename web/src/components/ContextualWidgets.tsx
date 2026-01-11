@@ -769,7 +769,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('study')}>
           <div className={styles.widgetTitleRow}>
-            <h3 className={styles.widgetTitle}>Study Plan</h3>
+            <h3 className={styles.widgetTitle}><span className={styles.widgetIcon}>📚</span> Study Plan</h3>
             <button className={styles.chevronButton}>
               <svg
                 width="16"
@@ -943,7 +943,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('prayer')}>
           <div className={styles.widgetTitleRow}>
-            <h3 className={styles.widgetTitle}>Prayer Journal</h3>
+            <h3 className={styles.widgetTitle}><span className={styles.widgetIcon}>🙏</span> Prayer Journal</h3>
             <button className={styles.chevronButton}>
               <svg
                 width="16"
@@ -1017,7 +1017,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('myVerses')}>
           <div className={styles.widgetTitleRow}>
-            <h3 className={styles.widgetTitle}>My Verses</h3>
+            <h3 className={styles.widgetTitle}><span className={styles.widgetIcon}>🔖</span> My Verses</h3>
             <button className={styles.chevronButton}>
               <svg
                 width="16"
@@ -1103,7 +1103,7 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       <div className={styles.widget}>
         <div className={styles.widgetHeader} onClick={() => toggleWidget('memory')}>
           <div className={styles.widgetTitleRow}>
-            <h3 className={styles.widgetTitle}>Memory Verses</h3>
+            <h3 className={styles.widgetTitle}><span className={styles.widgetIcon}>🧠</span> Memory Verses</h3>
             <button className={styles.chevronButton}>
               <svg
                 width="16"
