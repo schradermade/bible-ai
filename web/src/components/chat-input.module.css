@@ -1,10 +1,10 @@
 .chatInputContainer {
   position: fixed;
   bottom: 0;
-  left: calc((100vw - 1400px) / 2);
+  left: calc((100vw - 1700px) / 2);
   transform: translateY(0);
-  width: calc(1400px - 480px - 20px);
-  max-width: calc(1400px - 480px - 20px);
+  width: calc(1700px - 630px - 20px);
+  max-width: calc(1700px - 630px - 20px);
   padding: 5px 15px 22px 15px;
   background: #efe6d8;
   border-top: 2px solid rgba(176, 123, 76, 0.25);
@@ -228,10 +228,10 @@
   }
 }
 
-@media (max-width: 1480px) {
+@media (max-width: 1780px) {
   .chatInputContainer {
     left: 40px;
-    width: calc(100vw - 80px - 480px - 20px);
+    width: calc(100vw - 80px - 630px - 20px);
     padding-left: 15px;
     padding-right: 15px;
   }
@@ -242,7 +242,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: calc(100% - 80px);
-    max-width: calc(1400px - 80px);
+    max-width: calc(1700px - 80px);
     padding-left: 15px;
     padding-right: 15px;
   }

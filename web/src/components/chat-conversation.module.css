@@ -99,12 +99,12 @@
   color: #5a4a30;
   line-height: 1.5;
   margin-bottom: 32px;
-  max-width: 700px;
+  max-width: 850px;
 }
 
 .welcomeSuggestions {
   width: 100%;
-  max-width: 900px;
+  max-width: 1050px;
 }
 
 .suggestionsLabel {
@@ -525,7 +525,7 @@
   border-top: 2px solid rgba(176, 123, 76, 0.2);
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 1050px;
 }
 
 .continueSection::before {
@@ -553,7 +553,7 @@
   display: flex;
   align-items: center;
   gap: 22px;
-  max-width: 900px;
+  max-width: 1050px;
   background: linear-gradient(145deg, #fdfcfa 0%, #f9f6f0 100%);
   border: 2px solid rgba(176, 123, 76, 0.3);
   border-radius: 18px;
