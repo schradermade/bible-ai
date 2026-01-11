@@ -22,20 +22,36 @@ export async function GET() {
   }
 
   try {
-    // Fetch active or recently completed plan with days
-    const activePlan = await prisma.studyPlan.findFirst({
+    // First try to fetch active plan
+    let activePlan = await prisma.studyPlan.findFirst({
       where: {
         userId,
-        status: { in: ['active', 'completed'] },
+        status: 'active',
         deletedAt: null
       },
-      orderBy: { updatedAt: 'desc' },
       include: {
         days: {
           orderBy: { dayNumber: 'asc' }
         }
       }
     });
+
+    // If no active plan, fetch most recently completed plan (but only the very latest one)
+    if (!activePlan) {
+      activePlan = await prisma.studyPlan.findFirst({
+        where: {
+          userId,
+          status: 'completed',
+          deletedAt: null
+        },
+        orderBy: { completedAt: 'desc' },
+        include: {
+          days: {
+            orderBy: { dayNumber: 'asc' }
+          }
+        }
+      });
+    }
 
     // Fetch or create streak stats
     const streak = await prisma.studyStreak.upsert({
