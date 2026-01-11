@@ -819,19 +819,27 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           {studyPlan && (
             <>
               <div className={styles.planHeader}>
-                <h4 className={styles.planTitle}>{studyPlan.title}</h4>
+                <div className={styles.planHeaderTop}>
+                  <h4 className={styles.planTitle}>{studyPlan.title}</h4>
+                  <div className={styles.planHeaderRight}>
+                    <span className={styles.streakIndicator}>🔥 {studyStreak.currentStreak} day streak</span>
+                    <span className={styles.planProgress}>
+                      {studyPlan.days.filter(d => d.completed).length}/{studyPlan.days.length} days
+                    </span>
+                    <button
+                      className={styles.planMenuButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowPlanMenu(!showPlanMenu);
+                      }}
+                    >
+                      ⋮
+                    </button>
+                  </div>
+                </div>
                 {studyPlan.status === 'completed' && (
                   <span className={styles.completedBadge}>✓ Completed</span>
                 )}
-                <button
-                  className={styles.planMenuButton}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowPlanMenu(!showPlanMenu);
-                  }}
-                >
-                  ⋮
-                </button>
                 {showPlanMenu && (
                   <div className={styles.planMenu}>
                     <button onClick={handleDeletePlan}>Delete Plan</button>
@@ -839,14 +847,8 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                 )}
               </div>
 
-              {/* Progress Overview */}
-              <div className={styles.progressOverview}>
-                <div className={styles.progressStats}>
-                  <span>{studyPlan.days.filter(d => d.completed).length}/{studyPlan.days.length} days</span>
-                  {studyStreak.currentStreak > 0 && (
-                    <span>🔥 {studyStreak.currentStreak} day streak</span>
-                  )}
-                </div>
+              {/* Progress Bar */}
+              <div className={styles.progressBarContainer}>
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}

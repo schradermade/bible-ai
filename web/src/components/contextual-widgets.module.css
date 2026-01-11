@@ -186,13 +186,14 @@
 
 /* Progress Bar */
 .progressBar {
+  width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.18));
+  background: linear-gradient(180deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.3));
   overflow: hidden;
   box-shadow: inset 0 2px 4px rgba(31, 26, 22, 0.08);
   position: relative;
-  margin-bottom: 8px;
+  border: 1px solid rgba(176, 123, 76, 0.25);
 }
 
 .progressFill {
@@ -759,13 +760,41 @@
   border-bottom: 1px solid rgba(176, 123, 76, 0.15);
 }
 
+.planHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.planHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
 .planTitle {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
   color: #5a4d41;
   line-height: 1.4;
-  padding-right: 30px;
+  flex: 1;
+}
+
+.planProgress {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5d4f;
+  white-space: nowrap;
+}
+
+.streakIndicator {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff6b35;
+  white-space: nowrap;
 }
 
 .completedBadge {
@@ -781,9 +810,6 @@
 }
 
 .planMenuButton {
-  position: absolute;
-  top: 0;
-  right: 0;
   background: none;
   border: none;
   font-size: 20px;
@@ -791,6 +817,7 @@
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .planMenuButton:hover {
@@ -828,6 +855,12 @@
 }
 
 /* Progress Overview */
+.progressBarContainer {
+  margin-bottom: 16px;
+  padding: 0;
+  width: 100%;
+}
+
 .progressOverview {
   margin-bottom: 16px;
 }
