@@ -880,10 +880,29 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                 return (
                   <div className={styles.currentDayFocus}>
                     <h5 className={styles.dayTitle}>{currentDay.title}</h5>
+
+                    {/* Scripture Section */}
                     {currentDay.verseReference && (
-                      <p className={styles.verseRef}>{currentDay.verseReference}</p>
+                      <div className={styles.scriptureSection}>
+                        <p className={styles.verseRef}>{currentDay.verseReference}</p>
+                        {currentDay.verseText && (
+                          <p className={styles.verseText}>&quot;{currentDay.verseText}&quot;</p>
+                        )}
+                      </div>
                     )}
-                    <p className={styles.dayContent}>{currentDay.content.substring(0, 200)}...</p>
+
+                    {/* Main Content */}
+                    <div className={styles.contentSection}>
+                      <p className={styles.dayContent}>{currentDay.content}</p>
+                    </div>
+
+                    {/* Reflection Questions */}
+                    {currentDay.reflection && (
+                      <div className={styles.reflectionSection}>
+                        <h6 className={styles.reflectionTitle}>Reflection</h6>
+                        <p className={styles.reflectionText}>{currentDay.reflection}</p>
+                      </div>
+                    )}
 
                     {/* Actions */}
                     <div className={styles.dayActions}>
