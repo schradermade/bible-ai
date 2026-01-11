@@ -940,10 +940,20 @@
 
 .scriptureSection {
   margin-bottom: 16px;
+}
+
+.verseWithButton {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
   padding: 12px;
   background: rgba(176, 123, 76, 0.05);
   border-left: 3px solid #b07b4c;
   border-radius: 4px;
+}
+
+.verseContent {
+  flex: 1;
 }
 
 .verseRef {
@@ -961,6 +971,56 @@
   line-height: 1.7;
   color: #3a2f26;
   font-style: italic;
+}
+
+.saveVerseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+  border: 1.5px solid rgba(176, 123, 76, 0.3);
+  border-radius: 6px;
+  padding: 6px;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.1);
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.saveVerseButton:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.15));
+  border-color: rgba(176, 123, 76, 0.5);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 98, 57, 0.18);
+}
+
+.saveVerseButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.15);
+}
+
+.saveVerseButton svg {
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saveVerseButton:hover svg {
+  transform: scale(1.15);
+}
+
+.savedIndicator {
+  font-size: 11px;
+  font-weight: 600;
+  color: #2a5a4d;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .contentSection {
@@ -1009,8 +1069,16 @@
   box-shadow: 0 1px 3px rgba(139, 98, 57, 0.08);
 }
 
+.prayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
 .prayerTitle {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 12px;
   font-weight: 700;
   color: #8b6239;
@@ -1019,11 +1087,51 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  flex: 1;
 }
 
 .prayerTitle::before {
   content: "🙏";
   font-size: 14px;
+}
+
+.savePrayerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.12), rgba(176, 123, 76, 0.08));
+  border: 1.5px solid rgba(176, 123, 76, 0.3);
+  border-radius: 6px;
+  padding: 6px;
+  color: #8b6239;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(139, 98, 57, 0.1);
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.savePrayerButton:hover {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.15));
+  border-color: rgba(176, 123, 76, 0.5);
+  color: #6d5228;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 98, 57, 0.18);
+}
+
+.savePrayerButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.15);
+}
+
+.savePrayerButton svg {
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.savePrayerButton:hover svg {
+  transform: scale(1.15);
 }
 
 .prayerText {

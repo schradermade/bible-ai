@@ -658,7 +658,7 @@ export default function Dashboard() {
         ref={widgetsSidebarRef}
         className={`${styles.widgetsSidebar} ${isWidgetsSidebarScrolled ? styles.widgetsSidebarScrolled : ''} ${hasWidgetsScrollableContent ? styles.widgetsSidebarHasMore : ''}`}
       >
-        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
+        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onSaveVerse={addVerse} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
       </aside>
     </div>
   );

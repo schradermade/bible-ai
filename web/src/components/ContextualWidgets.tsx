@@ -63,11 +63,12 @@ interface StudyStreak {
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
+  onSaveVerse: (verse: SavedVerse) => void;
   onDeleteVerse: (verse: SavedVerse) => void;
   prayerRefreshTrigger?: number;
 }
 
-export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefreshTrigger }: ContextualWidgetsProps) {
+export default function ContextualWidgets({ myVerses, onSaveVerse, onDeleteVerse, prayerRefreshTrigger }: ContextualWidgetsProps) {
   const { user } = useUser();
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<MemoryVerse[]>([]);
@@ -640,11 +641,14 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
   const handleSaveVerseFromPlan = async (day: StudyPlanDay) => {
     if (!day.verseReference || !day.verseText || !studyPlan) return;
 
-    // This assumes there's an addVerse function in parent - for now we'll just track engagement
-    // In real implementation, you'd call parent's verse saving function
-
-    // Update engagement
     try {
+      // Save the verse using parent's callback
+      await onSaveVerse({
+        reference: day.verseReference,
+        text: day.verseText,
+      });
+
+      // Update engagement
       await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -661,8 +665,78 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
           d.id === day.id ? { ...d, verseSaved: true } : d
         )
       } : null);
+
+      // Highlight the newly added verse
+      const verseKey = `verse-${day.verseReference}`;
+      setHighlightedItems(prev => new Set([...prev, verseKey]));
+      setTimeout(() => {
+        setHighlightedItems(prev => {
+          const next = new Set(prev);
+          next.delete(verseKey);
+          return next;
+        });
+      }, 2000);
     } catch (error) {
-      console.error('Failed to update engagement:', error);
+      console.error('Failed to save verse:', error);
+      alert('Failed to save verse. Please try again.');
+    }
+  };
+
+  const handleSavePrayerFromPlan = async (day: StudyPlanDay) => {
+    if (!day.prayer || !studyPlan) return;
+
+    try {
+      // Save the existing prayer from the study plan
+      const saveResponse = await fetch('/api/prayers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: day.title.replace(/^Day \d+: /, ''), // Remove "Day X:" prefix
+          content: day.prayer,
+          source: 'study_plan',
+          sourceReference: day.verseReference || undefined,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save prayer');
+      }
+
+      const { prayer: savedPrayer } = await saveResponse.json();
+
+      // Add to prayers list
+      setPrayers([savedPrayer, ...prayers]);
+
+      // Update engagement
+      await fetch(`/api/study-plans/${studyPlan.id}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dayNumber: day.dayNumber,
+          engagement: { prayerGenerated: true }
+        })
+      });
+
+      // Optimistic update
+      setStudyPlan(prev => prev ? {
+        ...prev,
+        days: prev.days.map(d =>
+          d.id === day.id ? { ...d, prayerGenerated: true } : d
+        )
+      } : null);
+
+      // Highlight the newly added prayer
+      setHighlightedItems(prev => new Set([...prev, `prayer-${savedPrayer.id}`]));
+      setTimeout(() => {
+        setHighlightedItems(prev => {
+          const next = new Set(prev);
+          next.delete(`prayer-${savedPrayer.id}`);
+          return next;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to save prayer:', error);
+      alert('Failed to save prayer. Please try again.');
     }
   };
 
@@ -959,10 +1033,37 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                     {/* Scripture Section */}
                     {currentDay.verseReference && (
                       <div className={styles.scriptureSection}>
-                        <p className={styles.verseRef}>{currentDay.verseReference}</p>
-                        {currentDay.verseText && (
-                          <p className={styles.verseText}>&quot;{currentDay.verseText}&quot;</p>
-                        )}
+                        <div className={styles.verseWithButton}>
+                          <div className={styles.verseContent}>
+                            <p className={styles.verseRef}>{currentDay.verseReference}</p>
+                            {currentDay.verseText && (
+                              <p className={styles.verseText}>&quot;{currentDay.verseText}&quot;</p>
+                            )}
+                          </div>
+                          {!currentDay.verseSaved && (
+                            <button
+                              className={styles.saveVerseButton}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveVerseFromPlan(currentDay);
+                              }}
+                              title="Save verse"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          {currentDay.verseSaved && (
+                            <span className={styles.savedIndicator}>✓ Saved</span>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -982,7 +1083,32 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                     {/* Prayer */}
                     {currentDay.prayer && (
                       <div className={styles.prayerSection}>
-                        <h6 className={styles.prayerTitle}>Prayer</h6>
+                        <div className={styles.prayerHeader}>
+                          <h6 className={styles.prayerTitle}>Prayer</h6>
+                          {!currentDay.prayerGenerated && (
+                            <button
+                              className={styles.savePrayerButton}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSavePrayerFromPlan(currentDay);
+                              }}
+                              title="Save prayer"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          {currentDay.prayerGenerated && (
+                            <span className={styles.savedIndicator}>✓ Saved</span>
+                          )}
+                        </div>
                         <p className={styles.prayerText}>{currentDay.prayer}</p>
                       </div>
                     )}
@@ -995,22 +1121,6 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                       >
                         {currentDay.completed ? '✓ Completed' : 'Mark Complete'}
                       </button>
-                      {currentDay.verseReference && !currentDay.verseSaved && (
-                        <button
-                          className={styles.secondaryBtn}
-                          onClick={() => handleSaveVerseFromPlan(currentDay)}
-                        >
-                          💾 Save Verse
-                        </button>
-                      )}
-                      {currentDay.verseReference && !currentDay.prayerGenerated && (
-                        <button
-                          className={styles.secondaryBtn}
-                          onClick={() => handleGeneratePrayerFromPlan(currentDay)}
-                        >
-                          🙏 Create Prayer
-                        </button>
-                      )}
                       {!currentDay.chatEngaged && (
                         <button
                           className={styles.secondaryBtn}
