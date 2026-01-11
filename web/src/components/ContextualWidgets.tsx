@@ -618,18 +618,11 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
       // Plan completed celebration
       if (data.planCompleted) {
         setShowPlanCompletion(true);
-        // Wait for celebration before reloading
+        // Update plan status to completed in local state
+        setStudyPlan(prev => prev ? { ...prev, status: 'completed', completedAt: new Date() } : null);
+        // Close celebration modal after 6 seconds
         setTimeout(() => {
           setShowPlanCompletion(false);
-          const loadPlan = async () => {
-            const response = await fetch('/api/study-plans');
-            if (response.ok) {
-              const data = await response.json();
-              setStudyPlan(data.activePlan);
-              setStudyStreak(data.stats);
-            }
-          };
-          loadPlan();
         }, 6000);
       }
     } catch (error) {
@@ -818,6 +811,36 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
     }
   };
 
+  const handleArchivePlan = async () => {
+    if (!studyPlan) return;
+
+    const planId = studyPlan.id;
+
+    try {
+      const response = await fetch(`/api/study-plans/${planId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to archive plan');
+      }
+
+      // Successfully archived - clear local state
+      setStudyPlan(null);
+
+      // Reload to check for other plans
+      const reloadResponse = await fetch('/api/study-plans');
+      if (reloadResponse.ok) {
+        const data = await reloadResponse.json();
+        setStudyPlan(data.activePlan);
+        setStudyStreak(data.stats);
+      }
+    } catch (error) {
+      console.error('Failed to archive plan:', error);
+      alert('Failed to archive study plan. Please try again.');
+    }
+  };
+
   return (
     <>
     <div className={styles.widgetsContainer}>
@@ -905,7 +928,11 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                 )}
                 {showPlanMenu && (
                   <div className={styles.planMenu}>
-                    <button onClick={handleDeletePlan}>Delete Plan</button>
+                    {studyPlan.status === 'completed' ? (
+                      <button onClick={handleArchivePlan}>Archive Plan</button>
+                    ) : (
+                      <button onClick={handleDeletePlan}>Delete Plan</button>
+                    )}
                   </div>
                 )}
               </div>
@@ -1024,6 +1051,21 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                       <p className={styles.dayItemTitle}>{day.title}</p>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Archive Plan Button for Completed Plans */}
+              {studyPlan.status === 'completed' && (
+                <div className={styles.archivePlanSection}>
+                  <p className={styles.archiveMessage}>
+                    Great work completing this journey! Ready to start a new one?
+                  </p>
+                  <button
+                    className={styles.archivePlanButton}
+                    onClick={handleArchivePlan}
+                  >
+                    Archive Plan
+                  </button>
                 </div>
               )}
             </>

@@ -22,13 +22,14 @@ export async function GET() {
   }
 
   try {
-    // Fetch active plan with days
+    // Fetch active or recently completed plan with days
     const activePlan = await prisma.studyPlan.findFirst({
       where: {
         userId,
-        status: 'active',
+        status: { in: ['active', 'completed'] },
         deletedAt: null
       },
+      orderBy: { updatedAt: 'desc' },
       include: {
         days: {
           orderBy: { dayNumber: 'asc' }

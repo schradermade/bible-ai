@@ -855,6 +855,49 @@
   background: rgba(196, 69, 54, 0.1);
 }
 
+/* Archive Plan Section */
+.archivePlanSection {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(42, 90, 77, 0.05) 0%, rgba(30, 66, 57, 0.05) 100%);
+  border: 1px solid rgba(42, 90, 77, 0.15);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.archiveMessage {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5d4f;
+  line-height: 1.5;
+}
+
+.archivePlanButton {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #8b6239 0%, #6b4d2f 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(139, 98, 57, 0.3);
+}
+
+.archivePlanButton:hover {
+  background: linear-gradient(135deg, #6b4d2f 0%, #5a3d24 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 98, 57, 0.4);
+}
+
+.archivePlanButton:active {
+  transform: translateY(0);
+}
+
 /* Progress Overview */
 .progressBarContainer {
   margin-bottom: 16px;
