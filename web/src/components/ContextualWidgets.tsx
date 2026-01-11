@@ -979,6 +979,14 @@ export default function ContextualWidgets({ myVerses, onDeleteVerse, prayerRefre
                       </div>
                     )}
 
+                    {/* Prayer */}
+                    {currentDay.prayer && (
+                      <div className={styles.prayerSection}>
+                        <h6 className={styles.prayerTitle}>Prayer</h6>
+                        <p className={styles.prayerText}>{currentDay.prayer}</p>
+                      </div>
+                    )}
+
                     {/* Actions */}
                     <div className={styles.dayActions}>
                       <button

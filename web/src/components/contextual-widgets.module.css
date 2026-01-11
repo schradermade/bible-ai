@@ -1000,6 +1000,41 @@
   white-space: pre-wrap;
 }
 
+.prayerSection {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.06) 0%, rgba(139, 98, 57, 0.04) 100%);
+  border-left: 3px solid #b07b4c;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.08);
+}
+
+.prayerTitle {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b6239;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prayerTitle::before {
+  content: "🙏";
+  font-size: 14px;
+}
+
+.prayerText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a4d41;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
 /* Day Actions */
 .dayActions {
   display: flex;

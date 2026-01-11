@@ -141,6 +141,7 @@ model StudyPlanDay {
   title           String
   content         String    @db.Text // Rich reflection
   reflection      String    @db.Text // Questions
+  prayer          String?   @db.Text // Prayer for the day
   verseReference  String?
   verseText       String?   @db.Text
   completed       Boolean   @default(false)

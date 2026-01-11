@@ -142,6 +142,7 @@ export async function POST(request: Request) {
         title: string;
         content: string;
         reflection: string;
+        prayer: string;
         verseReference: string;
         verseText: string;
       }>;
@@ -196,6 +197,7 @@ export async function POST(request: Request) {
           title: day.title,
           content: day.content,
           reflection: day.reflection,
+          prayer: day.prayer || null,
           verseReference: day.verseReference || null,
           verseText: day.verseText || null
         }))

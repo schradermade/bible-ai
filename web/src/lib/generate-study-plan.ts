@@ -7,6 +7,7 @@ Based on the user's spiritual journey (recent conversations, saved verses, praye
 - Builds naturally on themes from their journey
 - Provides substantial daily reflections (200-300 words each)
 - Includes thoughtful reflection questions (2-3 per day)
+- Includes heartfelt prayers (3-5 sentences) that relate to the day's content
 - References Scripture with full verse text (KJV preferred)
 - Feels conversational and inviting, not academic or preachy
 - Creates a progressive learning arc across all ${duration} days
@@ -17,7 +18,7 @@ CRITICAL FORMAT REQUIREMENTS:
 - Use double quotes for all strings
 - Escape any quotes within strings properly
 - No trailing commas
-- Each day must have: dayNumber, title, content, reflection, verseReference, verseText
+- Each day must have: dayNumber, title, content, reflection, prayer, verseReference, verseText
 
 Return your response in this EXACT JSON format:
 {
@@ -29,6 +30,7 @@ Return your response in this EXACT JSON format:
       "title": "Day 1: [Concise descriptive title]",
       "content": "Rich 200-300 word reflection connecting to their spiritual journey. Discuss the theme, provide biblical insights, and encourage practical application.",
       "reflection": "2-3 thoughtful questions for personal reflection and application",
+      "prayer": "A heartfelt 3-5 sentence prayer relating to the day's content, ending with 'In Jesus' name, Amen.' or similar. Make it conversational and personal.",
       "verseReference": "Book Chapter:Verse-Verse",
       "verseText": "The full verse text in KJV or similar translation"
     }
@@ -44,6 +46,7 @@ export interface GeneratedStudyPlan {
     title: string;
     content: string;
     reflection: string;
+    prayer: string;
     verseReference: string;
     verseText: string;
   }>;
@@ -195,7 +198,7 @@ export async function generateAIStudyPlan(
 
   // Validate each day
   parsed.days.forEach((day: any, index: number) => {
-    if (!day.dayNumber || !day.title || !day.content || !day.reflection) {
+    if (!day.dayNumber || !day.title || !day.content || !day.reflection || !day.prayer) {
       throw new Error(`Invalid day ${index + 1} structure`);
     }
     // Ensure dayNumber is set correctly
