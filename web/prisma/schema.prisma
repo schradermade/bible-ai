@@ -127,7 +127,8 @@ model StudyPlan {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  days StudyPlanDay[]
+  days       StudyPlanDay[]
+  memberPlan MemberStudyPlan?
 
   @@index([userId, status])
   @@index([userId, createdAt])
@@ -179,4 +180,195 @@ model StudyStreak {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+// Study Circles Models
+
+model StudyCircle {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  createdBy   String
+  maxMembers  Int      @default(8)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     StudyCircleMember[]
+  plans       CircleStudyPlan[]
+  invitations CircleInvitation[]
+  prayers     CirclePrayerRequest[]
+  verses      CircleSharedVerse[]
+
+  @@index([createdBy])
+}
+
+model StudyCircleMember {
+  id        String      @id @default(cuid())
+  circleId  String
+  circle    StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  userId    String
+  role      String      @default("member") // "owner", "admin", "member"
+  joinedAt  DateTime    @default(now())
+
+  // Granular privacy settings
+  shareProgress    Boolean @default(true) // Share which days completed
+  shareReflections Boolean @default(false) // Share personal reflections
+  shareVerses      Boolean @default(false) // Share saved verses
+  sharePrayers     Boolean @default(false) // Share prayer requests
+
+  @@unique([circleId, userId])
+  @@index([userId])
+  @@index([circleId])
+}
+
+model CircleInvitation {
+  id           String      @id @default(cuid())
+  circleId     String
+  circle       StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  invitedBy    String
+  invitedEmail String?
+  token        String      @unique
+  status       String      @default("pending") // "pending", "accepted", "declined", "expired"
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  createdAt    DateTime    @default(now())
+
+  @@index([token])
+  @@index([circleId])
+}
+
+model CircleStudyPlan {
+  id             String      @id @default(cuid())
+  circleId       String
+  circle         StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  templateSource String
+  duration       Int
+  title          String
+  description    String?     @db.Text
+  startDate      DateTime
+  status         String      @default("active") // "active", "completed"
+  createdBy      String
+  createdAt      DateTime    @default(now())
+
+  memberPlans MemberStudyPlan[]
+  reflections CircleDayReflection[]
+
+  @@index([circleId])
+  @@index([status])
+}
+
+model MemberStudyPlan {
+  id                String          @id @default(cuid())
+  circleStudyPlanId String
+  circleStudyPlan   CircleStudyPlan @relation(fields: [circleStudyPlanId], references: [id], onDelete: Cascade)
+  userId            String
+  studyPlanId       String          @unique
+  studyPlan         StudyPlan       @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  joinedAt          DateTime        @default(now())
+
+  @@unique([circleStudyPlanId, userId])
+  @@index([userId])
+}
+
+model CircleDayReflection {
+  id                String          @id @default(cuid())
+  circleStudyPlanId String
+  circleStudyPlan   CircleStudyPlan @relation(fields: [circleStudyPlanId], references: [id], onDelete: Cascade)
+  dayNumber         Int
+  userId            String
+  content           String          @db.Text
+  verseHighlight    String?         @db.Text
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  reactions CircleReaction[]
+  comments  CircleComment[]
+
+  @@index([circleStudyPlanId, dayNumber])
+  @@index([userId])
+}
+
+model CircleReaction {
+  id           String              @id @default(cuid())
+  reflectionId String
+  reflection   CircleDayReflection @relation(fields: [reflectionId], references: [id], onDelete: Cascade)
+  userId       String
+  type         String // "amen", "praying", "insightful", "encouraging"
+  createdAt    DateTime            @default(now())
+
+  @@unique([reflectionId, userId, type])
+  @@index([reflectionId])
+}
+
+model CircleComment {
+  id           String              @id @default(cuid())
+  reflectionId String
+  reflection   CircleDayReflection @relation(fields: [reflectionId], references: [id], onDelete: Cascade)
+  userId       String
+  content      String              @db.Text
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([reflectionId])
+  @@index([userId])
+}
+
+model CirclePrayerRequest {
+  id              String      @id @default(cuid())
+  circleId        String
+  circle          StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  userId          String
+  title           String?
+  content         String      @db.Text
+  source          String
+  sourceReference String?
+  dayNumber       Int?
+  status          String      @default("ongoing") // "ongoing", "answered"
+  answeredAt      DateTime?
+  createdAt       DateTime    @default(now())
+
+  prayerSupport CirclePrayerSupport[]
+
+  @@index([circleId])
+  @@index([userId])
+  @@index([status])
+}
+
+model CirclePrayerSupport {
+  id        String              @id @default(cuid())
+  prayerId  String
+  prayer    CirclePrayerRequest @relation(fields: [prayerId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime            @default(now())
+
+  @@unique([prayerId, userId])
+  @@index([prayerId])
+}
+
+model CircleSharedVerse {
+  id            String      @id @default(cuid())
+  circleId      String
+  circle        StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  userId        String
+  reference     String
+  text          String      @db.Text
+  note          String?     @db.Text
+  fromDayNumber Int?
+  createdAt     DateTime    @default(now())
+
+  reactions CircleVerseReaction[]
+
+  @@index([circleId])
+}
+
+model CircleVerseReaction {
+  id        String            @id @default(cuid())
+  verseId   String
+  verse     CircleSharedVerse @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  userId    String
+  type      String // "amen", "saved", "memorizing"
+  createdAt DateTime          @default(now())
+
+  @@unique([verseId, userId, type])
+  @@index([verseId])
 }
