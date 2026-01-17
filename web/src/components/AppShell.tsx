@@ -57,6 +57,40 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: '/circles',
+    label: 'Circles',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle
+          cx="12"
+          cy="12"
+          r="9"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        />
+        <circle
+          cx="9"
+          cy="10"
+          r="1.5"
+          fill="currentColor"
+        />
+        <circle
+          cx="15"
+          cy="10"
+          r="1.5"
+          fill="currentColor"
+        />
+        <circle
+          cx="12"
+          cy="14"
+          r="1.5"
+          fill="currentColor"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
