@@ -142,7 +142,7 @@ export default function CircleList() {
                   )}
                 </div>
 
-                {circle.plans.length > 0 && (
+                {circle.plans && circle.plans.length > 0 && (
                   <div className={styles.activeStudy}>
                     <div className={styles.studyIcon}>📖</div>
                     <span className={styles.studyTitle}>

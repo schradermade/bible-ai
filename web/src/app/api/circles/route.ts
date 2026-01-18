@@ -146,17 +146,35 @@ export async function POST(request: Request) {
         },
       });
 
-      // Return circle with member count
+      // Return circle with member count and plans
       return await tx.studyCircle.findUnique({
         where: { id: newCircle.id },
         include: {
           _count: {
-            select: { members: true },
+            select: {
+              members: true,
+              plans: true,
+            },
           },
           members: {
             select: {
               userId: true,
               role: true,
+            },
+          },
+          plans: {
+            where: {
+              status: 'active',
+            },
+            take: 1,
+            orderBy: {
+              createdAt: 'desc',
+            },
+            select: {
+              id: true,
+              title: true,
+              duration: true,
+              startDate: true,
             },
           },
         },
