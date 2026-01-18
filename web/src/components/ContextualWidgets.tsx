@@ -1177,9 +1177,12 @@ export default function ContextualWidgets({
                 {myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > 0 && (
                   <>
                     {memoryVerses.length > 0 && (
-                      <div className={styles.versesSectionHeader}>
-                        📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})
-                      </div>
+                      <>
+                        <div className={styles.versesSectionDivider}></div>
+                        <div className={styles.versesSectionHeader}>
+                          📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})
+                        </div>
+                      </>
                     )}
                     <div className={styles.versesList}>
                       {myVerses

@@ -1918,3 +1918,15 @@
   letter-spacing: 0.5px;
   color: #8b6239;
 }
+
+.versesSectionDivider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(176, 123, 76, 0.2) 10%,
+    rgba(176, 123, 76, 0.2) 90%,
+    transparent 100%
+  );
+  margin: 20px 0 16px 0;
+}
