@@ -1225,7 +1225,7 @@ export default function ContextualWidgets({
                           onClick={() => toggleVerseSection('savedVerses')}
                           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                         >
-                          <span>📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})</span>
+                          <span>🔖 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})</span>
                           <svg
                             width="12"
                             height="12"
