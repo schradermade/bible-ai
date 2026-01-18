@@ -622,7 +622,7 @@ export default function ChatConversation({
   return (
     <div
       ref={containerRef}
-      className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''}`}
+      className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''} ${messages.length === 0 && welcomeMinimized ? styles.welcomeMinimizedContainer : ''}`}
     >
       {messages.length === 0 && !welcomeMinimized ? (
         <div className={styles.welcomeContainer}>
@@ -739,7 +739,7 @@ export default function ChatConversation({
             </div>
           </div>
         </div>
-      ) : (
+      ) : messages.length > 0 ? (
         <div className={styles.messagesContainer}>
           {messages.map((message) => (
             <React.Fragment key={message.id}>
@@ -813,7 +813,7 @@ export default function ChatConversation({
           )}
           <div ref={messagesEndRef} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
