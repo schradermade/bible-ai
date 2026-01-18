@@ -1,9 +1,10 @@
 import CircleHome from '@/components/circles/CircleHome';
 
-export default function CircleDetailPage({
+export default async function CircleDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <CircleHome circleId={params.id} />;
+  const { id } = await params;
+  return <CircleHome circleId={id} />;
 }

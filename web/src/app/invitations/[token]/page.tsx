@@ -1,9 +1,10 @@
 import InvitationAccept from '@/components/circles/InvitationAccept';
 
-export default function InvitationPage({
+export default async function InvitationPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  return <InvitationAccept token={params.token} />;
+  const { token } = await params;
+  return <InvitationAccept token={token} />;
 }

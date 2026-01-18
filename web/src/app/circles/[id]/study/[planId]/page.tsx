@@ -1,9 +1,10 @@
 import SharedStudyView from '@/components/circles/SharedStudyView';
 
-export default function CircleStudyPage({
+export default async function CircleStudyPage({
   params,
 }: {
-  params: { id: string; planId: string };
+  params: Promise<{ id: string; planId: string }>;
 }) {
-  return <SharedStudyView circleId={params.id} studyPlanId={params.planId} />;
+  const { id, planId } = await params;
+  return <SharedStudyView circleId={id} studyPlanId={planId} />;
 }
