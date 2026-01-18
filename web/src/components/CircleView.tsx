@@ -490,6 +490,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
         </button>
       </div>
 
+      {/* Study Circle Title */}
+      <h2 className={styles.studyCircleTitle}>Study Circle</h2>
+
       {/* Circle name and basic info - compact */}
       <div className={styles.circleHeader}>
         <div className={styles.circleHeaderContent}>
