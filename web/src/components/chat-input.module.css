@@ -501,25 +501,25 @@
 }
 
 .welcomeRestoreButton {
-  background: rgba(176, 123, 76, 0.1);
-  border: 1px solid rgba(176, 123, 76, 0.25);
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.625rem;
+  background: rgba(139, 115, 85, 0.1);
+  border: 1px solid rgba(139, 115, 85, 0.2);
+  border-radius: 8px;
+  color: #5d4e37;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #8b6239;
   flex-shrink: 0;
-  padding: 0;
   align-self: flex-end;
 }
 
 .welcomeRestoreButton:hover {
-  background: rgba(176, 123, 76, 0.2);
-  border-color: rgba(176, 123, 76, 0.4);
-  transform: scale(1.05);
-  color: #6b5d4f;
+  background: rgba(139, 115, 85, 0.15);
+  border-color: rgba(139, 115, 85, 0.3);
+}
+
+.welcomeRestoreButton svg {
+  color: #8b7355;
 }
