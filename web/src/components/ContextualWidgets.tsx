@@ -1032,149 +1032,293 @@ export default function ContextualWidgets({
               <p className={styles.emptyState}>No verses saved yet</p>
             ) : (
               <>
-                <div className={styles.versesList}>
-                  {myVerses.slice(0, visibleVersesCount).map((verse, index) => (
-                    <div
-                      key={index}
-                      className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}
-                    >
-                      <div className={styles.verseCardHeader}>
-                        <span className={styles.verseReference}>
-                          {verse.reference}
-                        </span>
-                        <button
-                          className={styles.deleteButton}
-                          onClick={() => onDeleteVerse(verse)}
-                          aria-label="Delete verse"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M18 6L6 18M6 6L18 18"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className={styles.verseText}>
-                        &quot;{verse.text}&quot;
-                      </p>
-                      <div className={styles.verseActions}>
-                        <button
-                          className={`${styles.memorizedButton} ${memoryVerses.find(m => m.reference === verse.reference)?.memorized ? styles.memorizedActive : ''}`}
-                          onClick={() => handleToggleMemorizeVerse(verse)}
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? (
-                              <path
-                                d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            ) : (
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="9"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              />
-                            )}
-                          </svg>
-                          {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? 'Memorized!' : 'Memorize'}
-                        </button>
-                        <button
-                          className={styles.createPrayerButton}
-                          onClick={() => generatePrayerFromVerse(verse)}
-                          disabled={
-                            generatingPrayerForVerse === verse.reference
-                          }
-                        >
-                          {generatingPrayerForVerse === verse.reference ? (
-                            <>
-                              <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                className={styles.spinningIcon}
-                              >
-                                <path
-                                  d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                              Generating...
-                            </>
-                          ) : (
-                            <>
-                              <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12 6v6l4 2"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-                                <path
-                                  d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                />
-                                <path
-                                  d="M8 2h8M8 22h8"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                              Create Prayer
-                            </>
-                          )}
-                        </button>
-                      </div>
+                {/* Memory Verses Section */}
+                {memoryVerses.length > 0 && (
+                  <>
+                    <div className={styles.versesSectionHeader}>
+                      💭 Working on Memorizing ({memoryVerses.length})
                     </div>
-                  ))}
-                </div>
-                {myVerses.length > visibleVersesCount && (
-                  <button
-                    className={styles.showMoreButton}
-                    onClick={() => setVisibleVersesCount((prev) => prev + 5)}
-                  >
-                    Show More ({myVerses.length - visibleVersesCount} more)
-                  </button>
+                    <div className={styles.versesList}>
+                      {memoryVerses.map((memVerse) => {
+                        const verse = myVerses.find(v => v.reference === memVerse.reference);
+                        if (!verse) return null;
+                        return (
+                          <div
+                            key={memVerse.reference}
+                            className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}
+                          >
+                            <div className={styles.verseCardHeader}>
+                              <span className={styles.verseReference}>
+                                {verse.reference}
+                              </span>
+                              <button
+                                className={styles.deleteButton}
+                                onClick={() => onDeleteVerse(verse)}
+                                aria-label="Delete verse"
+                              >
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M18 6L6 18M6 6L18 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                            <p className={styles.verseText}>
+                              &quot;{verse.text}&quot;
+                            </p>
+                            <div className={styles.verseActions}>
+                              <button
+                                className={`${styles.memorizedButton} ${memVerse.memorized ? styles.memorizedActive : ''}`}
+                                onClick={() => handleToggleMemorizeVerse(verse)}
+                              >
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  {memVerse.memorized ? (
+                                    <path
+                                      d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  ) : (
+                                    <circle
+                                      cx="12"
+                                      cy="12"
+                                      r="9"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                    />
+                                  )}
+                                </svg>
+                                Memorize
+                              </button>
+                              <button
+                                className={styles.createPrayerButton}
+                                onClick={() => generatePrayerFromVerse(verse)}
+                                disabled={
+                                  generatingPrayerForVerse === verse.reference
+                                }
+                              >
+                                {generatingPrayerForVerse === verse.reference ? (
+                                  <>
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className={styles.spinningIcon}
+                                    >
+                                      <path
+                                        d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                    </svg>
+                                    Generating...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M12 6v6l4 2"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                      <path
+                                        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                      />
+                                      <path
+                                        d="M8 2h8M8 22h8"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                    </svg>
+                                    Create Prayer
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
                 )}
-                {visibleVersesCount > 5 && myVerses.length > 5 && (
-                  <button
-                    className={styles.showMoreButton}
-                    onClick={() => setVisibleVersesCount(5)}
-                  >
-                    Show Less
-                  </button>
+
+                {/* Regular Saved Verses Section */}
+                {myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > 0 && (
+                  <>
+                    {memoryVerses.length > 0 && (
+                      <div className={styles.versesSectionHeader}>
+                        📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})
+                      </div>
+                    )}
+                    <div className={styles.versesList}>
+                      {myVerses
+                        .filter(v => !memoryVerses.some(m => m.reference === v.reference))
+                        .slice(0, visibleVersesCount)
+                        .map((verse, index) => (
+                          <div
+                            key={index}
+                            className={`${styles.verseCard} ${highlightedItems.has(`verse-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}
+                          >
+                            <div className={styles.verseCardHeader}>
+                              <span className={styles.verseReference}>
+                                {verse.reference}
+                              </span>
+                              <button
+                                className={styles.deleteButton}
+                                onClick={() => onDeleteVerse(verse)}
+                                aria-label="Delete verse"
+                              >
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M18 6L6 18M6 6L18 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                            <p className={styles.verseText}>
+                              &quot;{verse.text}&quot;
+                            </p>
+                            <div className={styles.verseActions}>
+                              <button
+                                className={styles.memorizeButton}
+                                onClick={() => handleToggleMemorizeVerse(verse)}
+                              >
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                Memorize
+                              </button>
+                              <button
+                                className={styles.createPrayerButton}
+                                onClick={() => generatePrayerFromVerse(verse)}
+                                disabled={
+                                  generatingPrayerForVerse === verse.reference
+                                }
+                              >
+                                {generatingPrayerForVerse === verse.reference ? (
+                                  <>
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className={styles.spinningIcon}
+                                    >
+                                      <path
+                                        d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                    </svg>
+                                    Generating...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg
+                                      width="14"
+                                      height="14"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M12 6v6l4 2"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                      <path
+                                        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                      />
+                                      <path
+                                        d="M8 2h8M8 22h8"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                      />
+                                    </svg>
+                                    Create Prayer
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    {myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > visibleVersesCount && (
+                      <button
+                        className={styles.showMoreButton}
+                        onClick={() => setVisibleVersesCount((prev) => prev + 5)}
+                      >
+                        Show More ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length - visibleVersesCount} more)
+                      </button>
+                    )}
+                    {visibleVersesCount > 5 && myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > 5 && (
+                      <button
+                        className={styles.showMoreButton}
+                        onClick={() => setVisibleVersesCount(5)}
+                      >
+                        Show Less
+                      </button>
+                    )}
+                  </>
                 )}
               </>
             )}
