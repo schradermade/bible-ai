@@ -210,8 +210,11 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [visibleDaysCount, setVisibleDaysCount] = useState(7);
   const [currentDayNumber, setCurrentDayNumber] = useState(1);
   const [showAddHighlightModal, setShowAddHighlightModal] = useState(false);
-  const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] = useState(false);
-  const [prayerFilter, setPrayerFilter] = useState<'all' | 'active' | 'answered'>('all');
+  const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] =
+    useState(false);
+  const [prayerFilter, setPrayerFilter] = useState<
+    'all' | 'active' | 'answered'
+  >('all');
   const [intentions, setIntentions] = useState<any[]>([]);
   const [hasSubmittedIntention, setHasSubmittedIntention] = useState(false);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
@@ -277,7 +280,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   const fetchReflections = async () => {
     try {
-      const response = await fetch(`/api/circles/${circleId}/reflections?limit=5`);
+      const response = await fetch(
+        `/api/circles/${circleId}/reflections?limit=5`
+      );
       const data = await response.json();
       if (response.ok) {
         setReflections(data.reflections || []);
@@ -313,7 +318,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   const fetchHighlights = async () => {
     try {
-      const response = await fetch(`/api/circles/${circleId}/highlights?limit=5`);
+      const response = await fetch(
+        `/api/circles/${circleId}/highlights?limit=5`
+      );
       const data = await response.json();
       if (response.ok) {
         setHighlights(data.highlights || []);
@@ -325,7 +332,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   const fetchEncouragements = async () => {
     try {
-      const response = await fetch(`/api/circles/${circleId}/encouragements?limit=3`);
+      const response = await fetch(
+        `/api/circles/${circleId}/encouragements?limit=3`
+      );
       const data = await response.json();
       if (response.ok) {
         setEncouragements(data.encouragements || []);
@@ -342,7 +351,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       if (response.ok) {
         setIntentions(data.intentions || []);
         setTotalMembers(data.totalMembers || 0);
-        const userIntention = data.intentions?.find((i: any) => i.userId === user?.id);
+        const userIntention = data.intentions?.find(
+          (i: any) => i.userId === user?.id
+        );
         setHasSubmittedIntention(!!userIntention);
       }
     } catch (err) {
@@ -359,9 +370,13 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     if (circle && user) {
       const activePlan = circle.plans.find((p) => p.status === 'active');
       if (activePlan) {
-        const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user.id);
+        const userPlan = activePlan.memberPlans?.find(
+          (mp) => mp.userId === user.id
+        );
         if (userPlan) {
-          const completedDays = userPlan.studyPlan.days.filter((d) => d.completed).length;
+          const completedDays = userPlan.studyPlan.days.filter(
+            (d) => d.completed
+          ).length;
           setCurrentDayNumber(completedDays + 1);
         }
       }
@@ -426,20 +441,25 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const activePlan = circle.plans.find((p) => p.status === 'active');
 
   // Calculate member progress
-  const memberProgress = activePlan?.memberPlans?.map((mp) => {
-    const completedDays = mp.studyPlan.days.filter((d) => d.completed).length;
-    const lastCompleted = mp.studyPlan.days
-      .filter((d) => d.completed && d.completedAt)
-      .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+  const memberProgress =
+    activePlan?.memberPlans?.map((mp) => {
+      const completedDays = mp.studyPlan.days.filter((d) => d.completed).length;
+      const lastCompleted = mp.studyPlan.days
+        .filter((d) => d.completed && d.completedAt)
+        .sort(
+          (a, b) =>
+            new Date(b.completedAt!).getTime() -
+            new Date(a.completedAt!).getTime()
+        )[0];
 
-    return {
-      userId: mp.userId,
-      userName: mp.userName,
-      completedDays,
-      totalDays: activePlan.duration,
-      lastCompletedAt: lastCompleted?.completedAt || undefined,
-    };
-  }) || [];
+      return {
+        userId: mp.userId,
+        userName: mp.userName,
+        completedDays,
+        totalDays: activePlan.duration,
+        lastCompletedAt: lastCompleted?.completedAt || undefined,
+      };
+    }) || [];
 
   return (
     <div className={styles.circleView}>
@@ -462,7 +482,12 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             {activePlan && (
               <>
                 <span className={styles.metaSeparator}>•</span>
-                <span>{activePlan.title.replace(/^\d+-Day (Journey|Deep Dive): /, '')}</span>
+                <span>
+                  {activePlan.title.replace(
+                    /^\d+-Day (Journey|Deep Dive): /,
+                    ''
+                  )}
+                </span>
                 <span className={styles.metaSeparator}>•</span>
                 <span>{activePlan.duration} days</span>
               </>
@@ -483,55 +508,85 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           <>
             {/* Individual progress bars for each member - stacked */}
             {(() => {
-              console.log('[CircleView] activePlan.memberPlans:', activePlan.memberPlans);
-              return activePlan.memberPlans && activePlan.memberPlans.length > 0 && (
-                <div className={styles.memberProgressBars}>
-                  <h3 className={styles.progressBarsTitle}>Member Progress</h3>
-                  {activePlan.memberPlans.map((mp) => {
-                  const completedDays = mp.studyPlan.days.filter((d) => d.completed).length;
-                  const percentage = (completedDays / activePlan.duration) * 100;
-                  const isCurrentUser = mp.userId === user?.id;
-                  const displayName = mp.userName || mp.userId;
-                  const initials = mp.userName
-                    ? mp.userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-                    : mp.userId.substring(0, 2).toUpperCase();
+              console.log(
+                '[CircleView] activePlan.memberPlans:',
+                activePlan.memberPlans
+              );
+              return (
+                activePlan.memberPlans &&
+                activePlan.memberPlans.length > 0 && (
+                  <div className={styles.memberProgressBars}>
+                    <h3 className={styles.progressBarsTitle}>
+                      Member Progress
+                    </h3>
+                    {activePlan.memberPlans.map((mp) => {
+                      const completedDays = mp.studyPlan.days.filter(
+                        (d) => d.completed
+                      ).length;
+                      const percentage =
+                        (completedDays / activePlan.duration) * 100;
+                      const isCurrentUser = mp.userId === user?.id;
+                      const displayName = mp.userName || mp.userId;
+                      const initials = mp.userName
+                        ? mp.userName
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()
+                            .substring(0, 2)
+                        : mp.userId.substring(0, 2).toUpperCase();
 
-                  return (
-                    <div key={mp.userId} className={styles.memberProgressItem}>
-                      <div className={styles.memberProgressRow}>
-                        <div className={styles.memberAvatar}>
-                          {initials}
-                        </div>
-                        <div className={styles.memberProgressContent}>
-                          <div className={styles.memberProgressHeader}>
-                            <span className={styles.memberProgressName}>
-                              {displayName.length > 20 ? displayName.substring(0, 20) + '...' : displayName}
-                              {isCurrentUser && <span className={styles.youLabel}> (You)</span>}
-                            </span>
-                            <span className={styles.memberProgressCount}>
-                              {completedDays}/{activePlan.duration}
-                            </span>
+                      return (
+                        <div
+                          key={mp.userId}
+                          className={styles.memberProgressItem}
+                        >
+                          <div className={styles.memberProgressRow}>
+                            <div className={styles.memberAvatar}>
+                              {initials}
+                            </div>
+                            <div className={styles.memberProgressContent}>
+                              <div className={styles.memberProgressHeader}>
+                                <span className={styles.memberProgressName}>
+                                  {displayName.length > 20
+                                    ? displayName.substring(0, 20) + '...'
+                                    : displayName}
+                                  {isCurrentUser && (
+                                    <span className={styles.youLabel}>
+                                      {' '}
+                                      (You)
+                                    </span>
+                                  )}
+                                </span>
+                                <span className={styles.memberProgressCount}>
+                                  {completedDays}/{activePlan.duration}
+                                </span>
+                              </div>
+                              <div className={styles.memberProgressBarTrack}>
+                                <div
+                                  className={`${styles.memberProgressBarFill} ${isCurrentUser ? styles.currentUserBar : ''}`}
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div className={styles.memberProgressBarTrack}>
-                            <div
-                              className={`${styles.memberProgressBarFill} ${isCurrentUser ? styles.currentUserBar : ''}`}
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )
               );
             })()}
 
             {/* Current day study - matching Study widget exactly */}
             {(() => {
-              const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
+              const userPlan = activePlan.memberPlans?.find(
+                (mp) => mp.userId === user?.id
+              );
               if (userPlan) {
-                const currentDay = userPlan.studyPlan.days.find((d) => d.dayNumber === currentDayNumber);
+                const currentDay = userPlan.studyPlan.days.find(
+                  (d) => d.dayNumber === currentDayNumber
+                );
 
                 if (currentDay && currentDayNumber <= activePlan.duration) {
                   return (
@@ -573,9 +628,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                       {/* Reflection Questions */}
                       {currentDay.reflection && (
                         <div className={styles.reflectionSection}>
-                          <h6 className={styles.reflectionTitle}>
-                            Reflection
-                          </h6>
+                          <h6 className={styles.reflectionTitle}>Reflection</h6>
                           <p className={styles.reflectionText}>
                             {currentDay.reflection}
                           </p>
@@ -610,7 +663,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                                 `/api/study-plans/${userPlan.studyPlan.id}/progress`,
                                 {
                                   method: 'PATCH',
-                                  headers: { 'Content-Type': 'application/json' },
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
                                   body: JSON.stringify({
                                     dayNumber: currentDay.dayNumber,
                                     completed: !currentDay.completed,
@@ -621,7 +676,10 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                                 await refreshCircle();
                               }
                             } catch (error) {
-                              console.error('Failed to toggle completion:', error);
+                              console.error(
+                                'Failed to toggle completion:',
+                                error
+                              );
                             } finally {
                               setIsMarkingComplete(false);
                             }
@@ -645,9 +703,12 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                   return (
                     <div className={styles.completedCard}>
                       <div className={styles.completedIcon}>✓</div>
-                      <h3 className={styles.completedTitle}>Study Completed!</h3>
+                      <h3 className={styles.completedTitle}>
+                        Study Completed!
+                      </h3>
                       <p className={styles.completedText}>
-                        Congratulations on completing this {activePlan.duration}-day journey together!
+                        Congratulations on completing this {activePlan.duration}
+                        -day journey together!
                       </p>
                     </div>
                   );
@@ -658,7 +719,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
             {/* All Days Toggle */}
             {(() => {
-              const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
+              const userPlan = activePlan.memberPlans?.find(
+                (mp) => mp.userId === user?.id
+              );
               if (userPlan && userPlan.studyPlan.days.length > 1) {
                 return (
                   <button
@@ -674,46 +737,52 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
             {/* All Days List */}
             {(() => {
-              const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
+              const userPlan = activePlan.memberPlans?.find(
+                (mp) => mp.userId === user?.id
+              );
               if (showAllDays && userPlan) {
                 return (
                   <>
                     <div className={styles.allDaysList}>
-                      {userPlan.studyPlan.days.slice(0, visibleDaysCount).map((day) => (
-                        <div
-                          key={day.id}
-                          className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
-                          onClick={() => setCurrentDayNumber(day.dayNumber)}
-                        >
-                          <div className={styles.dayItemHeader}>
-                            <span className={styles.dayNumber}>
-                              Day {day.dayNumber}
-                            </span>
-                            {day.completed && (
-                              <span className={styles.checkmark}>✓</span>
-                            )}
+                      {userPlan.studyPlan.days
+                        .slice(0, visibleDaysCount)
+                        .map((day) => (
+                          <div
+                            key={day.id}
+                            className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
+                            onClick={() => setCurrentDayNumber(day.dayNumber)}
+                          >
+                            <div className={styles.dayItemHeader}>
+                              <span className={styles.dayNumber}>
+                                Day {day.dayNumber}
+                              </span>
+                              {day.completed && (
+                                <span className={styles.checkmark}>✓</span>
+                              )}
+                            </div>
+                            <p className={styles.dayItemTitle}>{day.title}</p>
                           </div>
-                          <p className={styles.dayItemTitle}>{day.title}</p>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                     {userPlan.studyPlan.days.length > visibleDaysCount && (
                       <button
                         className={styles.showMoreButton}
                         onClick={() => setVisibleDaysCount((prev) => prev + 7)}
                       >
-                        Show More ({userPlan.studyPlan.days.length - visibleDaysCount}{' '}
-                        more days)
+                        Show More (
+                        {userPlan.studyPlan.days.length - visibleDaysCount} more
+                        days)
                       </button>
                     )}
-                    {visibleDaysCount > 7 && userPlan.studyPlan.days.length > 7 && (
-                      <button
-                        className={styles.showMoreButton}
-                        onClick={() => setVisibleDaysCount(7)}
-                      >
-                        Show Less
-                      </button>
-                    )}
+                    {visibleDaysCount > 7 &&
+                      userPlan.studyPlan.days.length > 7 && (
+                        <button
+                          className={styles.showMoreButton}
+                          onClick={() => setVisibleDaysCount(7)}
+                        >
+                          Show Less
+                        </button>
+                      )}
                   </>
                 );
               }
@@ -748,7 +817,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               </div>
               {encouragements.length === 0 ? (
                 <div className={styles.emptyMessage}>
-                  <p>No encouragement prompts yet. Be the first to share one!</p>
+                  <p>
+                    No encouragement prompts yet. Be the first to share one!
+                  </p>
                 </div>
               ) : (
                 encouragements.map((encouragement) => (
@@ -768,19 +839,31 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 <h3 className={styles.sectionTitle}>Prayer Requests</h3>
                 <div className={styles.filterButtons}>
                   <button
-                    className={prayerFilter === 'all' ? styles.filterActive : styles.filterButton}
+                    className={
+                      prayerFilter === 'all'
+                        ? styles.filterActive
+                        : styles.filterButton
+                    }
                     onClick={() => setPrayerFilter('all')}
                   >
                     All
                   </button>
                   <button
-                    className={prayerFilter === 'active' ? styles.filterActive : styles.filterButton}
+                    className={
+                      prayerFilter === 'active'
+                        ? styles.filterActive
+                        : styles.filterButton
+                    }
                     onClick={() => setPrayerFilter('active')}
                   >
                     Active
                   </button>
                   <button
-                    className={prayerFilter === 'answered' ? styles.filterActive : styles.filterButton}
+                    className={
+                      prayerFilter === 'answered'
+                        ? styles.filterActive
+                        : styles.filterButton
+                    }
                     onClick={() => setPrayerFilter('answered')}
                   >
                     Answered
@@ -788,16 +871,21 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 </div>
               </div>
               {(() => {
-                const filteredPrayers = prayers.filter(prayer => {
+                const filteredPrayers = prayers.filter((prayer) => {
                   if (prayerFilter === 'all') return true;
-                  if (prayerFilter === 'active') return prayer.status === 'ongoing';
-                  if (prayerFilter === 'answered') return prayer.status === 'answered';
+                  if (prayerFilter === 'active')
+                    return prayer.status === 'ongoing';
+                  if (prayerFilter === 'answered')
+                    return prayer.status === 'answered';
                   return true;
                 });
 
                 return filteredPrayers.length === 0 ? (
                   <div className={styles.emptyMessage}>
-                    <p>No {prayerFilter !== 'all' ? prayerFilter : ''} prayer requests yet.</p>
+                    <p>
+                      No {prayerFilter !== 'all' ? prayerFilter : ''} prayer
+                      requests yet.
+                    </p>
                   </div>
                 ) : (
                   filteredPrayers.map((prayer) => (
@@ -828,10 +916,15 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
             {/* Verse Highlights Section */}
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Verse Highlights & Insights</h3>
+              <h3 className={styles.sectionTitle}>
+                Verse Highlights & Insights
+              </h3>
               {highlights.length === 0 ? (
                 <div className={styles.emptyMessage}>
-                  <p>No verse highlights yet. Use the "💡 Share Insight" button on today's scripture to add one!</p>
+                  <p>
+                    No verse highlights yet. Use the "💡 Share Insight" button
+                    on today's scripture to add one!
+                  </p>
                 </div>
               ) : (
                 highlights.map((highlight) => (
@@ -858,14 +951,16 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 {circle.members.map((member) => {
                   const displayName = member.userName || member.userId;
                   const initials = member.userName
-                    ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                    ? member.userName
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
                     : member.userId.substring(0, 2).toUpperCase();
 
                   return (
                     <div key={member.id} className={styles.memberCard}>
-                      <div className={styles.memberAvatar}>
-                        {initials}
-                      </div>
+                      <div className={styles.memberAvatar}>{initials}</div>
                       <div className={styles.memberInfo}>
                         <span className={styles.memberName}>{displayName}</span>
                         {member.role === 'owner' && (
@@ -885,6 +980,8 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               {!hasSubmittedIntention ? (
                 <StudyIntentionsForm
                   circleId={circleId}
+                  members={circle.members}
+                  intentions={intentions}
                   onSubmit={() => {
                     fetchIntentions();
                   }}
@@ -892,18 +989,65 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               ) : circle.createdBy === user?.id ? (
                 <StudyIntentionsSummary
                   intentions={intentions}
+                  members={circle.members}
                   totalMembers={totalMembers}
                   isCreator={true}
                   onGenerateStudy={() => setShowGenerationModal(true)}
                 />
               ) : (
-                <div className={styles.waitingMessage}>
-                  <div className={styles.sealedScrollIcon}>📜</div>
-                  <h3>Your intention has been sealed</h3>
-                  <p className={styles.waitingSubtitle}>
-                    Waiting for the circle creator to generate the study
-                  </p>
-                </div>
+                <>
+                  <div className={styles.waitingMessage}>
+                    <div className={styles.sealedScrollIcon}>📜</div>
+                    <h3>Your contribution has been submitted</h3>
+                    <p className={styles.waitingSubtitle}>
+                      Waiting for the Study Circle creator to start the study
+                    </p>
+                  </div>
+
+                  {/* Show member progress to non-creator members too */}
+                  <div className={styles.memberProgressCard}>
+                    <h3 className={styles.memberProgressTitle}>
+                      Study Contribution Status
+                    </h3>
+                    <div className={styles.memberAvatarsGrid}>
+                      {circle.members.map((member) => {
+                        const hasSubmitted = intentions.some(
+                          (i) => i.userId === member.userId
+                        );
+                        const displayName = member.userName || member.userId;
+                        const initials = member.userName
+                          ? member.userName
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .substring(0, 2)
+                          : '?';
+
+                        return (
+                          <div
+                            key={member.id}
+                            className={styles.memberAvatarItem}
+                          >
+                            <div
+                              className={`${styles.memberAvatar} ${
+                                hasSubmitted ? styles.completed : styles.pending
+                              }`}
+                            >
+                              {initials}
+                              {hasSubmitted && (
+                                <div className={styles.completionBadge}>✓</div>
+                              )}
+                            </div>
+                            <div className={styles.memberName}>
+                              {displayName}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
 
@@ -914,14 +1058,16 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 {circle.members.map((member) => {
                   const displayName = member.userName || member.userId;
                   const initials = member.userName
-                    ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                    ? member.userName
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
                     : member.userId.substring(0, 2).toUpperCase();
 
                   return (
                     <div key={member.id} className={styles.memberCard}>
-                      <div className={styles.memberAvatar}>
-                        {initials}
-                      </div>
+                      <div className={styles.memberAvatar}>{initials}</div>
                       <div className={styles.memberInfo}>
                         <span className={styles.memberName}>{displayName}</span>
                         {member.role === 'owner' && (

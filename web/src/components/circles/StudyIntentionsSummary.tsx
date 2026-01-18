@@ -2,6 +2,13 @@
 
 import styles from './study-intentions-summary.module.css';
 
+interface CircleMember {
+  id: string;
+  userId: string;
+  userName?: string;
+  role: string;
+}
+
 interface Intention {
   id: string;
   userId: string;
@@ -11,6 +18,7 @@ interface Intention {
 
 interface StudyIntentionsSummaryProps {
   intentions: Intention[];
+  members: CircleMember[];
   totalMembers: number;
   isCreator: boolean;
   onGenerateStudy: () => void;
@@ -26,6 +34,7 @@ function getUserInitials(name: string): string {
 
 export default function StudyIntentionsSummary({
   intentions,
+  members,
   totalMembers,
   isCreator,
   onGenerateStudy,
@@ -33,12 +42,44 @@ export default function StudyIntentionsSummary({
   const submittedCount = intentions.length;
   const canGenerate = submittedCount >= 2;
 
+  const hasCompleted = (userId: string) => {
+    return intentions.some((intention) => intention.userId === userId);
+  };
+
   return (
     <div className={styles.summaryContainer}>
       <div className={styles.summaryHeader}>
         <h3>Group Study Intentions</h3>
         <div className={styles.submissionStatus}>
           {submittedCount}/{totalMembers} members have submitted
+        </div>
+      </div>
+
+      {/* Member Completion Status */}
+      <div className={styles.memberStatusSection}>
+        <h3 className={styles.memberStatusTitle}>Study Contribution Status</h3>
+        <div className={styles.memberAvatars}>
+          {members.map((member) => {
+            const completed = hasCompleted(member.userId);
+            const displayName = member.userName || member.userId;
+            const initials = getUserInitials(displayName);
+
+            return (
+              <div key={member.id} className={styles.memberAvatarItem}>
+                <div
+                  className={`${styles.memberAvatar} ${
+                    completed ? styles.completed : styles.pending
+                  }`}
+                >
+                  {initials}
+                  {completed && (
+                    <div className={styles.completionBadge}>✓</div>
+                  )}
+                </div>
+                <div className={styles.memberName}>{displayName}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
