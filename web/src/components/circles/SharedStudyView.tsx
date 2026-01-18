@@ -56,7 +56,7 @@ interface Reflection {
   reactions: Array<{
     id: string;
     userId: string;
-    type: string;
+    type: 'amen' | 'praying' | 'insightful' | 'encouraging';
     createdAt: string;
   }>;
   comments: Array<{
