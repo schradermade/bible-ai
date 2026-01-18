@@ -483,21 +483,20 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   return (
     <div className={styles.circleView}>
-      {/* Top header with title and invite */}
+      {/* Top header with back button, title, and invite */}
       <div className={styles.topHeader}>
+        <button className={styles.closeButton} onClick={onClose}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to Chat
+        </button>
         <h2 className={styles.studyCircleTitle}>Study Circle</h2>
         <button
           className={styles.inviteButton}
           onClick={() => setShowInviteModal(true)}
         >
           + Invite
-        </button>
-      </div>
-
-      {/* Compact header */}
-      <div className={styles.header}>
-        <button className={styles.closeButton} onClick={onClose}>
-          ← Back to Chat
         </button>
       </div>
 

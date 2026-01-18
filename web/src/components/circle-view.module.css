@@ -9,25 +9,32 @@
 }
 
 .closeButton {
-  background: none;
-  border: none;
-  color: #8b6239;
-  font-size: 14px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #6b5d4f;
+  font-size: 13px;
   font-weight: 500;
-  padding: 6px 0;
+  padding: 6px 14px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .closeButton:hover {
-  color: #b07b4c;
+  color: #2a2118;
+  border-color: #b07b4c;
+  background: rgba(176, 123, 76, 0.05);
 }
 
 .topHeader {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   margin-bottom: 16px;
+  gap: 16px;
 }
 
 .studyCircleTitle {
@@ -36,7 +43,18 @@
   color: #5a4a30;
   margin: 0;
   letter-spacing: 0.02em;
-  flex: 1;
+  text-align: center;
+  grid-column: 2;
+}
+
+.topHeader .closeButton {
+  justify-self: start;
+  grid-column: 1;
+}
+
+.topHeader .inviteButton {
+  justify-self: end;
+  grid-column: 3;
 }
 
 .loading,
