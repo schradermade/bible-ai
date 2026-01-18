@@ -81,6 +81,7 @@ interface Circle {
 interface CircleViewProps {
   circleId: string;
   onClose: () => void;
+  onDelete?: () => void;
 }
 
 interface Reflection {
@@ -203,7 +204,7 @@ interface Encouragement {
   };
 }
 
-export default function CircleView({ circleId, onClose }: CircleViewProps) {
+export default function CircleView({ circleId, onClose, onDelete }: CircleViewProps) {
   const { user } = useUser();
   const [circle, setCircle] = useState<Circle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -233,6 +234,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [skipIntentionsFetch, setSkipIntentionsFetch] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -324,6 +328,37 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     } finally {
       setIsArchiving(false);
       setSkipIntentionsFetch(false); // Re-enable automatic fetch
+    }
+  };
+
+  // Delete the circle
+  const handleDeleteCircle = async () => {
+    if (deleteConfirmText.toLowerCase() !== 'delete') {
+      alert('Please type "delete" to confirm');
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/circles/${circleId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to delete circle');
+      }
+
+      // Notify parent to refresh circles list
+      onDelete?.();
+
+      // Close modal and navigate back
+      setShowDeleteModal(false);
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete circle:', error);
+      alert(error instanceof Error ? error.message : 'Failed to delete circle');
+      setIsDeleting(false);
     }
   };
 
@@ -1198,6 +1233,18 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             </div>
           </div>
         )}
+
+        {/* Delete Circle Button - Host Only */}
+        {circle.createdBy === user?.id && (
+          <div className={styles.deleteSection}>
+            <button
+              className={styles.deleteCircleButton}
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete Circle
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modals */}
@@ -1255,6 +1302,59 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             loadCircle();
           }}
         />
+      )}
+
+      {/* Delete Circle Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className={styles.deleteModalOverlay}
+          onClick={() => {
+            setShowDeleteModal(false);
+            setDeleteConfirmText('');
+          }}
+        >
+          <div
+            className={styles.deleteModal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className={styles.deleteModalTitle}>Delete Circle</h3>
+            <p className={styles.deleteModalWarning}>
+              This action cannot be undone. All study data and member progress
+              will be permanently deleted.
+            </p>
+            <p className={styles.deleteModalPrompt}>
+              Type <strong>delete</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              className={styles.deleteConfirmInput}
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type delete"
+              autoFocus
+            />
+            <div className={styles.deleteModalActions}>
+              <button
+                className={styles.deleteCancelButton}
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.deleteConfirmButton}
+                onClick={handleDeleteCircle}
+                disabled={
+                  isDeleting || deleteConfirmText.toLowerCase() !== 'delete'
+                }
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Circle'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Plan Completion Celebration */}

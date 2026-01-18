@@ -104,6 +104,7 @@ interface ContextualWidgetsProps {
   onSaveVerse: (verse: SavedVerse) => void;
   onDeleteVerse: (verse: SavedVerse) => void;
   prayerRefreshTrigger?: number;
+  circlesRefreshTrigger?: number;
   onSelectCircle?: (circleId: string) => void;
 }
 
@@ -112,6 +113,7 @@ export default function ContextualWidgets({
   onSaveVerse,
   onDeleteVerse,
   prayerRefreshTrigger,
+  circlesRefreshTrigger,
   onSelectCircle,
 }: ContextualWidgetsProps) {
   const { user } = useUser();
@@ -380,7 +382,7 @@ export default function ContextualWidgets({
     loadStudyPlan();
   }, [user]);
 
-  // Load circles on mount and when user changes
+  // Load circles on mount and when user changes or when refresh is triggered
   useEffect(() => {
     const loadCircles = async () => {
       if (!user) {
@@ -404,7 +406,7 @@ export default function ContextualWidgets({
     };
 
     loadCircles();
-  }, [user]);
+  }, [user, circlesRefreshTrigger]);
 
   // Load invitations
   useEffect(() => {

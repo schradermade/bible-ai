@@ -106,6 +106,7 @@ export default function Dashboard() {
   const [usageRefreshTrigger, setUsageRefreshTrigger] = useState(0);
   const [prayerRefreshTrigger, setPrayerRefreshTrigger] = useState(0);
   const [conversationRefreshTrigger, setConversationRefreshTrigger] = useState(0);
+  const [circlesRefreshTrigger, setCirclesRefreshTrigger] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [recentConversation, setRecentConversation] = useState<{
@@ -565,6 +566,13 @@ export default function Dashboard() {
     setSelectedCircleId(null);
   };
 
+  const handleDeleteCircle = () => {
+    // Trigger circles widget refresh
+    setCirclesRefreshTrigger(prev => prev + 1);
+    // Close the circle view
+    setSelectedCircleId(null);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
@@ -585,6 +593,7 @@ export default function Dashboard() {
             <CircleView
               circleId={selectedCircleId}
               onClose={handleCloseCircle}
+              onDelete={handleDeleteCircle}
             />
           </div>
         )}
@@ -689,6 +698,7 @@ export default function Dashboard() {
           onSaveVerse={addVerse}
           onDeleteVerse={deleteVerse}
           prayerRefreshTrigger={prayerRefreshTrigger}
+          circlesRefreshTrigger={circlesRefreshTrigger}
           onSelectCircle={handleSelectCircle}
         />
       </aside>
