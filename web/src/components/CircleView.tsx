@@ -532,12 +532,14 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           <div className={styles.heroLeft}>
             <div className={styles.heroTitleRow}>
               <h2 className={styles.studyCircleTitle}>{circle.name}</h2>
-              <button
-                className={styles.inviteButton}
-                onClick={() => setShowInviteModal(true)}
-              >
-                + Invite
-              </button>
+              {circle.createdBy === user?.id && (
+                <button
+                  className={styles.inviteButton}
+                  onClick={() => setShowInviteModal(true)}
+                >
+                  + Invite
+                </button>
+              )}
             </div>
             {circle.description && (
               <p className={styles.circleDescriptionSubtitle}>{circle.description}</p>
