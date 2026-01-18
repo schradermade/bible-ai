@@ -102,7 +102,7 @@ export default function StudyIntentionsForm({
         <div className={styles.scrollIcon}>📜</div>
         <h2>Share Your Study Intentions</h2>
         <p className={styles.subtitle}>
-          Help shape a personalized study that meets everyone where they are
+          Share where you are—Berea AI will use everyone's input to generate a study that fits your whole circle. Once submitted, your circle host can generate the plan.
         </p>
       </div>
 
