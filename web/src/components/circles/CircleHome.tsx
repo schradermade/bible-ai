@@ -5,6 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import styles from './circle-home.module.css';
 import InviteModal from './InviteModal';
 import PrivacySettingsModal from './PrivacySettingsModal';
+import StartStudyModal from './StartStudyModal';
 import ProgressHeatmap from './ProgressHeatmap';
 import ActivityFeed from './ActivityFeed';
 import CircleStatsCard from './CircleStatsCard';
@@ -59,6 +60,7 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const [error, setError] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showStartStudyModal, setShowStartStudyModal] = useState(false);
 
   useEffect(() => {
     fetchCircle();
@@ -202,7 +204,10 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                 Start a study together to begin your shared Scripture journey.
               </p>
               {canManage && (
-                <button className={styles.startStudyButton}>
+                <button
+                  className={styles.startStudyButton}
+                  onClick={() => setShowStartStudyModal(true)}
+                >
                   Start New Study
                 </button>
               )}
@@ -289,6 +294,15 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
         onClose={() => setShowPrivacyModal(false)}
         onUpdate={fetchCircle}
       />
+
+      {showStartStudyModal && (
+        <StartStudyModal
+          circleId={circle.id}
+          circleName={circle.name}
+          onClose={() => setShowStartStudyModal(false)}
+          onStudyCreated={fetchCircle}
+        />
+      )}
     </div>
   );
 }

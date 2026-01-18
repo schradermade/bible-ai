@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './circle-view.module.css';
 import CircleStatsCard from './circles/CircleStatsCard';
 import InviteModal from './circles/InviteModal';
+import StartStudyModal from './circles/StartStudyModal';
 
 interface CircleMember {
   id: string;
@@ -44,32 +45,33 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showStartStudyModal, setShowStartStudyModal] = useState(false);
+
+  const loadCircle = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/circles/${circleId}`);
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to load circle');
+      }
+
+      const data = await response.json();
+      setCircle(data.circle);
+    } catch (error) {
+      console.error('Failed to load circle:', error);
+      setError(
+        error instanceof Error ? error.message : 'Failed to load circle'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadCircle = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch(`/api/circles/${circleId}`);
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.message || 'Failed to load circle');
-        }
-
-        const data = await response.json();
-        setCircle(data.circle);
-      } catch (error) {
-        console.error('Failed to load circle:', error);
-        setError(
-          error instanceof Error ? error.message : 'Failed to load circle'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadCircle();
   }, [circleId]);
 
@@ -221,7 +223,10 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             <div className={styles.emptyIcon}>📚</div>
             <h3>No Active Study</h3>
             <p>Start a study plan to begin your circle's journey together</p>
-            <button className={styles.startStudyButton}>
+            <button
+              className={styles.startStudyButton}
+              onClick={() => setShowStartStudyModal(true)}
+            >
               Start New Study
             </button>
           </div>
@@ -234,6 +239,16 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           onClose={() => setShowInviteModal(false)}
           circleId={circle.id}
           circleName={circle.name}
+        />
+      )}
+
+      {/* Start Study Modal */}
+      {showStartStudyModal && (
+        <StartStudyModal
+          circleId={circle.id}
+          circleName={circle.name}
+          onClose={() => setShowStartStudyModal(false)}
+          onStudyCreated={loadCircle}
         />
       )}
     </div>
