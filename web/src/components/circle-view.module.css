@@ -1,6 +1,7 @@
 .circleView {
   padding: 20px;
   background: #fdfcfa;
+  border-radius: 24px;
 }
 
 .header {
