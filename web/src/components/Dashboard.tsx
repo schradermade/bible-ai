@@ -599,7 +599,7 @@ export default function Dashboard() {
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         conversationRefreshTrigger={conversationRefreshTrigger}
-        welcomeMinimized={messages.length === 0 && welcomeMinimized}
+        welcomeMinimized={welcomeMinimized}
         onRestoreWelcome={() => handleWelcomeMinimizedChange(false)}
       />
       <div className={styles.panelsContainer}>
