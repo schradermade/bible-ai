@@ -203,6 +203,19 @@
   padding-top: 0;
 }
 
+/* Chat Area hidden when welcome is minimized */
+.chatAreaHidden {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: 0;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 /* Expanded Panel - takes up main space */
 .panelExpanded {
   grid-column: 1;
