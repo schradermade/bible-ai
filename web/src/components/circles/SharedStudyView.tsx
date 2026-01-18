@@ -104,7 +104,7 @@ interface Verse {
   reactions: Array<{
     id: string;
     userId: string;
-    type: string;
+    type: 'amen' | 'saved' | 'memorizing';
     createdAt: string;
   }>;
   _count: {
