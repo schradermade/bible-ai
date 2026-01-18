@@ -231,7 +231,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       {/* Invite Modal */}
       {showInviteModal && (
         <InviteModal
-          isOpen={showInviteModal}
           onClose={() => setShowInviteModal(false)}
           circleId={circle.id}
           circleName={circle.name}
