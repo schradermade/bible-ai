@@ -1,0 +1,358 @@
+.container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.refreshButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.refreshButton:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.refreshButton:active {
+  transform: rotate(180deg);
+}
+
+.refreshIcon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  transition: color 0.15s;
+}
+
+.refreshButton:hover .refreshIcon {
+  color: #2563eb;
+}
+
+.loading,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.loading {
+  color: #6b7280;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.9375rem;
+}
+
+.heatmapWrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  margin-bottom: 1.25rem;
+}
+
+.heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: min-content;
+}
+
+.dayHeaders {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.cornerCell {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.dayHeader {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.memberRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.memberLabel {
+  width: 140px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.memberAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.memberName {
+  font-size: 0.8125rem;
+  color: #374151;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dayCells {
+  display: flex;
+  gap: 4px;
+}
+
+.cell {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cell:hover {
+  transform: scale(1.2);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.cellEmpty {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.cellLevel1 {
+  background: #dbeafe;
+  border: 1px solid #bfdbfe;
+}
+
+.cellLevel2 {
+  background: #93c5fd;
+  border: 1px solid #60a5fa;
+}
+
+.cellLevel3 {
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+}
+
+.cellLevel4 {
+  background: #1e40af;
+  border: 1px solid #1e3a8a;
+}
+
+.checkmark {
+  width: 14px;
+  height: 14px;
+  color: white;
+  opacity: 0;
+  animation: checkmarkAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes checkmarkAppear {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cellLevel1 .checkmark {
+  color: #1e40af;
+}
+
+.cellLevel2 .checkmark {
+  color: white;
+}
+
+.cellLevel3 .checkmark,
+.cellLevel4 .checkmark {
+  color: white;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.legendLabel {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.legendCell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  z-index: 1000;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 5px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+.tooltipContent {
+  background: #1a1a1a;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+
+.tooltipContent::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #1a1a1a;
+}
+
+.tooltipHeader {
+  font-size: 0.8125rem;
+  margin-bottom: 0.375rem;
+  color: white;
+}
+
+.tooltipHeader strong {
+  font-weight: 600;
+}
+
+.tooltipStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+.tooltipStatusIcon {
+  font-size: 0.875rem;
+}
+
+.tooltipTime {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.25rem;
+  }
+
+  .heatmapWrapper {
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    padding: 0 1.25rem;
+  }
+
+  .memberLabel {
+    width: 100px;
+  }
+
+  .memberName {
+    font-size: 0.75rem;
+  }
+
+  .cornerCell {
+    width: 100px;
+  }
+}

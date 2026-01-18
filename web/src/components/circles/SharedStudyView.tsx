@@ -128,6 +128,9 @@ export default function SharedStudyView({
   const [verses, setVerses] = useState<Verse[]>([]);
   const [contentLoading, setContentLoading] = useState(false);
 
+  // Phase 3: Mobile tabs
+  const [activeTab, setActiveTab] = useState<'study' | 'circle'>('study');
+
   useEffect(() => {
     fetchStudyPlan();
   }, [circleId, studyPlanId]);
@@ -333,6 +336,8 @@ export default function SharedStudyView({
     (mp) => mp.userId === user?.id
   );
 
+  const hasNewActivity = reflections.length + prayers.length + verses.length > 0;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -342,8 +347,27 @@ export default function SharedStudyView({
         <h1 className={styles.title}>{studyPlan.title}</h1>
       </div>
 
+      {/* Mobile tabs */}
+      <div className={styles.mobileTabs}>
+        <button
+          className={`${styles.mobileTab} ${activeTab === 'study' ? styles.mobileTabActive : ''}`}
+          onClick={() => setActiveTab('study')}
+        >
+          <span className={styles.mobileTabIcon}>📖</span>
+          <span>My Study</span>
+        </button>
+        <button
+          className={`${styles.mobileTab} ${activeTab === 'circle' ? styles.mobileTabActive : ''}`}
+          onClick={() => setActiveTab('circle')}
+        >
+          <span className={styles.mobileTabIcon}>👥</span>
+          <span>Circle</span>
+          {hasNewActivity && <span className={styles.activityBadge} />}
+        </button>
+      </div>
+
       <div className={styles.splitView}>
-        <div className={styles.personalStudy}>
+        <div className={`${styles.personalStudy} ${activeTab === 'study' ? styles.tabActive : ''}`}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>My Study</h2>
             <a href="/study" className={styles.viewLink}>
@@ -361,7 +385,7 @@ export default function SharedStudyView({
           </div>
         </div>
 
-        <div className={styles.circleContext}>
+        <div className={`${styles.circleContext} ${activeTab === 'circle' ? styles.tabActive : ''}`}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Circle Activity</h2>
           </div>

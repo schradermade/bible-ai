@@ -1,0 +1,462 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 1rem;
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stepIndicators {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 2rem 1rem;
+  gap: 0;
+}
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.stepDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 2;
+}
+
+.stepActive .stepDot {
+  width: 16px;
+  height: 16px;
+  background: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.stepCompleted .stepDot {
+  background: #10b981;
+}
+
+.stepLine {
+  width: 48px;
+  height: 2px;
+  background: #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepCompleted .stepLine {
+  background: #10b981;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iconWrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  animation: iconPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes iconPop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.icon {
+  font-size: 2.5rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+  text-align: center;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stepContent {
+  width: 100%;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+}
+
+.description {
+  font-size: 1.0625rem;
+  color: #6b7280;
+  line-height: 1.7;
+  text-align: center;
+  margin: 0 0 2rem 0;
+}
+
+.description strong {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Step 1: Features */
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.feature {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.featureIcon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.featureTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.featureDescription {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Step 2: Concept Cards */
+.conceptCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.conceptCard {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 2px solid #e9d5ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.conceptCardIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.conceptCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b21a8;
+  margin-bottom: 0.5rem;
+}
+
+.conceptCardDescription {
+  font-size: 0.875rem;
+  color: #7c3aed;
+  line-height: 1.5;
+}
+
+.note {
+  background: #eff6ff;
+  border-left: 3px solid #2563eb;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+.note strong {
+  font-weight: 600;
+}
+
+/* Step 3: Privacy Settings */
+.privacySettings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.privacySetting {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.privacySetting:hover {
+  background: white;
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.privacyInfo {
+  flex: 1;
+}
+
+.privacyLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.privacyIcon {
+  font-size: 1.125rem;
+}
+
+.privacyDescription {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #2563eb;
+  flex-shrink: 0;
+}
+
+/* Step 4: Ready */
+.readyCard {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #86efac;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.readyCardIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.readyCardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 1.25rem;
+}
+
+.readyCardList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.readyCardItem {
+  font-size: 0.9375rem;
+  color: #15803d;
+  line-height: 1.6;
+}
+
+.encouragement {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  color: #92400e;
+  line-height: 1.6;
+}
+
+.encouragement strong {
+  font-weight: 600;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.backButton,
+.skipButton,
+.nextButton {
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.backButton {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.backButton:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.skipButton {
+  background: transparent;
+  color: #9ca3af;
+  padding: 0.875rem 1rem;
+}
+
+.skipButton:hover {
+  color: #6b7280;
+  text-decoration: underline;
+}
+
+.nextButton {
+  background: #2563eb;
+  color: white;
+  margin-left: auto;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.nextButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.nextButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .stepIndicators,
+  .content,
+  .footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .conceptCards {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    flex-wrap: wrap;
+  }
+
+  .nextButton {
+    flex: 1;
+    margin-left: 0;
+  }
+}
