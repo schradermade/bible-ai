@@ -7,6 +7,7 @@ import styles from './contextual-widgets.module.css';
 import { TEMPLATE_OPTIONS } from '@/lib/study-plan-templates';
 import type { Achievement } from '@/lib/achievements';
 import type { Milestone } from '@/lib/milestones';
+import CreateCircleModal from './circles/CreateCircleModal';
 
 interface SavedVerse {
   reference: string;
@@ -61,12 +62,29 @@ interface StudyStreak {
   longestStreak: number;
 }
 
+interface Circle {
+  id: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  _count: {
+    members: number;
+    plans: number;
+  };
+  plans: Array<{
+    id: string;
+    title: string;
+    status: string;
+  }>;
+}
+
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
   onSaveVerse: (verse: SavedVerse) => void;
   onDeleteVerse: (verse: SavedVerse) => void;
   prayerRefreshTrigger?: number;
+  onSelectCircle?: (circleId: string) => void;
 }
 
 export default function ContextualWidgets({
@@ -74,17 +92,21 @@ export default function ContextualWidgets({
   onSaveVerse,
   onDeleteVerse,
   prayerRefreshTrigger,
+  onSelectCircle,
 }: ContextualWidgetsProps) {
   const { user } = useUser();
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [memoryVerses, setMemoryVerses] = useState<MemoryVerse[]>([]);
   const [studyProgress, setStudyProgress] = useState(0);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [isLoadingCircles, setIsLoadingCircles] = useState(true);
   const [generatingPrayerForVerse, setGeneratingPrayerForVerse] = useState<
     string | null
   >(null);
   const [collapsedWidgets, setCollapsedWidgets] = useState<
     Record<string, boolean>
   >({
+    circles: false,
     prayer: false,
     myVerses: false,
     memory: false,
@@ -115,6 +137,8 @@ export default function ContextualWidgets({
   const [showPlanMenu, setShowPlanMenu] = useState(false);
   const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [showCreateCircle, setShowCreateCircle] = useState(false);
+  const [isCreatingCircle, setIsCreatingCircle] = useState(false);
 
   // Pagination state for widgets
   const [visibleVersesCount, setVisibleVersesCount] = useState(5);
@@ -331,6 +355,32 @@ export default function ContextualWidgets({
     };
 
     loadStudyPlan();
+  }, [user]);
+
+  // Load circles on mount and when user changes
+  useEffect(() => {
+    const loadCircles = async () => {
+      if (!user) {
+        setCircles([]);
+        setIsLoadingCircles(false);
+        return;
+      }
+
+      setIsLoadingCircles(true);
+      try {
+        const response = await fetch('/api/circles');
+        if (response.ok) {
+          const data = await response.json();
+          setCircles(data.circles || []);
+        }
+      } catch (error) {
+        console.error('Failed to load circles:', error);
+      } finally {
+        setIsLoadingCircles(false);
+      }
+    };
+
+    loadCircles();
   }, [user]);
 
   const toggleWidget = (widgetId: string) => {
@@ -1017,15 +1067,147 @@ export default function ContextualWidgets({
     }
   };
 
+  const handleCreateCircle = async (name: string, description: string) => {
+    setIsCreatingCircle(true);
+    setShowCreateCircle(false);
+
+    try {
+      const response = await fetch('/api/circles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create circle');
+      }
+
+      const data = await response.json();
+      // Add new circle to list
+      setCircles([data.circle, ...circles]);
+
+      // Optionally, select the newly created circle
+      if (onSelectCircle) {
+        onSelectCircle(data.circle.id);
+      }
+    } catch (error) {
+      console.error('Failed to create circle:', error);
+      alert('Failed to create circle. Please try again.');
+    } finally {
+      setIsCreatingCircle(false);
+    }
+  };
+
   return (
     <>
       <div className={styles.widgetsContainer}>
-        {/* Search History Widget - Moved to input field dropdown */}
-        {/* <SearchHistory
-        onLoadHistory={onLoadHistory}
-        isCollapsed={collapsedWidgets.searchHistory}
-        onToggle={() => toggleWidget('searchHistory')}
-      /> */}
+        {/* Circles Widget */}
+        <div className={styles.widget}>
+          <div
+            className={styles.widgetHeader}
+            onClick={() => toggleWidget('circles')}
+          >
+            <div className={styles.widgetTitleRow}>
+              <h3 className={styles.widgetTitle}>
+                <span className={styles.widgetIcon}>👥</span> Circles
+              </h3>
+              <button className={styles.chevronButton}>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  style={{
+                    transform: collapsedWidgets.circles
+                      ? 'rotate(-90deg)'
+                      : 'rotate(0deg)',
+                  }}
+                >
+                  <path
+                    d="M4 6L8 10L12 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <span className={styles.countBadge}>{circles.length}</span>
+          </div>
+          <div
+            className={`${styles.widgetContent} ${collapsedWidgets.circles ? styles.collapsed : ''}`}
+          >
+            {isLoadingCircles && (
+              <div className={styles.creatingPlan}>
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={styles.spinningIcon}
+                >
+                  <path
+                    d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <p>Loading circles...</p>
+              </div>
+            )}
+
+            {!isLoadingCircles && circles.length === 0 && (
+              <div className={styles.studyPlanEmpty}>
+                <div className={styles.emptyIcon}>👥</div>
+                <h4>Study Together</h4>
+                <p>Create a circle to study the Bible with 2-8 friends</p>
+                <button
+                  className={styles.createPlanButton}
+                  onClick={() => setShowCreateCircle(true)}
+                >
+                  + Create Circle
+                </button>
+              </div>
+            )}
+
+            {!isLoadingCircles && circles.length > 0 && (
+              <>
+                <div className={styles.versesList}>
+                  {circles.map((circle) => (
+                    <div
+                      key={circle.id}
+                      className={styles.prayerCard}
+                      onClick={() => onSelectCircle?.(circle.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={styles.prayerCardHeader}>
+                        <span className={styles.prayerTitle}>{circle.name}</span>
+                        <span className={styles.verseReference}>
+                          {circle._count.members} members
+                        </span>
+                      </div>
+                      {circle.plans && circle.plans.length > 0 && (
+                        <p className={styles.prayerText}>
+                          Active: {circle.plans[0].title}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  className={styles.createPlanButton}
+                  onClick={() => setShowCreateCircle(true)}
+                  style={{ marginTop: '12px' }}
+                >
+                  + Create Circle
+                </button>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Study Plan Widget */}
         <div className={styles.widget}>
@@ -1989,6 +2171,15 @@ export default function ContextualWidgets({
           </div>,
           document.body
         )}
+
+      {/* Create Circle Modal */}
+      {showCreateCircle && (
+        <CreateCircleModal
+          isOpen={showCreateCircle}
+          onClose={() => setShowCreateCircle(false)}
+          onCreate={handleCreateCircle}
+        />
+      )}
     </>
   );
 }

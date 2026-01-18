@@ -10,6 +10,7 @@ import DailyPanel from './DailyPanel';
 import ProphecyPanel from './ProphecyPanel';
 import InsightPanel from './InsightPanel';
 import LifePanel from './LifePanel';
+import CircleView from './CircleView';
 import { useToast } from '@/contexts/ToastContext';
 
 type PanelType = 'insight' | 'life' | 'prophecy' | 'daily' | null;
@@ -116,6 +117,7 @@ export default function Dashboard() {
   const [isWidgetsSidebarScrolled, setIsWidgetsSidebarScrolled] = useState(false);
   const [hasWidgetsScrollableContent, setHasWidgetsScrollableContent] = useState(false);
   const widgetsSidebarRef = useRef<HTMLElement>(null);
+  const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
 
   // Scroll detection for widgets sidebar
   useEffect(() => {
@@ -550,6 +552,19 @@ export default function Dashboard() {
     setExpandedPanel(null);
   };
 
+  const handleSelectCircle = (circleId: string) => {
+    // Close any expanded panel
+    setExpandedPanel(null);
+    // Clear chat
+    setMessages([]);
+    // Set selected circle
+    setSelectedCircleId(circleId);
+  };
+
+  const handleCloseCircle = () => {
+    setSelectedCircleId(null);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.dashboard}>
@@ -564,8 +579,18 @@ export default function Dashboard() {
       />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
-        {/* Chat Conversation - Show when no panel is expanded */}
-        {!expandedPanel && (
+        {/* Circle View - Show when a circle is selected */}
+        {selectedCircleId && !expandedPanel && (
+          <div className={styles.chatArea}>
+            <CircleView
+              circleId={selectedCircleId}
+              onClose={handleCloseCircle}
+            />
+          </div>
+        )}
+
+        {/* Chat Conversation - Show when no panel is expanded and no circle selected */}
+        {!expandedPanel && !selectedCircleId && (
           <div className={`${styles.chatArea} ${messages.length > 0 ? styles.chatAreaWithMessages : ''}`}>
             <ChatConversation
               messages={messages}
@@ -658,7 +683,14 @@ export default function Dashboard() {
         ref={widgetsSidebarRef}
         className={`${styles.widgetsSidebar} ${isWidgetsSidebarScrolled ? styles.widgetsSidebarScrolled : ''} ${hasWidgetsScrollableContent ? styles.widgetsSidebarHasMore : ''}`}
       >
-        <ContextualWidgets myVerses={myVerses} onLoadHistory={handleLoadHistory} onSaveVerse={addVerse} onDeleteVerse={deleteVerse} prayerRefreshTrigger={prayerRefreshTrigger} />
+        <ContextualWidgets
+          myVerses={myVerses}
+          onLoadHistory={handleLoadHistory}
+          onSaveVerse={addVerse}
+          onDeleteVerse={deleteVerse}
+          prayerRefreshTrigger={prayerRefreshTrigger}
+          onSelectCircle={handleSelectCircle}
+        />
       </aside>
     </div>
   );
