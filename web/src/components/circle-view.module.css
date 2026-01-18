@@ -3,6 +3,8 @@
   border-radius: 14px;
   overflow: hidden;
   min-height: calc(100vh - 250px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Hero Section */
@@ -143,6 +145,9 @@
 
 .content {
   padding: 20px 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .loading,
@@ -1469,7 +1474,7 @@
    ======================================== */
 
 .leaveSection {
-  margin-top: 48px;
+  margin-top: auto;
   padding-top: 32px;
   border-top: 2px solid rgba(234, 179, 8, 0.15);
   text-align: center;
@@ -1619,7 +1624,7 @@
    ======================================== */
 
 .deleteSection {
-  margin-top: 48px;
+  margin-top: auto;
   padding-top: 32px;
   border-top: 2px solid rgba(220, 38, 38, 0.15);
   text-align: center;
