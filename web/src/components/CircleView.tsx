@@ -577,14 +577,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               return null;
             })()}
 
-            {/* Member progress - compact */}
-            {memberProgress.length > 0 && (
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Circle Progress</h3>
-                <MemberProgressIndicator members={memberProgress} />
-              </div>
-            )}
-
             {/* Shared content - integrated */}
             {reflections.length > 0 && (
               <div className={styles.section}>

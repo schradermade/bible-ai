@@ -595,14 +595,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
               totalDays={activeStudy.duration}
             />
 
-            {/* Member progress */}
-            {memberProgress.length > 0 && (
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Circle Progress</h3>
-                <MemberProgressIndicator members={memberProgress} />
-              </div>
-            )}
-
             {/* Activity feed */}
             <ActivityFeed circleId={circle.id} limit={10} />
 
