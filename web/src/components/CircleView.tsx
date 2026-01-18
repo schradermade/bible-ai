@@ -692,8 +692,6 @@ export default function CircleView({ circleId, onClose, onDelete }: CircleViewPr
 
       {activePlan && (
         <div className={styles.circleMetaBar}>
-          <span>{circle.members.length} members</span>
-          <span className={styles.metaSeparator}>•</span>
           <span>
             {activePlan.title.replace(
               /^\d+-Day (Journey|Deep Dive): /,
