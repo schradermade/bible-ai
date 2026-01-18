@@ -232,6 +232,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [skipIntentionsFetch, setSkipIntentionsFetch] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -291,6 +292,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   // Archive the current study
   const handleArchiveStudy = async (planId: string) => {
     setIsArchiving(true);
+    setSkipIntentionsFetch(true); // Prevent automatic fetch during archive
     try {
       const response = await fetch(`/api/circles/${circleId}/studies/${planId}`, {
         method: 'PATCH',
@@ -305,14 +307,48 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
         throw new Error(data.message || 'Failed to archive study');
       }
 
+      // Clear intentions state immediately
+      setIntentions([]);
+      setHasSubmittedIntention(false);
+
+      // Wait for DB transaction to complete and propagate
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       // Refresh circle data to show updated state
-      await new Promise((resolve) => setTimeout(resolve, 300));
       await refreshCircle();
+
+      // Wait a bit more before fetching intentions
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Fetch fresh intentions with cache-busting timestamp (should be empty after archive)
+      const response2 = await fetch(
+        `/api/circles/${circleId}/study-intentions?t=${Date.now()}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+          },
+        }
+      );
+
+      if (response2.ok) {
+        const data = await response2.json();
+        console.log('[Archive] Fetched intentions after archive:', data.intentions);
+        setIntentions(data.intentions || []);
+        setTotalMembers(data.totalMembers || 0);
+        const userIntention = data.intentions?.find(
+          (i: any) => i.userId === user?.id
+        );
+        console.log('[Archive] User intention found:', !!userIntention);
+        setHasSubmittedIntention(!!userIntention);
+      }
     } catch (error) {
       console.error('Failed to archive study:', error);
       alert(error instanceof Error ? error.message : 'Failed to archive study');
     } finally {
       setIsArchiving(false);
+      setSkipIntentionsFetch(false); // Re-enable automatic fetch
     }
   };
 
@@ -433,19 +469,22 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   // Fetch intentions when circle loads if no active study
   useEffect(() => {
-    if (circle && user) {
+    if (circle && user && !skipIntentionsFetch) {
       const activePlan = circle.plans.find((p) => p.status === 'active');
       if (!activePlan) {
         fetchIntentions();
       }
     }
-  }, [circle, user]);
+  }, [circle, user, skipIntentionsFetch]);
 
   // Poll all data every 30 seconds for real-time updates
   useEffect(() => {
-    if (!circle) return;
+    if (!circle || skipIntentionsFetch) return;
 
     const interval = setInterval(() => {
+      // Skip polling if we're in the middle of archiving
+      if (skipIntentionsFetch) return;
+
       // Refresh circle data without loading spinner (member updates, study progress)
       refreshCircle();
 
@@ -460,7 +499,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [circleId, circle, refreshCircle, fetchSharedContent, fetchIntentions]);
+  }, [circleId, circle, refreshCircle, fetchSharedContent, fetchIntentions, skipIntentionsFetch]);
 
   if (isLoading) {
     return (

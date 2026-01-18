@@ -205,11 +205,17 @@ export async function PATCH(
       );
     }
 
-    // Update status to archived
-    const updatedStudyPlan = await prisma.circleStudyPlan.update({
-      where: { id: planId },
-      data: { status: 'archived' },
-    });
+    // Update status to archived and clear old intentions
+    const [updatedStudyPlan] = await prisma.$transaction([
+      prisma.circleStudyPlan.update({
+        where: { id: planId },
+        data: { status: 'archived' },
+      }),
+      // Clear all study intentions for this circle so members can submit fresh intentions
+      prisma.circleStudyIntention.deleteMany({
+        where: { circleId },
+      }),
+    ]);
 
     return NextResponse.json({
       success: true,
