@@ -79,20 +79,6 @@ export default function StudyIntentionsForm({
   const isValid =
     selectedTopics.length > 0 && currentSeason && studyPace;
 
-  const getUserInitials = (userName?: string) => {
-    if (!userName) return '?';
-    return userName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
-  const hasCompleted = (userId: string) => {
-    return intentions.some((intention) => intention.userId === userId);
-  };
-
   const handleSubmit = async () => {
     if (!isValid || isSubmitting) return;
 
@@ -135,34 +121,6 @@ export default function StudyIntentionsForm({
         <p className={styles.subtitle}>
           Share where you are—Berea AI will use everyone's input to generate a study that fits your whole circle. Once submitted, your circle host can generate the plan.
         </p>
-      </div>
-
-      {/* Member Completion Status */}
-      <div className={styles.memberStatusSection}>
-        <h3 className={styles.memberStatusTitle}>Study Contribution Status</h3>
-        <div className={styles.memberAvatars}>
-          {members.map((member) => {
-            const completed = hasCompleted(member.userId);
-            const displayName = member.userName || member.userId;
-            const initials = getUserInitials(member.userName);
-
-            return (
-              <div key={member.id} className={styles.memberAvatarItem}>
-                <div
-                  className={`${styles.memberAvatar} ${
-                    completed ? styles.completed : styles.pending
-                  }`}
-                >
-                  {initials}
-                  {completed && (
-                    <div className={styles.completionBadge}>✓</div>
-                  )}
-                </div>
-                <div className={styles.memberName}>{displayName}</div>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
       {/* Topic Cards */}
