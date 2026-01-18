@@ -239,6 +239,10 @@
   border-top: 1px solid #f3f4f6;
 }
 
+.reactionWrapper {
+  position: relative;
+}
+
 .reactionButton {
   display: flex;
   align-items: center;
@@ -279,6 +283,63 @@
   font-size: 0.625rem;
 }
 
+/* Reaction popup - cute tooltip */
+.reactionPopup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1.5px solid #e8d4bc;
+  border-radius: 8px;
+  padding: 0.5rem 0.625rem;
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.25);
+  z-index: 1000;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: popupFadeIn 0.2s ease-out;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.reactionPopupArrow {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-right: 1.5px solid #e8d4bc;
+  border-bottom: 1.5px solid #e8d4bc;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.reactionPopupContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.reactionPopupUser {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #78350f;
+  text-align: center;
+  padding: 0.125rem 0;
+}
+
 /* Compact add response button */
 .footer {
   padding-top: 0.75rem;
@@ -313,6 +374,247 @@
   height: 14px;
 }
 
+/* Inline response input form */
+.responseInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9f6f0;
+  border: 1px solid #e8d4bc;
+  border-radius: 8px;
+}
+
+.modeToggle {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e8d4bc;
+}
+
+.modeButton {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modeButton:hover {
+  color: #374151;
+  background: #fafafa;
+}
+
+.modeButtonActive {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+}
+
+.customInput,
+.aiInput {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.responseTextarea,
+.contextTextarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: white;
+  border: 1px solid #e8d4bc;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: #374151;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.responseTextarea:focus,
+.contextTextarea:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+.characterCount {
+  text-align: right;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.generateButton {
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #c084fc, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(168, 85, 247, 0.3);
+}
+
+.generateButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(168, 85, 247, 0.4);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aiPreview {
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e8d4bc;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aiPreviewHeader {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.aiPreviewContent {
+  font-size: 0.8125rem;
+  color: #374151;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aiPreviewContent p {
+  margin: 0;
+}
+
+.aiPreviewScripture {
+  padding: 0.5rem;
+  background: rgba(245, 158, 11, 0.06);
+  border-left: 2px solid #fbbf24;
+  border-radius: 4px;
+  font-style: italic;
+  color: #78350f;
+}
+
+.aiPreviewScripture strong {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  font-style: normal;
+}
+
+.aiPreviewScripture p {
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.aiPreviewSection {
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.aiPreviewSection strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.regenerateButton {
+  padding: 0.375rem 0.625rem;
+  background: white;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  align-self: flex-start;
+}
+
+.regenerateButton:hover:not(:disabled) {
+  background: #f5f3ff;
+  border-color: #c084fc;
+}
+
+.regenerateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e8d4bc;
+}
+
+.cancelButton,
+.submitButton {
+  padding: 0.5rem 0.875rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cancelButton {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #84cc16, #65a30d);
+  color: white;
+  box-shadow: 0 2px 4px rgba(132, 204, 22, 0.3);
+}
+
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #65a30d, #4d7c0f);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(132, 204, 22, 0.4);
+}
+
+.submitButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
   .card {
     padding: 0.875rem 1rem;
@@ -320,5 +622,14 @@
 
   .responseReactions {
     flex-wrap: wrap;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
   }
 }

@@ -6,6 +6,7 @@ import styles from './prayer-request-card.module.css';
 
 interface PrayerSupport {
   userId: string;
+  userName?: string;
   createdAt: string;
 }
 
@@ -39,6 +40,7 @@ export default function PrayerRequestCard({
   const [isToggling, setIsToggling] = useState(false);
   const [showAllSupporters, setShowAllSupporters] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredSupporter, setHoveredSupporter] = useState<string | null>(null);
 
   const isOwner = prayer.userId === user?.id;
   const isSupporting = prayer.prayerSupport.some((s) => s.userId === user?.id);
@@ -244,16 +246,32 @@ export default function PrayerRequestCard({
             </span>
           </div>
           <div className={styles.supportersList}>
-            {displayedSupporters.map((supporter, index) => (
-              <div
-                key={`${supporter.userId}-${index}`}
-                className={styles.supporterAvatar}
-                style={{ zIndex: displayedSupporters.length - index }}
-                title={supporter.userId}
-              >
-                {getUserAvatar(supporter.userId)}
-              </div>
-            ))}
+            {displayedSupporters.map((supporter, index) => {
+              const showPopup = hoveredSupporter === supporter.userId;
+              return (
+                <div
+                  key={`${supporter.userId}-${index}`}
+                  className={styles.supporterWrapper}
+                  style={{ zIndex: displayedSupporters.length - index }}
+                >
+                  <div
+                    className={styles.supporterAvatar}
+                    onMouseEnter={() => setHoveredSupporter(supporter.userId)}
+                    onMouseLeave={() => setHoveredSupporter(null)}
+                  >
+                    {getUserAvatar(supporter.userId)}
+                  </div>
+                  {showPopup && (
+                    <div className={styles.supporterPopup}>
+                      <div className={styles.supporterPopupArrow} />
+                      <div className={styles.supporterPopupContent}>
+                        {supporter.userName || 'Unknown User'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             {hasMoreSupporters && !showAllSupporters && (
               <button
                 className={styles.moreButton}

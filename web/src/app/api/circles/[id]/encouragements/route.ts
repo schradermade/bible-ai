@@ -72,21 +72,28 @@ export async function GET(
       take: limit ? parseInt(limit) : 10,
     });
 
-    // Fetch user names from Clerk for prompt creators and response authors
+    // Fetch user names from Clerk for prompt creators, response authors, and reaction users
     const promptUserIds = encouragements.map((e) => e.createdBy);
     const responseUserIds = encouragements.flatMap((e) =>
       e.responses.map((r) => r.userId)
     );
-    const allUserIds = [...new Set([...promptUserIds, ...responseUserIds])];
+    const reactionUserIds = encouragements.flatMap((e) =>
+      e.responses.flatMap((r) => r.reactions.map((reaction) => reaction.userId))
+    );
+    const allUserIds = [...new Set([...promptUserIds, ...responseUserIds, ...reactionUserIds])];
     const userNames = await getFormattedUserNames(allUserIds);
 
-    // Add user names to encouragements and responses
+    // Add user names to encouragements, responses, and reactions
     const encouragementsWithNames = encouragements.map((encouragement) => ({
       ...encouragement,
       createdByName: userNames[encouragement.createdBy] || 'Unknown User',
       responses: encouragement.responses.map((response) => ({
         ...response,
         userName: userNames[response.userId] || 'Unknown User',
+        reactions: response.reactions.map((reaction) => ({
+          ...reaction,
+          userName: userNames[reaction.userId] || 'Unknown User',
+        })),
       })),
     }));
 

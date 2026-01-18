@@ -7,6 +7,7 @@ import styles from './reflection-card.module.css';
 interface Reaction {
   id: string;
   userId: string;
+  userName?: string;
   type: 'amen' | 'praying' | 'insightful' | 'encouraging';
   createdAt: string;
 }
@@ -57,6 +58,7 @@ export default function ReflectionCard({
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isReacting, setIsReacting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredReaction, setHoveredReaction] = useState<string | null>(null);
 
   const isOwner = reflection.userId === user?.id;
   const displayedComments = showAllComments
@@ -72,6 +74,12 @@ export default function ReflectionCard({
 
   const getReactionCount = (type: string) => {
     return reflection.reactions.filter((r) => r.type === type).length;
+  };
+
+  const getReactionUsers = (type: string) => {
+    return reflection.reactions
+      .filter((r) => r.type === type)
+      .map((r) => r.userName || 'Unknown User');
   };
 
   const handleReaction = async (type: string) => {
@@ -195,20 +203,37 @@ export default function ReflectionCard({
           {REACTION_TYPES.map(({ type, emoji, label }) => {
             const count = getReactionCount(type);
             const isActive = userReactions.includes(type);
+            const users = getReactionUsers(type);
+            const showPopup = hoveredReaction === type && count > 0;
 
             return (
-              <button
-                key={type}
-                className={`${styles.reactionButton} ${
-                  isActive ? styles.active : ''
-                }`}
-                onClick={() => handleReaction(type)}
-                disabled={isReacting}
-                title={label}
-              >
-                <span className={styles.reactionEmoji}>{emoji}</span>
-                {count > 0 && <span className={styles.reactionCount}>{count}</span>}
-              </button>
+              <div key={type} className={styles.reactionWrapper}>
+                <button
+                  className={`${styles.reactionButton} ${
+                    isActive ? styles.active : ''
+                  }`}
+                  onClick={() => handleReaction(type)}
+                  onMouseEnter={() => setHoveredReaction(type)}
+                  onMouseLeave={() => setHoveredReaction(null)}
+                  disabled={isReacting}
+                  title={label}
+                >
+                  <span className={styles.reactionEmoji}>{emoji}</span>
+                  {count > 0 && <span className={styles.reactionCount}>{count}</span>}
+                </button>
+                {showPopup && (
+                  <div className={styles.reactionPopup}>
+                    <div className={styles.reactionPopupArrow} />
+                    <div className={styles.reactionPopupContent}>
+                      {users.map((userName, idx) => (
+                        <div key={idx} className={styles.reactionPopupUser}>
+                          {userName}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

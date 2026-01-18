@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 import { verifyCircleMember, filterVisiblePrayers } from '@/lib/circle-permissions';
+import { getFormattedUserNames } from '@/lib/clerk-utils';
 
 export const runtime = 'nodejs';
 
@@ -60,9 +61,25 @@ export async function GET(
     // Filter based on privacy settings
     const visiblePrayers = await filterVisiblePrayers(prayers, circleId, userId);
 
+    // Fetch user names for prayer support users
+    const supportUserIds = visiblePrayers.flatMap((p) =>
+      p.prayerSupport.map((support: { userId: string }) => support.userId)
+    );
+    const allUserIds = [...new Set(supportUserIds)];
+    const userNames = await getFormattedUserNames(allUserIds);
+
+    // Add user names to prayer support
+    const prayersWithNames = visiblePrayers.map((prayer) => ({
+      ...prayer,
+      prayerSupport: prayer.prayerSupport.map((support: { userId: string; createdAt: Date }) => ({
+        ...support,
+        userName: userNames[support.userId] || 'Unknown User',
+      })),
+    }));
+
     return NextResponse.json({
       success: true,
-      prayers: visiblePrayers,
+      prayers: prayersWithNames,
     });
   } catch (error) {
     console.error('[API] Failed to fetch prayers:', error);

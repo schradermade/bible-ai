@@ -13,7 +13,6 @@ import SharedVerseCard from './circles/SharedVerseCard';
 import VerseHighlightCard from './circles/VerseHighlightCard';
 import AddHighlightModal from './circles/AddHighlightModal';
 import EncouragementPromptCard from './circles/EncouragementPromptCard';
-import AddEncouragementResponseModal from './circles/AddEncouragementResponseModal';
 import AddEncouragementPromptModal from './circles/AddEncouragementPromptModal';
 
 interface CircleMember {
@@ -178,6 +177,7 @@ interface Encouragement {
     reactions: Array<{
       id: string;
       userId: string;
+      userName?: string;
       type: 'amen' | 'encouraging' | 'blessed';
       createdAt: string;
     }>;
@@ -208,8 +208,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [currentDayNumber, setCurrentDayNumber] = useState(1);
   const [showAddHighlightModal, setShowAddHighlightModal] = useState(false);
   const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] = useState(false);
-  const [showAddEncouragementResponseModal, setShowAddEncouragementResponseModal] = useState(false);
-  const [selectedEncouragement, setSelectedEncouragement] = useState<Encouragement | null>(null);
   const [prayerFilter, setPrayerFilter] = useState<'all' | 'active' | 'answered'>('all');
 
   const loadCircle = async () => {
@@ -347,6 +345,17 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       }
     }
   }, [circle, user]);
+
+  // Poll encouragements every 30 seconds
+  useEffect(() => {
+    if (!circle) return;
+
+    const interval = setInterval(() => {
+      fetchEncouragements();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [circleId, circle]);
 
   if (isLoading) {
     return (
@@ -716,10 +725,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                     encouragement={encouragement}
                     circleId={circleId}
                     onUpdate={fetchEncouragements}
-                    onAddResponse={(enc) => {
-                      setSelectedEncouragement(enc);
-                      setShowAddEncouragementResponseModal(true);
-                    }}
                   />
                 ))
               )}
@@ -927,24 +932,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             fetchEncouragements();
           }}
           currentDay={currentDayNumber}
-        />
-      )}
-
-      {showAddEncouragementResponseModal && selectedEncouragement && (
-        <AddEncouragementResponseModal
-          circleId={circle.id}
-          encouragementId={selectedEncouragement.id}
-          promptText={selectedEncouragement.promptText}
-          isOpen={true}
-          onClose={() => {
-            setShowAddEncouragementResponseModal(false);
-            setSelectedEncouragement(null);
-          }}
-          onSuccess={() => {
-            setShowAddEncouragementResponseModal(false);
-            setSelectedEncouragement(null);
-            fetchEncouragements();
-          }}
         />
       )}
     </div>

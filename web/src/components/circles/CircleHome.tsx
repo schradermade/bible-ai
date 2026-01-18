@@ -13,11 +13,6 @@ import MemberProgressIndicator from './MemberProgressIndicator';
 import ReflectionCard from './ReflectionCard';
 import PrayerRequestCard from './PrayerRequestCard';
 import SharedVerseCard from './SharedVerseCard';
-import VerseHighlightCard from './VerseHighlightCard';
-import AddHighlightModal from './AddHighlightModal';
-import EncouragementPromptCard from './EncouragementPromptCard';
-import AddEncouragementResponseModal from './AddEncouragementResponseModal';
-import AddEncouragementPromptModal from './AddEncouragementPromptModal';
 
 interface Member {
   id: string;
@@ -150,56 +145,6 @@ interface Verse {
   };
 }
 
-interface VerseHighlight {
-  id: string;
-  userId: string;
-  reference: string;
-  text: string;
-  insight?: string | null;
-  fromDayNumber?: number | null;
-  createdAt: string;
-  reactions: Array<{
-    id: string;
-    userId: string;
-    type: 'amen' | 'insightful' | 'saved';
-    createdAt: string;
-  }>;
-  _count: {
-    reactions: number;
-  };
-}
-
-interface Encouragement {
-  id: string;
-  promptText: string;
-  createdBy: string;
-  dayNumber?: number | null;
-  createdAt: string;
-  responses: Array<{
-    id: string;
-    userId: string;
-    content: string;
-    source: 'ai_generated' | 'user_custom';
-    scriptureRef?: string | null;
-    scriptureText?: string | null;
-    reflection?: string | null;
-    prayerPrompt?: string | null;
-    createdAt: string;
-    reactions: Array<{
-      id: string;
-      userId: string;
-      type: 'amen' | 'encouraging' | 'blessed';
-      createdAt: string;
-    }>;
-    _count: {
-      reactions: number;
-    };
-  }>;
-  _count: {
-    responses: number;
-  };
-}
-
 export default function CircleHome({ circleId }: CircleHomeProps) {
   const { user } = useUser();
   const [circle, setCircle] = useState<Circle | null>(null);
@@ -211,16 +156,10 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [verses, setVerses] = useState<Verse[]>([]);
-  const [highlights, setHighlights] = useState<VerseHighlight[]>([]);
-  const [encouragements, setEncouragements] = useState<Encouragement[]>([]);
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
   const [showAllDays, setShowAllDays] = useState(false);
   const [visibleDaysCount, setVisibleDaysCount] = useState(7);
   const [currentDayNumber, setCurrentDayNumber] = useState(1);
-  const [showAddHighlightModal, setShowAddHighlightModal] = useState(false);
-  const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] = useState(false);
-  const [showAddEncouragementResponseModal, setShowAddEncouragementResponseModal] = useState(false);
-  const [selectedEncouragement, setSelectedEncouragement] = useState<Encouragement | null>(null);
   const [prayerFilter, setPrayerFilter] = useState<'all' | 'active' | 'answered'>('all');
 
   useEffect(() => {
@@ -286,10 +225,8 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const fetchSharedContent = async () => {
     await Promise.all([
       fetchReflections(),
-      fetchEncouragements(),
       fetchPrayers(),
       fetchVerses(),
-      fetchHighlights(),
     ]);
   };
 
@@ -326,30 +263,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
       }
     } catch (err) {
       console.error('Failed to fetch verses:', err);
-    }
-  };
-
-  const fetchHighlights = async () => {
-    try {
-      const response = await fetch(`/api/circles/${circleId}/highlights?limit=5`);
-      const data = await response.json();
-      if (response.ok) {
-        setHighlights(data.highlights || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch highlights:', err);
-    }
-  };
-
-  const fetchEncouragements = async () => {
-    try {
-      const response = await fetch(`/api/circles/${circleId}/encouragements?limit=3`);
-      const data = await response.json();
-      if (response.ok) {
-        setEncouragements(data.encouragements || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch encouragements:', err);
     }
   };
 
@@ -529,12 +442,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                               )}
                             </div>
                           </div>
-                          <button
-                            className={styles.highlightButton}
-                            onClick={() => setShowAddHighlightModal(true)}
-                          >
-                            💡 Share Insight
-                          </button>
                         </div>
                       )}
 
@@ -720,37 +627,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
               </div>
             )}
 
-            {/* Encouragement Prompts */}
-            <div className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>Encouragement Prompts</h3>
-                <button
-                  className={styles.addPromptButton}
-                  onClick={() => setShowAddEncouragementPromptModal(true)}
-                >
-                  + Add Prompt
-                </button>
-              </div>
-              {encouragements.length > 0 ? (
-                encouragements.map((encouragement) => (
-                  <EncouragementPromptCard
-                    key={encouragement.id}
-                    encouragement={encouragement}
-                    circleId={circleId}
-                    onUpdate={fetchEncouragements}
-                    onAddResponse={() => {
-                      setSelectedEncouragement(encouragement);
-                      setShowAddEncouragementResponseModal(true);
-                    }}
-                  />
-                ))
-              ) : (
-                <div className={styles.emptySection}>
-                  <p className={styles.emptySectionText}>No encouragement prompts yet. Be the first to share!</p>
-                </div>
-              )}
-            </div>
-
             {/* Prayer Requests with Filters */}
             {prayers.length > 0 && (
               <div className={styles.section}>
@@ -801,27 +677,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                 ))}
               </div>
             )}
-
-            {/* Verse Highlights */}
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Verse Highlights</h3>
-              {highlights.length > 0 ? (
-                highlights.map((highlight) => (
-                  <VerseHighlightCard
-                    key={highlight.id}
-                    highlight={highlight}
-                    circleId={circleId}
-                    onUpdate={fetchHighlights}
-                  />
-                ))
-              ) : (
-                <div className={styles.emptySection}>
-                  <p className={styles.emptySectionText}>
-                    No verse highlights yet. Use the &quot;💡 Share Insight&quot; button above to highlight verses!
-                  </p>
-                </div>
-              )}
-            </div>
 
             {/* Stats - compact */}
             <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy.id} />
@@ -920,36 +775,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
           circleName={circle.name}
           onClose={() => setShowStartStudyModal(false)}
           onStudyCreated={fetchCircle}
-        />
-      )}
-
-      <AddHighlightModal
-        circleId={circle.id}
-        isOpen={showAddHighlightModal}
-        onClose={() => setShowAddHighlightModal(false)}
-        onSuccess={fetchHighlights}
-        currentDay={currentDayNumber}
-      />
-
-      <AddEncouragementPromptModal
-        circleId={circle.id}
-        isOpen={showAddEncouragementPromptModal}
-        onClose={() => setShowAddEncouragementPromptModal(false)}
-        onSuccess={fetchEncouragements}
-        currentDay={currentDayNumber}
-      />
-
-      {selectedEncouragement && (
-        <AddEncouragementResponseModal
-          circleId={circle.id}
-          encouragementId={selectedEncouragement.id}
-          promptText={selectedEncouragement.promptText}
-          isOpen={showAddEncouragementResponseModal}
-          onClose={() => {
-            setShowAddEncouragementResponseModal(false);
-            setSelectedEncouragement(null);
-          }}
-          onSuccess={fetchEncouragements}
         />
       )}
     </div>

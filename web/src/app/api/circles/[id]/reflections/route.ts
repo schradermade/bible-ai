@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 import { verifyCircleMember, filterVisibleReflections } from '@/lib/circle-permissions';
+import { getFormattedUserNames } from '@/lib/clerk-utils';
 
 export const runtime = 'nodejs';
 
@@ -91,9 +92,25 @@ export async function GET(
       userId
     );
 
+    // Fetch user names for reaction users
+    const reactionUserIds = visibleReflections.flatMap((r) =>
+      r.reactions.map((reaction: { userId: string }) => reaction.userId)
+    );
+    const allUserIds = [...new Set(reactionUserIds)];
+    const userNames = await getFormattedUserNames(allUserIds);
+
+    // Add user names to reactions
+    const reflectionsWithNames = visibleReflections.map((reflection) => ({
+      ...reflection,
+      reactions: reflection.reactions.map((reaction: { id: string; userId: string; type: string; createdAt: Date }) => ({
+        ...reaction,
+        userName: userNames[reaction.userId] || 'Unknown User',
+      })),
+    }));
+
     return NextResponse.json({
       success: true,
-      reflections: visibleReflections,
+      reflections: reflectionsWithNames,
     });
   } catch (error) {
     console.error('[API] Failed to fetch reflections:', error);
