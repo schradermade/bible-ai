@@ -151,68 +151,38 @@
   overflow: hidden;
 }
 
-.cardFooter {
-  margin-top: 1.5rem;
+.cardMeta {
+  margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid #e8d4bc;
 }
 
-.avatars {
-  position: relative;
-  height: 40px;
-  margin-bottom: 1rem;
-}
-
-.avatar {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.currentStudy {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.avatarMore {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f3f4f6;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.activeStudy {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: #eff6ff;
-  border-radius: 6px;
+  flex-direction: column;
+  gap: 4px;
   font-size: 0.875rem;
 }
 
-.studyIcon {
-  font-size: 1rem;
+.studyLabel {
+  color: #8b6239;
+  font-weight: 500;
+  font-size: 0.8125rem;
 }
 
-.studyTitle {
-  color: #1e40af;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.studyName {
+  color: #2a2118;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.studyDuration {
+  color: #8b6239;
+  font-size: 0.8125rem;
+}
+
+.noStudy {
+  color: #8b6239;
+  font-size: 0.875rem;
+  font-style: italic;
 }

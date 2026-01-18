@@ -222,6 +222,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [totalMembers, setTotalMembers] = useState(0);
   const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -275,6 +276,34 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       setCircle(data.circle);
     } catch (error) {
       console.error('Failed to refresh circle:', error);
+    }
+  };
+
+  // Archive the current study
+  const handleArchiveStudy = async (planId: string) => {
+    setIsArchiving(true);
+    try {
+      const response = await fetch(`/api/circles/${circleId}/studies/${planId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'archive' }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to archive study');
+      }
+
+      // Refresh circle data to show updated state
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await refreshCircle();
+    } catch (error) {
+      console.error('Failed to archive study:', error);
+      alert(error instanceof Error ? error.message : 'Failed to archive study');
+    } finally {
+      setIsArchiving(false);
     }
   };
 
@@ -751,6 +780,20 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                         Congratulations on completing this {activePlan.duration}
                         -day journey together!
                       </p>
+                      <button
+                        className={styles.archiveButton}
+                        onClick={() => handleArchiveStudy(activePlan.id)}
+                        disabled={isArchiving}
+                      >
+                        {isArchiving ? (
+                          <>
+                            <div className={styles.buttonSpinner}></div>
+                            Archiving...
+                          </>
+                        ) : (
+                          'Archive Study'
+                        )}
+                      </button>
                     </div>
                   );
                 }
@@ -1061,7 +1104,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                     <div className={styles.sealedScrollIcon}>📜</div>
                     <h3>Your contribution has been submitted</h3>
                     <p className={styles.waitingSubtitle}>
-                      Waiting for the Study Circle creator to start the study
+                      Waiting for the group creator to start the study
                     </p>
                   </div>
 
@@ -1141,6 +1184,37 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               </div>
             </div>
           </>
+        )}
+
+        {/* Study History Section - shown at bottom */}
+        {circle.plans && circle.plans.some((p) => p.status === 'archived') && (
+          <div className={styles.historySection}>
+            <h3 className={styles.historySectionTitle}>Study History</h3>
+            <div className={styles.historyList}>
+              {circle.plans
+                .filter((plan) => plan.status === 'archived')
+                .sort((a, b) =>
+                  new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+                )
+                .map((plan) => (
+                  <div key={plan.id} className={styles.historyCard}>
+                    <div className={styles.historyCardContent}>
+                      <h4 className={styles.historyTitle}>
+                        {plan.title.replace(/^\d+-Day (Journey|Deep Dive): /, '')}
+                      </h4>
+                      <div className={styles.historyMeta}>
+                        <span>{plan.duration} days</span>
+                        <span className={styles.metaSeparator}>•</span>
+                        <span>
+                          Started {new Date(plan.startDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.historyBadge}>Completed</div>
+                  </div>
+                ))}
+            </div>
+          </div>
         )}
       </div>
 

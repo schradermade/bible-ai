@@ -627,7 +627,26 @@
 .completedText {
   font-size: 14px;
   color: #6b5d4f;
-  margin: 0;
+  margin: 0 0 16px 0;
+}
+
+.archiveButton {
+  background: linear-gradient(145deg, #8b6239, #6b4d2e);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(139, 98, 57, 0.3);
+}
+
+.archiveButton:hover {
+  background: linear-gradient(145deg, #6b4d2e, #5a3f25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 98, 57, 0.4);
 }
 
 /* Sections - simple and compact */
@@ -1086,4 +1105,75 @@
 .planCompletionContent button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(176, 123, 76, 0.5);
+}
+
+/* ========================================
+   STUDY HISTORY SECTION
+   ======================================== */
+
+.historySection {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 2px solid rgba(176, 123, 76, 0.15);
+}
+
+.historySectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #5a4a30;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(145deg, #f9f6f0 0%, #ffffff 100%);
+  border: 1px solid rgba(176, 123, 76, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.historyCard:hover {
+  border-color: rgba(176, 123, 76, 0.35);
+  box-shadow: 0 2px 8px rgba(31, 26, 22, 0.08);
+}
+
+.historyCardContent {
+  flex: 1;
+}
+
+.historyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2a2118;
+  margin: 0 0 6px 0;
+}
+
+.historyMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8b6239;
+}
+
+.historyBadge {
+  background: rgba(107, 159, 107, 0.1);
+  color: #6b9f6b;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

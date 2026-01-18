@@ -432,6 +432,34 @@ export default function ContextualWidgets({
     loadInvitations();
   }, [user]);
 
+  // Poll for new invitations and circles every 30 seconds
+  useEffect(() => {
+    if (!user) return;
+
+    const refreshInvitationsAndCircles = async () => {
+      try {
+        // Fetch invitations without showing loading spinner
+        const invitationsResponse = await fetch('/api/invitations');
+        if (invitationsResponse.ok) {
+          const data = await invitationsResponse.json();
+          setInvitations(data.invitations || []);
+        }
+
+        // Fetch circles without showing loading spinner
+        const circlesResponse = await fetch('/api/circles');
+        if (circlesResponse.ok) {
+          const data = await circlesResponse.json();
+          setCircles(data.circles || []);
+        }
+      } catch (error) {
+        console.error('Failed to refresh invitations and circles:', error);
+      }
+    };
+
+    const interval = setInterval(refreshInvitationsAndCircles, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   const toggleWidget = (widgetId: string) => {
     setCollapsedWidgets((prev) => ({
       ...prev,

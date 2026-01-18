@@ -22,6 +22,7 @@ interface Circle {
     title: string;
     duration: number;
     startDate: string;
+    status: string;
   }>;
 }
 
@@ -112,7 +113,7 @@ export default function CircleList() {
               <div className={styles.cardHeader}>
                 <h3 className={styles.cardTitle}>{circle.name}</h3>
                 <div className={styles.memberCount}>
-                  {circle._count.members} {circle._count.members === 1 ? 'member' : 'members'}
+                  👥 {circle._count.members} {circle._count.members === 1 ? 'member' : 'members'}
                 </div>
               </div>
 
@@ -120,36 +121,25 @@ export default function CircleList() {
                 <p className={styles.cardDescription}>{circle.description}</p>
               )}
 
-              <div className={styles.cardFooter}>
-                <div className={styles.avatars}>
-                  {circle.members.slice(0, 5).map((member, index) => (
-                    <div
-                      key={member.userId}
-                      className={styles.avatar}
-                      style={{ left: `${index * 24}px` }}
-                      title={member.role}
-                    >
-                      {member.userId.substring(0, 2).toUpperCase()}
+              <div className={styles.cardMeta}>
+                {(() => {
+                  const activePlan = circle.plans?.find((p) => p.status === 'active');
+                  return activePlan ? (
+                    <div className={styles.currentStudy}>
+                      <span className={styles.studyLabel}>Currently studying:</span>
+                      <span className={styles.studyName}>
+                        {activePlan.title.replace(/^\d+-Day (Journey|Deep Dive): /, '')}
+                      </span>
+                      <span className={styles.studyDuration}>
+                        ({activePlan.duration} days)
+                      </span>
                     </div>
-                  ))}
-                  {circle._count.members > 5 && (
-                    <div
-                      className={styles.avatarMore}
-                      style={{ left: `${5 * 24}px` }}
-                    >
-                      +{circle._count.members - 5}
+                  ) : (
+                    <div className={styles.noStudy}>
+                      No active study • Ready for a new journey
                     </div>
-                  )}
-                </div>
-
-                {circle.plans && circle.plans.length > 0 && (
-                  <div className={styles.activeStudy}>
-                    <div className={styles.studyIcon}>📖</div>
-                    <span className={styles.studyTitle}>
-                      {circle.plans[0].title}
-                    </span>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </a>
           ))}

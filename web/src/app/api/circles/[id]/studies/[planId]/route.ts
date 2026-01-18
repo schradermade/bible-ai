@@ -134,3 +134,95 @@ export async function GET(
     );
   }
 }
+
+/**
+ * PATCH /api/circles/[id]/studies/[planId]
+ * Archive a circle study plan (creator only)
+ */
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string; planId: string }> }
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id: circleId, planId } = await params;
+    const body = await request.json();
+    const { action } = body;
+
+    if (action !== 'archive') {
+      return NextResponse.json(
+        { error: 'invalid_action', message: 'Only archive action is supported' },
+        { status: 400 }
+      );
+    }
+
+    // Verify circle exists and user is creator
+    const circle = await prisma.studyCircle.findUnique({
+      where: { id: circleId },
+    });
+
+    if (!circle) {
+      return NextResponse.json(
+        { error: 'not_found', message: 'Circle not found' },
+        { status: 404 }
+      );
+    }
+
+    if (circle.createdBy !== userId) {
+      return NextResponse.json(
+        {
+          error: 'forbidden',
+          message: 'Only the circle creator can archive studies',
+        },
+        { status: 403 }
+      );
+    }
+
+    // Verify study plan exists and belongs to circle
+    const studyPlan = await prisma.circleStudyPlan.findUnique({
+      where: { id: planId },
+    });
+
+    if (!studyPlan) {
+      return NextResponse.json(
+        { error: 'not_found', message: 'Study plan not found' },
+        { status: 404 }
+      );
+    }
+
+    if (studyPlan.circleId !== circleId) {
+      return NextResponse.json(
+        {
+          error: 'forbidden',
+          message: 'Study plan does not belong to this circle',
+        },
+        { status: 403 }
+      );
+    }
+
+    // Update status to archived
+    const updatedStudyPlan = await prisma.circleStudyPlan.update({
+      where: { id: planId },
+      data: { status: 'archived' },
+    });
+
+    return NextResponse.json({
+      success: true,
+      studyPlan: updatedStudyPlan,
+    });
+  } catch (error) {
+    console.error('[API] Failed to archive study plan:', error);
+    return NextResponse.json(
+      {
+        error: 'server_error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}
