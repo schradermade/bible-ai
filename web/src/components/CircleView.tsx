@@ -237,6 +237,9 @@ export default function CircleView({ circleId, onClose, onDelete }: CircleViewPr
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaveConfirmText, setLeaveConfirmText] = useState('');
+  const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -359,6 +362,40 @@ export default function CircleView({ circleId, onClose, onDelete }: CircleViewPr
       console.error('Failed to delete circle:', error);
       alert(error instanceof Error ? error.message : 'Failed to delete circle');
       setIsDeleting(false);
+    }
+  };
+
+  // Leave the circle
+  const handleLeaveCircle = async () => {
+    if (leaveConfirmText.toLowerCase() !== 'leave') {
+      alert('Please type "leave" to confirm');
+      return;
+    }
+
+    setIsLeaving(true);
+    try {
+      const response = await fetch(
+        `/api/circles/${circleId}/members/${user?.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to leave circle');
+      }
+
+      // Notify parent to refresh circles list
+      onDelete?.();
+
+      // Close modal and navigate back
+      setShowLeaveModal(false);
+      onClose();
+    } catch (error) {
+      console.error('Failed to leave circle:', error);
+      alert(error instanceof Error ? error.message : 'Failed to leave circle');
+      setIsLeaving(false);
     }
   };
 
@@ -1234,6 +1271,18 @@ export default function CircleView({ circleId, onClose, onDelete }: CircleViewPr
           </div>
         )}
 
+        {/* Leave Circle Button - Non-Host Only */}
+        {circle.createdBy !== user?.id && (
+          <div className={styles.leaveSection}>
+            <button
+              className={styles.leaveCircleButton}
+              onClick={() => setShowLeaveModal(true)}
+            >
+              Leave Circle
+            </button>
+          </div>
+        )}
+
         {/* Delete Circle Button - Host Only */}
         {circle.createdBy === user?.id && (
           <div className={styles.deleteSection}>
@@ -1302,6 +1351,59 @@ export default function CircleView({ circleId, onClose, onDelete }: CircleViewPr
             loadCircle();
           }}
         />
+      )}
+
+      {/* Leave Circle Confirmation Modal */}
+      {showLeaveModal && (
+        <div
+          className={styles.leaveModalOverlay}
+          onClick={() => {
+            setShowLeaveModal(false);
+            setLeaveConfirmText('');
+          }}
+        >
+          <div
+            className={styles.leaveModal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className={styles.leaveModalTitle}>Leave Circle</h3>
+            <p className={styles.leaveModalWarning}>
+              You will no longer have access to this circle's studies and
+              shared content. You can rejoin if invited again.
+            </p>
+            <p className={styles.leaveModalPrompt}>
+              Type <strong>leave</strong> to confirm:
+            </p>
+            <input
+              type="text"
+              className={styles.leaveConfirmInput}
+              value={leaveConfirmText}
+              onChange={(e) => setLeaveConfirmText(e.target.value)}
+              placeholder="Type leave"
+              autoFocus
+            />
+            <div className={styles.leaveModalActions}>
+              <button
+                className={styles.leaveCancelButton}
+                onClick={() => {
+                  setShowLeaveModal(false);
+                  setLeaveConfirmText('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.leaveConfirmButton}
+                onClick={handleLeaveCircle}
+                disabled={
+                  isLeaving || leaveConfirmText.toLowerCase() !== 'leave'
+                }
+              >
+                {isLeaving ? 'Leaving...' : 'Leave Circle'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete Circle Confirmation Modal */}

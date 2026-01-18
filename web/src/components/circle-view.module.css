@@ -1465,6 +1465,156 @@
 }
 
 /* ========================================
+   LEAVE CIRCLE SECTION
+   ======================================== */
+
+.leaveSection {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 2px solid rgba(234, 179, 8, 0.15);
+  text-align: center;
+}
+
+.leaveCircleButton {
+  background: linear-gradient(145deg, #eab308 0%, #ca8a04 100%);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
+}
+
+.leaveCircleButton:hover {
+  background: linear-gradient(145deg, #ca8a04 0%, #a16207 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
+}
+
+/* Leave Modal */
+.leaveModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(31, 26, 22, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.leaveModal {
+  background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border: 2px solid #eab308;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow:
+    0 16px 48px rgba(234, 179, 8, 0.3),
+    0 8px 24px rgba(31, 26, 22, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.leaveModalTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ca8a04;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.leaveModalWarning {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.leaveModalPrompt {
+  font-size: 14px;
+  color: #5a4a30;
+  margin: 0 0 12px 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.leaveConfirmInput {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e8d4bc;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.leaveConfirmInput:focus {
+  outline: none;
+  border-color: #eab308;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.1);
+}
+
+.leaveModalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.leaveCancelButton,
+.leaveConfirmButton {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.leaveCancelButton {
+  background: linear-gradient(145deg, #f9f6f0 0%, #e8d4bc 100%);
+  color: #5a4a30;
+  border: 1px solid #d1d5db;
+}
+
+.leaveCancelButton:hover {
+  background: linear-gradient(145deg, #e8d4bc 0%, #d4c5b0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(31, 26, 22, 0.1);
+}
+
+.leaveConfirmButton {
+  background: linear-gradient(145deg, #eab308 0%, #ca8a04 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
+}
+
+.leaveConfirmButton:hover:not(:disabled) {
+  background: linear-gradient(145deg, #ca8a04 0%, #a16207 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
+}
+
+.leaveConfirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
    DELETE CIRCLE SECTION
    ======================================== */
 
