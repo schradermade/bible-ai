@@ -311,7 +311,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       // Don't fetch again - we know they should be empty after archive
       setIntentions([]);
       setHasSubmittedIntention(false);
-      setTotalMembers(circle.members.length);
+      setTotalMembers(circle?.members.length || 0);
 
       // Wait for DB transaction to complete
       await new Promise((resolve) => setTimeout(resolve, 1500));
