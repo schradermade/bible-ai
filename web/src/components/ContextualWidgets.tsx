@@ -1036,7 +1036,7 @@ export default function ContextualWidgets({
                 {memoryVerses.length > 0 && (
                   <>
                     <div className={styles.versesSectionHeader}>
-                      💭 Memory ({memoryVerses.length})
+                      🧠 Memory ({memoryVerses.length})
                     </div>
                     <div className={styles.versesList}>
                       {memoryVerses.map((memVerse) => {
