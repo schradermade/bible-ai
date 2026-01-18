@@ -55,39 +55,24 @@ export default function StudyIntentionsSummary({
         </div>
       </div>
 
-      {/* Member Completion Status */}
-      <div className={styles.memberStatusSection}>
-        <h3 className={styles.memberStatusTitle}>Study Contribution Status</h3>
-        <div className={styles.memberAvatars}>
-          {members.map((member) => {
-            const completed = hasCompleted(member.userId);
-            const displayName = member.userName || member.userId;
-            const initials = getUserInitials(displayName);
-
-            return (
-              <div key={member.id} className={styles.memberAvatarItem}>
-                <div
-                  className={`${styles.memberAvatar} ${
-                    completed ? styles.completed : styles.pending
-                  }`}
-                >
-                  {initials}
-                  {completed && (
-                    <div className={styles.completionBadge}>✓</div>
-                  )}
-                </div>
-                <div className={styles.memberName}>{displayName}</div>
-              </div>
-            );
-          })}
+      {/* Visual indicator for how to track submissions */}
+      <div className={styles.indicatorGuide}>
+        <div className={styles.guideIcon}>💡</div>
+        <div className={styles.guideContent}>
+          <p className={styles.guideText}>
+            Check member avatars above — a <span className={styles.goldBadge}>gold-bordered checkmark</span> means they've submitted their input
+          </p>
         </div>
       </div>
 
       {/* Generate button (only for creator, only when >= 2 submissions) */}
       {isCreator && canGenerate && (
-        <button className={styles.generateStudyButton} onClick={onGenerateStudy}>
-          Generate Study from Group Input
-        </button>
+        <div className={styles.generateButtonWrapper}>
+          <button className={styles.generateStudyButton} onClick={onGenerateStudy}>
+            <span className={styles.generateIcon}>✨</span>
+            Generate Study with Berea AI
+          </button>
+        </div>
       )}
     </div>
   );

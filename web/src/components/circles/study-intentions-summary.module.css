@@ -4,7 +4,7 @@
   border: 1px solid rgba(176, 123, 76, 0.2);
   border-radius: 14px;
   padding: 18px;
-  margin-bottom: 1.5rem;
+  padding-bottom: 20px;
   box-shadow:
     0 2px 8px rgba(31, 26, 22, 0.08),
     0 1px 2px rgba(31, 26, 22, 0.04),
@@ -62,6 +62,44 @@
   color: #8b6239;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* Indicator Guide */
+.indicatorGuide {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: rgba(251, 191, 36, 0.18);
+  border: 1.5px solid rgba(251, 191, 36, 0.5);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.guideIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.guideContent {
+  flex: 1;
+}
+
+.guideText {
+  font-size: 0.8125rem;
+  color: #6b5d4f;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.goldBadge {
+  color: #d97706;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* Member Completion Status - Compact */
@@ -222,33 +260,59 @@
   font-weight: 600;
 }
 
-/* Generate button */
-.generateStudyButton {
-  width: 100%;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #b07b4c, #8d6239);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow:
-    0 2px 6px rgba(176, 123, 76, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* Generate button wrapper */
+.generateButtonWrapper {
+  display: flex;
+  justify-content: center;
   position: relative;
   z-index: 1;
 }
 
-.generateStudyButton:hover {
-  transform: translateY(-1px);
+/* Generate button */
+.generateStudyButton {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 4px 12px rgba(176, 123, 76, 0.4),
+    0 4px 12px rgba(217, 119, 6, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.generateStudyButton:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(217, 119, 6, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  background: linear-gradient(135deg, #8d6239, #6b5d4f);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.generateIcon {
+  font-size: 1.25rem;
+  display: inline-flex;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
 }
 
 /* Requirement message */
