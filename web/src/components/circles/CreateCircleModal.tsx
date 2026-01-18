@@ -57,102 +57,94 @@ export default function CreateCircleModal({
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Create Study Circle</h2>
-          <button
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label="Close modal"
-          >
-            ×
-          </button>
-        </div>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.closeButton} onClick={onClose}>
+          ×
+        </button>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>
-              Study Type <span className={styles.required}>*</span>
-            </label>
-            <div className={styles.radioGroup}>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="studyType"
-                  checked={!isSolo}
-                  onChange={() => setIsSolo(false)}
-                  disabled={loading}
-                  className={styles.radio}
-                />
-                <div className={styles.radioContent}>
-                  <span className={styles.radioTitle}>Group Study</span>
-                  <span className={styles.radioDescription}>
-                    Study with 2-8 friends
-                  </span>
-                </div>
+        <h2 className={styles.modalTitle}>Create Study Circle</h2>
+
+        <form onSubmit={handleSubmit}>
+          {/* Study Type Selection */}
+          <div className={styles.typeStep}>
+            <h3>Choose Study Type</h3>
+            <div className={styles.typeOptions}>
+              <button
+                type="button"
+                className={`${styles.typeCard} ${!isSolo ? styles.selected : ''}`}
+                onClick={() => setIsSolo(false)}
+              >
+                <div className={styles.typeTitle}>Group Study</div>
+                <div className={styles.typeDesc}>Study with 2-8 friends</div>
+              </button>
+              <button
+                type="button"
+                className={`${styles.typeCard} ${isSolo ? styles.selected : ''}`}
+                onClick={() => setIsSolo(true)}
+              >
+                <div className={styles.typeTitle}>Solo Study</div>
+                <div className={styles.typeDesc}>Study on your own</div>
+              </button>
+            </div>
+          </div>
+
+          {/* Circle Details */}
+          <div className={styles.detailsSection}>
+            <div className={styles.fieldGroup}>
+              <label htmlFor="circle-name" className={styles.fieldLabel}>
+                Circle Name <span className={styles.required}>*</span>
               </label>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="studyType"
-                  checked={isSolo}
-                  onChange={() => setIsSolo(true)}
-                  disabled={loading}
-                  className={styles.radio}
-                />
-                <div className={styles.radioContent}>
-                  <span className={styles.radioTitle}>Solo Study</span>
-                  <span className={styles.radioDescription}>
-                    Study on your own
-                  </span>
-                </div>
+              <input
+                id="circle-name"
+                type="text"
+                className={styles.input}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={
+                  isSolo ? 'e.g., My Personal Study' : 'e.g., Sunday School Group'
+                }
+                maxLength={100}
+                disabled={loading}
+                autoFocus
+              />
+            </div>
+
+            <div className={styles.fieldGroup}>
+              <label htmlFor="circle-description" className={styles.fieldLabel}>
+                Description <span className={styles.optional}>(optional)</span>
               </label>
+              <textarea
+                id="circle-description"
+                className={styles.textarea}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="What is this circle about?"
+                rows={3}
+                maxLength={500}
+                disabled={loading}
+              />
+              <div className={styles.charCount}>{description.length}/500</div>
             </div>
           </div>
 
-          <div className={styles.field}>
-            <label htmlFor="circle-name" className={styles.label}>
-              Circle Name <span className={styles.required}>*</span>
-            </label>
-            <input
-              id="circle-name"
-              type="text"
-              className={styles.input}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={isSolo ? "e.g., My Personal Study" : "e.g., Sunday School Group"}
-              maxLength={100}
-              disabled={loading}
-              autoFocus
-            />
-            <div className={styles.hint}>
-              Choose a name that reflects your group's identity
+          {/* Info Card */}
+          <div className={styles.infoSection}>
+            <div className={styles.infoCard}>
+              <span className={styles.infoIcon}>ℹ️</span>
+              <span className={styles.infoText}>
+                {isSolo
+                  ? 'Solo circles are perfect for personal study with AI-generated plans.'
+                  : "You'll be able to invite members after creating the circle. Group circles can have 2-8 members."}
+              </span>
             </div>
           </div>
 
-          <div className={styles.field}>
-            <label htmlFor="circle-description" className={styles.label}>
-              Description <span className={styles.optional}>(optional)</span>
-            </label>
-            <textarea
-              id="circle-description"
-              className={styles.textarea}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="What is this circle about?"
-              rows={3}
-              maxLength={500}
-              disabled={loading}
-            />
-            <div className={styles.hint}>
-              {description.length}/500 characters
-            </div>
-          </div>
-
+          {/* Error Message */}
           {error && <div className={styles.error}>{error}</div>}
 
-          <div className={styles.footer}>
+          {/* Action Buttons */}
+          <div className={styles.buttonRow}>
             <button
               type="button"
               className={styles.cancelButton}
@@ -163,22 +155,20 @@ export default function CreateCircleModal({
             </button>
             <button
               type="submit"
-              className={styles.submitButton}
+              className={styles.createButton}
               disabled={loading || !name.trim()}
             >
-              {loading ? 'Creating...' : 'Create Circle'}
+              {loading ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  Creating Circle...
+                </>
+              ) : (
+                'Create Circle'
+              )}
             </button>
           </div>
         </form>
-
-        <div className={styles.info}>
-          <div className={styles.infoIcon}>ℹ️</div>
-          <div className={styles.infoText}>
-            {isSolo
-              ? "Solo circles are perfect for personal study with AI-generated plans."
-              : "You'll be able to invite members after creating the circle. Group circles can have 2-8 members."}
-          </div>
-        </div>
       </div>
     </div>
   );
