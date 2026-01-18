@@ -45,7 +45,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { email } = body;
+    const { email, firstName } = body;
 
     // Email is optional for now (shareable link), but validate if provided
     if (email !== undefined && email !== null) {
@@ -54,6 +54,19 @@ export async function POST(
           {
             error: 'invalid_payload',
             message: 'Invalid email address',
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate firstName if provided
+    if (firstName !== undefined && firstName !== null) {
+      if (typeof firstName !== 'string' || firstName.trim().length === 0) {
+        return NextResponse.json(
+          {
+            error: 'invalid_payload',
+            message: 'Invalid first name',
           },
           { status: 400 }
         );
@@ -73,6 +86,7 @@ export async function POST(
         circleId,
         invitedBy: userId,
         invitedEmail: email || null,
+        invitedFirstName: firstName || null,
         token,
         expiresAt,
         status: 'pending',

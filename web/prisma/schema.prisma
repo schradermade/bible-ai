@@ -225,16 +225,17 @@ model StudyCircleMember {
 }
 
 model CircleInvitation {
-  id           String      @id @default(cuid())
-  circleId     String
-  circle       StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
-  invitedBy    String
-  invitedEmail String?
-  token        String      @unique
-  status       String      @default("pending") // "pending", "accepted", "declined", "expired"
-  expiresAt    DateTime
-  acceptedAt   DateTime?
-  createdAt    DateTime    @default(now())
+  id               String      @id @default(cuid())
+  circleId         String
+  circle           StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  invitedBy        String
+  invitedEmail     String?
+  invitedFirstName String?
+  token            String      @unique
+  status           String      @default("pending") // "pending", "accepted", "declined", "expired"
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  createdAt        DateTime    @default(now())
 
   @@index([token])
   @@index([circleId])

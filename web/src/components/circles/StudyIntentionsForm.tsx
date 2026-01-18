@@ -117,7 +117,7 @@ export default function StudyIntentionsForm({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to submit intention');
+        throw new Error(data.message || 'Failed to submit input');
       }
 
       onSubmit();
@@ -131,7 +131,7 @@ export default function StudyIntentionsForm({
     <div className={styles.formContainer}>
       <div className={styles.formHeader}>
         <div className={styles.scrollIcon}>📜</div>
-        <h2>Share Your Study Intentions</h2>
+        <h2>Share Your Study Input</h2>
         <p className={styles.subtitle}>
           Share where you are—Berea AI will use everyone's input to generate a study that fits your whole circle. Once submitted, your circle host can generate the plan.
         </p>
@@ -273,7 +273,7 @@ export default function StudyIntentionsForm({
         disabled={!isValid || isSubmitting}
         type="button"
       >
-        {isSubmitting ? 'Sealing Your Intention...' : 'Seal Your Intention'}
+        {isSubmitting ? 'Submitting Your Input...' : 'Submit Your Input'}
       </button>
     </div>
   );

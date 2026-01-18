@@ -51,6 +51,24 @@ export async function GET(
             sharePrayers: true,
           },
         },
+        invitations: {
+          where: {
+            status: 'pending',
+            expiresAt: {
+              gt: new Date(),
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          select: {
+            id: true,
+            invitedEmail: true,
+            invitedFirstName: true,
+            createdAt: true,
+            expiresAt: true,
+          },
+        },
         plans: {
           orderBy: {
             createdAt: 'desc',

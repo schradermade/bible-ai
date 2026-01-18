@@ -7,12 +7,14 @@ interface InviteModalProps {
   circleId: string;
   circleName: string;
   onClose: () => void;
+  onInviteSent?: () => void;
 }
 
 export default function InviteModal({
   circleId,
   circleName,
   onClose,
+  onInviteSent,
 }: InviteModalProps) {
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -20,11 +22,17 @@ export default function InviteModal({
   const [copied, setCopied] = useState(false);
   const [inviteMode, setInviteMode] = useState<'link' | 'email'>('email');
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [invitationSent, setInvitationSent] = useState(false);
 
   const sendEmailInvitation = async () => {
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address');
+      return;
+    }
+
+    if (!firstName.trim()) {
+      setError('Please enter their first name');
       return;
     }
 
@@ -37,7 +45,10 @@ export default function InviteModal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({
+          email: email.trim(),
+          firstName: firstName.trim()
+        }),
       });
 
       const data = await response.json();
@@ -48,7 +59,13 @@ export default function InviteModal({
 
       setInvitationSent(true);
       setEmail('');
+      setFirstName('');
       setTimeout(() => setInvitationSent(false), 3000);
+
+      // Notify parent to refresh circle data
+      if (onInviteSent) {
+        onInviteSent();
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to send invitation'
@@ -78,6 +95,11 @@ export default function InviteModal({
       }
 
       setInvitationUrl(data.invitation.url);
+
+      // Notify parent to refresh circle data
+      if (onInviteSent) {
+        onInviteSent();
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to create invitation'
@@ -144,9 +166,17 @@ export default function InviteModal({
           {inviteMode === 'email' && (
             <div className={styles.emailSection}>
               <p className={styles.description}>
-                Enter an email address to send a direct invitation. They'll receive a personalized link to join {circleName}.
+                Enter their first name and email address to send a direct invitation. They'll receive a personalized link to join {circleName}.
               </p>
               <div className={styles.emailForm}>
+                <input
+                  type="text"
+                  className={styles.emailInput}
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  disabled={loading}
+                />
                 <input
                   type="email"
                   className={styles.emailInput}
@@ -159,7 +189,7 @@ export default function InviteModal({
                 <button
                   className={styles.sendButton}
                   onClick={sendEmailInvitation}
-                  disabled={loading || !email.trim()}
+                  disabled={loading || !email.trim() || !firstName.trim()}
                 >
                   {loading ? 'Sending...' : 'Send Invitation'}
                 </button>

@@ -49,7 +49,7 @@ export default function StudyIntentionsSummary({
   return (
     <div className={styles.summaryContainer}>
       <div className={styles.summaryHeader}>
-        <h3>Group Study Intentions</h3>
+        <h3>Group Study Input</h3>
         <div className={styles.submissionStatus}>
           {submittedCount}/{totalMembers} members have submitted
         </div>
@@ -88,19 +88,6 @@ export default function StudyIntentionsSummary({
         <button className={styles.generateStudyButton} onClick={onGenerateStudy}>
           Generate Study from Group Input
         </button>
-      )}
-
-      {/* Minimum requirement message */}
-      {isCreator && !canGenerate && (
-        <div className={styles.requirementMessage}>
-          <div className={styles.requirementIcon}>⏳</div>
-          <p>At least 2 members need to submit intentions before generating</p>
-          <p className={styles.requirementSubtext}>
-            {submittedCount > 0
-              ? `${2 - submittedCount} more ${2 - submittedCount === 1 ? 'submission' : 'submissions'} needed`
-              : 'Waiting for submissions...'}
-          </p>
-        </div>
       )}
     </div>
   );

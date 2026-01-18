@@ -59,6 +59,14 @@ interface CirclePlan {
   };
 }
 
+interface CircleInvitation {
+  id: string;
+  invitedEmail: string | null;
+  invitedFirstName: string | null;
+  createdAt: string;
+  expiresAt: string;
+}
+
 interface Circle {
   id: string;
   name: string;
@@ -66,6 +74,7 @@ interface Circle {
   createdBy: string;
   createdAt: string;
   members: CircleMember[];
+  invitations?: CircleInvitation[];
   plans: CirclePlan[];
 }
 
@@ -512,48 +521,111 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   return (
     <div className={styles.circleView}>
-      {/* Top header with back button, title, and invite */}
-      <div className={styles.topHeader}>
-        <button className={styles.closeButton} onClick={onClose}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Back to Chat
-        </button>
-        <h2 className={styles.studyCircleTitle}>Study Circle</h2>
-        <button
-          className={styles.inviteButton}
-          onClick={() => setShowInviteModal(true)}
-        >
-          + Invite
-        </button>
-      </div>
-
-      {/* Circle name and basic info - compact */}
-      <div className={styles.circleHeader}>
-        <div className={styles.circleHeaderContent}>
-          <h1 className={styles.circleName}>{circle.name}</h1>
-          {circle.description && (
-            <p className={styles.circleDescription}>{circle.description}</p>
-          )}
-          <div className={styles.circleMeta}>
-            <span>{circle.members.length} members</span>
-            {activePlan && (
-              <>
-                <span className={styles.metaSeparator}>•</span>
-                <span>
-                  {activePlan.title.replace(
-                    /^\d+-Day (Journey|Deep Dive): /,
-                    ''
-                  )}
-                </span>
-                <span className={styles.metaSeparator}>•</span>
-                <span>{activePlan.duration} days</span>
-              </>
+      {/* Hero Section */}
+      <div className={styles.heroSection}>
+        <div className={styles.heroContent}>
+          {/* Left side: Title and description */}
+          <div className={styles.heroLeft}>
+            <div className={styles.heroTitleRow}>
+              <h2 className={styles.studyCircleTitle}>{circle.name}</h2>
+              <button
+                className={styles.inviteButton}
+                onClick={() => setShowInviteModal(true)}
+              >
+                + Invite
+              </button>
+            </div>
+            {circle.description && (
+              <p className={styles.circleDescriptionSubtitle}>{circle.description}</p>
             )}
+          </div>
+
+          {/* Right side: Member Avatars */}
+          <div className={styles.heroMembersGrid}>
+            {/* Current Members */}
+            {circle.members.map((member) => {
+              const firstName = member.userName
+                ? member.userName.split(' ')[0]
+                : member.userId.substring(0, 8);
+
+              // Check if member has submitted study intention (only relevant when no active plan)
+              const hasSubmittedIntention = !activePlan && intentions.some(
+                (i) => i.userId === member.userId
+              );
+
+              // Build hover tooltip
+              return (
+                <div key={member.id} className={styles.memberStatusCard}>
+                  <div className={styles.avatarWithTooltip}>
+                    <div className={styles.memberStatusAvatar}>
+                      {firstName}
+                      <div className={`${styles.memberStatusBadge} ${hasSubmittedIntention ? styles.intentionSubmitted : ''}`}>
+                        ✓
+                      </div>
+                    </div>
+                    <div className={styles.avatarTooltip}>
+                      <div>✓ Joined</div>
+                      {!activePlan && (
+                        <div>
+                          {hasSubmittedIntention
+                            ? '✓ Input Submitted'
+                            : '○ Awaiting Input'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Pending Invitations */}
+            {circle.invitations && circle.invitations.length > 0 &&
+              circle.invitations.map((invitation) => {
+                // Use stored first name if available, otherwise derive from email
+                let displayName = 'Invited';
+                if (invitation.invitedFirstName) {
+                  displayName = invitation.invitedFirstName;
+                } else if (invitation.invitedEmail) {
+                  const emailUsername = invitation.invitedEmail.split('@')[0];
+                  displayName = emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1);
+                }
+
+                // Build hover tooltip for pending invitation
+                const inviteDate = new Date(invitation.createdAt).toLocaleDateString();
+
+                return (
+                  <div key={invitation.id} className={styles.memberStatusCard}>
+                    <div className={styles.avatarWithTooltip}>
+                      <div className={`${styles.memberStatusAvatar} ${styles.pending}`}>
+                        {displayName}
+                      </div>
+                      <div className={styles.avatarTooltip}>
+                        <div>📧 Pending Invitation</div>
+                        <div>📅 Sent {inviteDate}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            }
           </div>
         </div>
       </div>
+
+      {activePlan && (
+        <div className={styles.circleMetaBar}>
+          <span>{circle.members.length} members</span>
+          <span className={styles.metaSeparator}>•</span>
+          <span>
+            {activePlan.title.replace(
+              /^\d+-Day (Journey|Deep Dive): /,
+              ''
+            )}
+          </span>
+          <span className={styles.metaSeparator}>•</span>
+          <span>{activePlan.duration} days</span>
+        </div>
+      )}
 
       {/* Main unified content area */}
       <div className={styles.content}>
@@ -1047,39 +1119,10 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               <h3 className={styles.sectionTitle}>Statistics</h3>
               <CircleStatsCard circleId={circle.id} />
             </div>
-
-            {/* Members - compact list */}
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Members</h3>
-              <div className={styles.membersList}>
-                {circle.members.map((member) => {
-                  const displayName = member.userName || member.userId;
-                  const initials = member.userName
-                    ? member.userName
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()
-                    : member.userId.substring(0, 2).toUpperCase();
-
-                  return (
-                    <div key={member.id} className={styles.memberCard}>
-                      <div className={styles.memberAvatar}>{initials}</div>
-                      <div className={styles.memberInfo}>
-                        <span className={styles.memberName}>{displayName}</span>
-                        {member.role === 'owner' && (
-                          <span className={styles.memberRole}>Owner</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </>
         ) : (
           <>
-            {/* Study Intentions Flow */}
+            {/* Study Input Flow */}
             <div className={styles.studyInitiationSection}>
               {!hasSubmittedIntention ? (
                 <StudyIntentionsForm
@@ -1102,86 +1145,13 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 <>
                   <div className={styles.waitingMessage}>
                     <div className={styles.sealedScrollIcon}>📜</div>
-                    <h3>Your contribution has been submitted</h3>
+                    <h3>Your input has been submitted</h3>
                     <p className={styles.waitingSubtitle}>
                       Waiting for the group creator to start the study
                     </p>
                   </div>
-
-                  {/* Show member progress to non-creator members too */}
-                  <div className={styles.memberProgressCard}>
-                    <h3 className={styles.memberProgressTitle}>
-                      Study Contribution Status
-                    </h3>
-                    <div className={styles.memberAvatarsGrid}>
-                      {circle.members.map((member) => {
-                        const hasSubmitted = intentions.some(
-                          (i) => i.userId === member.userId
-                        );
-                        const displayName = member.userName || member.userId;
-                        const initials = member.userName
-                          ? member.userName
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')
-                              .toUpperCase()
-                              .substring(0, 2)
-                          : '?';
-
-                        return (
-                          <div
-                            key={member.id}
-                            className={styles.memberAvatarItem}
-                          >
-                            <div
-                              className={`${styles.memberAvatar} ${
-                                hasSubmitted ? styles.completed : styles.pending
-                              }`}
-                            >
-                              {initials}
-                              {hasSubmitted && (
-                                <div className={styles.completionBadge}>✓</div>
-                              )}
-                            </div>
-                            <div className={styles.memberName}>
-                              {displayName}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
                 </>
               )}
-            </div>
-
-            {/* Members even without study */}
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Members</h3>
-              <div className={styles.membersList}>
-                {circle.members.map((member) => {
-                  const displayName = member.userName || member.userId;
-                  const initials = member.userName
-                    ? member.userName
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()
-                    : member.userId.substring(0, 2).toUpperCase();
-
-                  return (
-                    <div key={member.id} className={styles.memberCard}>
-                      <div className={styles.memberAvatar}>{initials}</div>
-                      <div className={styles.memberInfo}>
-                        <span className={styles.memberName}>{displayName}</span>
-                        {member.role === 'owner' && (
-                          <span className={styles.memberRole}>Owner</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           </>
         )}
@@ -1224,6 +1194,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           onClose={() => setShowInviteModal(false)}
           circleId={circle.id}
           circleName={circle.name}
+          onInviteSent={refreshCircle}
         />
       )}
 
