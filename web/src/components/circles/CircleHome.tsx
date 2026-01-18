@@ -13,6 +13,7 @@ import CircleStatsCard from './CircleStatsCard';
 interface Member {
   id: string;
   userId: string;
+  userName?: string;
   role: string;
   joinedAt: string;
   shareProgress: boolean;
@@ -236,23 +237,29 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
               </div>
             </div>
             <div className={styles.membersList}>
-              {circle.members.map((member) => (
-                <div key={member.id} className={styles.memberItem}>
-                  <div className={styles.memberAvatar}>
-                    {member.userId.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className={styles.memberInfo}>
-                    <div className={styles.memberName}>
-                      {member.userId.substring(0, 20)}
-                      {member.userId.length > 20 ? '...' : ''}
+              {circle.members.map((member) => {
+                const displayName = member.userName || member.userId;
+                const initials = member.userName
+                  ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                  : member.userId.substring(0, 2).toUpperCase();
+
+                return (
+                  <div key={member.id} className={styles.memberItem}>
+                    <div className={styles.memberAvatar}>
+                      {initials}
                     </div>
-                    <div className={styles.memberRole}>
-                      {member.role === 'owner' && '👑 '}
-                      {member.role}
+                    <div className={styles.memberInfo}>
+                      <div className={styles.memberName}>
+                        {displayName}
+                      </div>
+                      <div className={styles.memberRole}>
+                        {member.role === 'owner' && '👑 '}
+                        {member.role}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

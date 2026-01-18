@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 import { verifyCircleMember, verifyCircleOwner } from '@/lib/circle-permissions';
+import { getFormattedUserNames } from '@/lib/clerk-utils';
 
 export const runtime = 'nodejs';
 
@@ -80,9 +81,22 @@ export async function GET(
       );
     }
 
+    // Fetch user names from Clerk for all members
+    const userIds = circle.members.map((m) => m.userId);
+    const userNames = await getFormattedUserNames(userIds);
+
+    // Add user names to members
+    const membersWithNames = circle.members.map((member) => ({
+      ...member,
+      userName: userNames[member.userId] || 'Unknown User',
+    }));
+
     return NextResponse.json({
       success: true,
-      circle,
+      circle: {
+        ...circle,
+        members: membersWithNames,
+      },
     });
   } catch (error) {
     console.error('[API] Failed to fetch circle:', error);

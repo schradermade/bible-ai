@@ -19,6 +19,7 @@ interface StudyDay {
 
 interface MemberPlan {
   userId: string;
+  userName?: string;
   studyPlan: {
     id: string;
     userId: string;
@@ -276,6 +277,7 @@ export default function SharedStudyView({
 
     return {
       userId: mp.userId,
+      userName: mp.userName,
       completedDays,
       totalDays: studyPlan.duration,
       lastCompletedAt: lastCompleted?.completedAt || undefined,

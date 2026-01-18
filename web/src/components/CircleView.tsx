@@ -9,6 +9,7 @@ import StartStudyModal from './circles/StartStudyModal';
 interface CircleMember {
   id: string;
   userId: string;
+  userName?: string;
   role: string;
   joinedAt: string;
 }
@@ -200,19 +201,26 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           Members ({circle.members.length})
         </h2>
         <div className={styles.membersList}>
-          {circle.members.map((member) => (
-            <div key={member.id} className={styles.memberCard}>
-              <div className={styles.memberAvatar}>
-                {member.userId.substring(0, 2).toUpperCase()}
+          {circle.members.map((member) => {
+            const displayName = member.userName || member.userId;
+            const initials = member.userName
+              ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+              : member.userId.substring(0, 2).toUpperCase();
+
+            return (
+              <div key={member.id} className={styles.memberCard}>
+                <div className={styles.memberAvatar}>
+                  {initials}
+                </div>
+                <div className={styles.memberInfo}>
+                  <span className={styles.memberUserId}>{displayName}</span>
+                  {member.role === 'owner' && (
+                    <span className={styles.memberRole}>Owner</span>
+                  )}
+                </div>
               </div>
-              <div className={styles.memberInfo}>
-                <span className={styles.memberUserId}>{member.userId}</span>
-                {member.role === 'owner' && (
-                  <span className={styles.memberRole}>Owner</span>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

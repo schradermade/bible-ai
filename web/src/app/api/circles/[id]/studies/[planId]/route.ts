@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 import { verifyCircleMember, canViewProgress } from '@/lib/circle-permissions';
+import { getFormattedUserNames } from '@/lib/clerk-utils';
 
 export const runtime = 'nodejs';
 
@@ -103,9 +104,19 @@ export async function GET(
       })
     );
 
+    // Fetch user names from Clerk for all members
+    const userIds = filteredMemberPlans.map((mp) => mp.userId);
+    const userNames = await getFormattedUserNames(userIds);
+
+    // Add user names to member plans
+    const memberPlansWithNames = filteredMemberPlans.map((memberPlan) => ({
+      ...memberPlan,
+      userName: userNames[memberPlan.userId] || 'Unknown User',
+    }));
+
     const filteredStudyPlan = {
       ...studyPlan,
-      memberPlans: filteredMemberPlans,
+      memberPlans: memberPlansWithNames,
     };
 
     return NextResponse.json({

@@ -4,6 +4,7 @@ import styles from './member-progress-indicator.module.css';
 
 interface MemberProgress {
   userId: string;
+  userName?: string;
   completedDays: number;
   totalDays: number;
   lastCompletedAt?: string;
@@ -62,6 +63,10 @@ export default function MemberProgressIndicator({
         {members.map((member) => {
           const status = getProgressStatus(member);
           const percentage = getProgressPercentage(member);
+          const displayName = member.userName || member.userId;
+          const initials = member.userName
+            ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+            : member.userId.substring(0, 2).toUpperCase();
 
           return (
             <div key={member.userId} className={styles.member}>
@@ -70,9 +75,9 @@ export default function MemberProgressIndicator({
                   className={`${styles.avatar} ${
                     member.isActiveNow ? styles.active : ''
                   }`}
-                  title={member.userId}
+                  title={displayName}
                 >
-                  {member.userId.substring(0, 2).toUpperCase()}
+                  {initials}
                 </div>
                 {member.isActiveNow && (
                   <div className={styles.activeIndicator} title="Active now" />
