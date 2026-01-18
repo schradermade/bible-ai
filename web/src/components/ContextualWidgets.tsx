@@ -121,6 +121,14 @@ export default function ContextualWidgets({
   const [visibleVersesCount, setVisibleVersesCount] = useState(5);
   const [visiblePrayersCount, setVisiblePrayersCount] = useState(5);
 
+  // Verses section collapse state
+  const [collapsedVerseSections, setCollapsedVerseSections] = useState<
+    Record<string, boolean>
+  >({
+    memory: false,
+    savedVerses: false,
+  });
+
   // Handle client-side mounting for portal
   useEffect(() => {
     setIsMounted(true);
@@ -378,6 +386,13 @@ export default function ContextualWidgets({
     setCollapsedWidgets((prev) => ({
       ...prev,
       [widgetId]: !prev[widgetId],
+    }));
+  };
+
+  const toggleVerseSection = (sectionId: string) => {
+    setCollapsedVerseSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
     }));
   };
 
@@ -1035,10 +1050,35 @@ export default function ContextualWidgets({
                 {/* Memory Verses Section */}
                 {memoryVerses.length > 0 && (
                   <>
-                    <div className={styles.versesSectionHeader}>
-                      🧠 Memory ({memoryVerses.length})
+                    <div
+                      className={styles.versesSectionHeader}
+                      onClick={() => toggleVerseSection('memory')}
+                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    >
+                      <span>🧠 Memory ({memoryVerses.length})</span>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        style={{
+                          transform: collapsedVerseSections.memory
+                            ? 'rotate(-90deg)'
+                            : 'rotate(0deg)',
+                          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }}
+                      >
+                        <path
+                          d="M4 6L8 10L12 6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                     </div>
-                    <div className={styles.versesList}>
+                    {!collapsedVerseSections.memory && (
+                      <div className={styles.versesList}>
                       {memoryVerses.map((memVerse) => {
                         const verse = myVerses.find(v => v.reference === memVerse.reference);
                         if (!verse) return null;
@@ -1169,7 +1209,8 @@ export default function ContextualWidgets({
                           </div>
                         );
                       })}
-                    </div>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -1179,12 +1220,37 @@ export default function ContextualWidgets({
                     {memoryVerses.length > 0 && (
                       <>
                         <div className={styles.versesSectionDivider}></div>
-                        <div className={styles.versesSectionHeader}>
-                          📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})
+                        <div
+                          className={styles.versesSectionHeader}
+                          onClick={() => toggleVerseSection('savedVerses')}
+                          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                        >
+                          <span>📚 Saved Verses ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length})</span>
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            style={{
+                              transform: collapsedVerseSections.savedVerses
+                                ? 'rotate(-90deg)'
+                                : 'rotate(0deg)',
+                              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            }}
+                          >
+                            <path
+                              d="M4 6L8 10L12 6"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                         </div>
                       </>
                     )}
-                    <div className={styles.versesList}>
+                    {!collapsedVerseSections.savedVerses && (
+                      <div className={styles.versesList}>
                       {myVerses
                         .filter(v => !memoryVerses.some(m => m.reference === v.reference))
                         .slice(0, visibleVersesCount)
@@ -1304,8 +1370,9 @@ export default function ContextualWidgets({
                             </div>
                           </div>
                         ))}
-                    </div>
-                    {myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > visibleVersesCount && (
+                      </div>
+                    )}
+                    {!collapsedVerseSections.savedVerses && myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > visibleVersesCount && (
                       <button
                         className={styles.showMoreButton}
                         onClick={() => setVisibleVersesCount((prev) => prev + 5)}
@@ -1313,7 +1380,7 @@ export default function ContextualWidgets({
                         Show More ({myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length - visibleVersesCount} more)
                       </button>
                     )}
-                    {visibleVersesCount > 5 && myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > 5 && (
+                    {!collapsedVerseSections.savedVerses && visibleVersesCount > 5 && myVerses.filter(v => !memoryVerses.some(m => m.reference === v.reference)).length > 5 && (
                       <button
                         className={styles.showMoreButton}
                         onClick={() => setVisibleVersesCount(5)}
