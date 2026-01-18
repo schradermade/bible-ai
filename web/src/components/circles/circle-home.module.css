@@ -1,430 +1,587 @@
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 24px;
+  background: #fdfcfa;
 }
 
 .loading,
 .error {
   text-align: center;
   padding: 3rem;
-  font-size: 1.1rem;
-  color: #666;
+  font-size: 1rem;
+  color: #8b6239;
 }
 
 .error {
-  color: #dc2626;
+  color: #c44536;
 }
 
+/* Compact header */
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
 }
 
-.headerContent {
+.headerTop {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-}
-
-.titleSection {
-  flex: 1;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .backLink {
-  display: inline-block;
-  color: #6b7280;
+  color: #8b6239;
   text-decoration: none;
-  font-size: 0.9375rem;
-  margin-bottom: 0.75rem;
+  font-size: 14px;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
 .backLink:hover {
-  color: #2563eb;
+  color: #b07b4c;
 }
 
-.title {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem 0;
-}
-
-.description {
-  font-size: 1.0625rem;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.6;
-}
-
-.stats {
+.headerActions {
   display: flex;
-  gap: 2rem;
-}
-
-.stat {
-  text-align: center;
-}
-
-.statValue {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2563eb;
-}
-
-.statLabel {
-  font-size: 0.875rem;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.actions {
-  display: flex;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
 .settingsButton {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid #e8d4bc;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s;
 }
 
 .settingsButton:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
+  border-color: #b07b4c;
+  background: #f9f6f0;
 }
 
 .settingsIcon {
-  width: 20px;
-  height: 20px;
-  color: #6b7280;
-  transition: color 0.2s;
-}
-
-.settingsButton:hover .settingsIcon {
-  color: #2563eb;
+  width: 16px;
+  height: 16px;
+  color: #8b6239;
 }
 
 .inviteButton {
-  padding: 0.75rem 1.5rem;
-  background: #2563eb;
+  padding: 8px 16px;
+  background: linear-gradient(145deg, #b07b4c, #8b6239);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s;
 }
 
 .inviteButton:hover {
-  background: #1d4ed8;
+  transform: translateY(-1px);
 }
 
+.headerMain {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8d4bc;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2a2118;
+  margin: 0 0 6px 0;
+}
+
+.description {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8b6239;
+}
+
+.metaSeparator {
+  color: #d4c5b0;
+}
+
+/* Main content */
 .content {
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 2rem;
-}
-
-@media (max-width: 1024px) {
-  .content {
-    grid-template-columns: 1fr;
-  }
-}
-
-.mainColumn {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-.activeStudyCard,
-.emptyStudyCard {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.cardTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.badge {
-  padding: 0.375rem 0.875rem;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 12px;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: 20px;
 }
 
 .studyInfo {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-}
-
-.studyIcon {
-  font-size: 2.5rem;
-  flex-shrink: 0;
-}
-
-.studyTitle {
-  font-size: 1.375rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem 0;
-}
-
-.studyMeta {
-  font-size: 0.9375rem;
-  color: #6b7280;
-  margin-bottom: 0.375rem;
-}
-
-.studyParticipants {
-  font-size: 0.875rem;
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.studyActions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.viewStudyButton {
-  padding: 0.75rem 2rem;
-  background: #2563eb;
-  color: white;
-  border: none;
+  background: #f9f6f0;
+  border: 1px solid #e8d4bc;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: inline-block;
+  padding: 14px;
 }
 
-.viewStudyButton:hover {
-  background: #1d4ed8;
+.studyInfo p {
+  margin: 0;
+  color: #5a4a30;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.emptyStudyCard {
-  text-align: center;
-  padding: 3rem 2rem;
-}
-
-.emptyIcon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.emptyTitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem 0;
-}
-
-.emptyText {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0 0 1.5rem 0;
-}
-
-.startStudyButton {
-  padding: 0.875rem 2rem;
-  background: #2563eb;
-  color: white;
-  border: none;
+/* Member Progress Bars - Stacked with Avatars */
+.memberProgressBars {
+  background: white;
+  border: 1px solid #e8d4bc;
   border-radius: 8px;
-  font-size: 1rem;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.progressBarsTitle {
+  font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+  color: #3a2f26;
+  margin: 0 0 16px 0;
 }
 
-.startStudyButton:hover {
-  background: #1d4ed8;
+.memberProgressItem {
+  margin-bottom: 14px;
 }
 
-.recentActivity {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
+.memberProgressItem:last-child {
+  margin-bottom: 0;
 }
 
-.sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 1rem 0;
-}
-
-.activityList {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.activityEmpty {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: #6b7280;
-}
-
-.activityEmpty p {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-}
-
-.activityHint {
-  font-size: 0.875rem;
-  color: #9ca3af;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.membersCard {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-}
-
-.memberCount {
-  font-size: 0.875rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 0.375rem 0.875rem;
-  border-radius: 12px;
-  font-weight: 500;
-}
-
-.membersList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.memberItem {
+.memberProgressRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.memberItem:hover {
-  background: #f9fafb;
+  gap: 12px;
 }
 
 .memberAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #b07b4c 0%, #8b6239 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(139, 98, 57, 0.2);
 }
 
-.memberInfo {
+.memberProgressContent {
   flex: 1;
   min-width: 0;
 }
 
+.memberProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.memberProgressName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a2f26;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.youLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b07b4c;
+}
+
+.memberProgressCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b5d4f;
+  white-space: nowrap;
+}
+
+.memberProgressBarTrack {
+  width: 100%;
+  height: 10px;
+  background: rgba(176, 123, 76, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.memberProgressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(176, 123, 76, 0.6), rgba(139, 98, 57, 0.5));
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.currentUserBar {
+  background: linear-gradient(90deg, #b07b4c, #8b6239);
+  box-shadow: 0 0 8px rgba(176, 123, 76, 0.4);
+}
+
+/* Current Day Focus - Matching Study Widget */
+.currentDayFocus {
+  background: rgba(247, 242, 234, 0.5);
+  border: 1px solid rgba(176, 123, 76, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.dayTitle {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #5a4d41;
+  line-height: 1.4;
+}
+
+.scriptureSection {
+  margin-bottom: 16px;
+}
+
+.verseWithButton {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: rgba(176, 123, 76, 0.05);
+  border-left: 3px solid #b07b4c;
+  border-radius: 4px;
+}
+
+.verseContent {
+  flex: 1;
+}
+
+.verseRef {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b07b4c;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verseText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #3a2f26;
+  font-style: italic;
+}
+
+.contentSection {
+  margin-bottom: 16px;
+}
+
+.dayContent {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5a4d41;
+  white-space: pre-wrap;
+}
+
+.reflectionSection {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(42, 90, 77, 0.05);
+  border-left: 3px solid #2a5a4d;
+  border-radius: 4px;
+}
+
+.reflectionTitle {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2a5a4d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reflectionText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3a2f26;
+  white-space: pre-wrap;
+}
+
+.prayerSection {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.06) 0%, rgba(139, 98, 57, 0.04) 100%);
+  border-left: 3px solid #b07b4c;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.08);
+}
+
+.prayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.prayerTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b6239;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.prayerTitle::before {
+  content: "🙏";
+  font-size: 14px;
+}
+
+.prayerText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a4d41;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+/* Day Actions */
+.dayActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.completeBtn,
+.completedBtn {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.completeBtn {
+  background: linear-gradient(135deg, #b07b4c 0%, #8d6239 100%);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(176, 123, 76, 0.3);
+}
+
+.completeBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(176, 123, 76, 0.4);
+}
+
+.completedBtn {
+  background: linear-gradient(135deg, #2a5a4d 0%, #1e4239 100%);
+  color: #f0e6d2;
+  box-shadow: 0 2px 6px rgba(42, 90, 77, 0.3);
+}
+
+.completedBtn:hover {
+  background: linear-gradient(135deg, #35705f 0%, #2a5a4d 100%);
+}
+
+/* Completed Card */
+.completedCard {
+  background: linear-gradient(145deg, #f9f6f0, #ffffff);
+  border: 2px solid #6b9f6b;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.completedIcon {
+  font-size: 48px;
+  color: #6b9f6b;
+  margin-bottom: 12px;
+}
+
+.completedTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2a2118;
+  margin: 0 0 8px 0;
+}
+
+.completedText {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0;
+}
+
+/* Sections */
+.section {
+  background: white;
+  border: 1px solid #e8d4bc;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3a2f26;
+  margin: 0 0 12px 0;
+}
+
+/* Members list */
+.membersList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.memberCard:hover {
+  background: #f9f6f0;
+}
+
+.memberAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b07b4c 0%, #8b6239 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.memberInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .memberName {
-  font-size: 0.9375rem;
+  font-size: 13px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #2a2118;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .memberRole {
-  font-size: 0.8125rem;
-  color: #6b7280;
-  text-transform: capitalize;
+  font-size: 11px;
+  color: #8b6239;
+  font-weight: 500;
 }
 
-.quickStats {
+/* Empty state */
+.emptyState {
   background: white;
-  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 40px 20px;
+  text-align: center;
+  border: 1px dashed #e8d4bc;
 }
 
-.quickStatsTitle {
-  font-size: 1rem;
+.emptyIcon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.emptyState h3 {
+  font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 1rem 0;
+  color: #2a2118;
+  margin: 0 0 8px 0;
 }
 
-.quickStatItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #f3f4f6;
+.emptyState p {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0 0 20px 0;
 }
 
-.quickStatItem:last-child {
-  border-bottom: none;
+.startStudyButton {
+  background: linear-gradient(145deg, #b07b4c, #8b6239);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-.quickStatLabel {
-  font-size: 0.875rem;
-  color: #6b7280;
+.startStudyButton:hover {
+  transform: translateY(-1px);
 }
 
-.quickStatValue {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1a1a1a;
-}
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
 
-/* Study View Container */
-.studyViewContainer {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  margin-top: 1.5rem;
-  overflow: hidden;
+  .title {
+    font-size: 20px;
+  }
+
+  .headerTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .membersList {
+    grid-template-columns: 1fr;
+  }
 }

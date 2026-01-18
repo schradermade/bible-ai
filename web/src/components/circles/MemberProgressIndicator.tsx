@@ -106,7 +106,7 @@ export default function MemberProgressIndicator({
                   </div>
                 </div>
                 {member.lastCompletedAt && (
-                  <div className={styles.lastCompleted}>
+                  <div className={styles.lastCompleted} suppressHydrationWarning>
                     Last: {getCompletionTime(member.lastCompletedAt)}
                   </div>
                 )}

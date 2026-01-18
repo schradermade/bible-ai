@@ -1,32 +1,27 @@
 .circleView {
   height: 100%;
   overflow-y: auto;
-  padding: 24px;
-  background: linear-gradient(to bottom, #faf9f7 0%, #ffffff 100%);
+  padding: 20px;
+  background: #fdfcfa;
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .closeButton {
   background: none;
   border: none;
-  color: #64748b;
+  color: #8b6239;
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 6px 0;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  transition: color 0.2s;
 }
 
 .closeButton:hover {
-  background: #f1f5f9;
-  color: #334155;
+  color: #b07b4c;
 }
 
 .loading,
@@ -36,14 +31,14 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  gap: 16px;
+  gap: 12px;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #6b46c1;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #e8d4bc;
+  border-top-color: #b07b4c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -55,217 +50,456 @@
 }
 
 .error {
-  color: #dc2626;
+  color: #c44536;
 }
 
 .retryButton {
-  background: #6b46c1;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.retryButton:hover {
-  background: #5a3a9f;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
-}
-
-/* Circle Info */
-.circleInfo {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
-}
-
-.circleHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.circleName {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 8px 0;
-}
-
-.circleDescription {
-  font-size: 15px;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.circleActions {
-  display: flex;
-  gap: 8px;
-}
-
-.inviteButton {
-  background: #6b46c1;
+  background: linear-gradient(145deg, #b07b4c, #8b6239);
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.retryButton:hover {
+  transform: translateY(-1px);
+}
+
+/* Compact circle header */
+.circleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8d4bc;
+  margin-bottom: 20px;
+}
+
+.circleHeaderContent {
+  flex: 1;
+}
+
+.circleName {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a2118;
+  margin: 0 0 6px 0;
+}
+
+.circleDescription {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.circleMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8b6239;
+}
+
+.metaSeparator {
+  color: #d4c5b0;
+}
+
+.inviteButton {
+  background: linear-gradient(145deg, #b07b4c, #8b6239);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.2s;
   white-space: nowrap;
 }
 
 .inviteButton:hover {
-  background: #5a3a9f;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
 }
 
-.circleStats {
-  display: flex;
-  gap: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.statItem {
+/* Main content area */
+.content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 20px;
 }
 
-.statValue {
-  font-size: 24px;
-  font-weight: 700;
-  color: #6b46c1;
-}
-
-.statLabel {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-/* Sections */
-.section {
-  margin-bottom: 24px;
-}
-
-.sectionTitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 16px 0;
-}
-
-/* Study Card */
-.studyCard {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.studyCardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.studyTitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.studyDuration {
-  background: #ede9fe;
-  color: #6b46c1;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.studyDescription {
-  font-size: 14px;
-  color: #64748b;
-  margin: 0 0 16px 0;
-  line-height: 1.6;
-}
-
-.studyStats {
-  font-size: 13px;
-  color: #64748b;
-  margin-bottom: 16px;
-}
-
-.viewStudyButton {
-  display: inline-block;
-  background: #f1f5f9;
-  color: #6b46c1;
-  padding: 10px 16px;
+.studyInfo {
+  background: #f9f6f0;
+  border: 1px solid #e8d4bc;
   border-radius: 8px;
-  font-weight: 500;
+  padding: 14px;
+}
+
+.studyInfo p {
+  margin: 0;
+  color: #5a4a30;
   font-size: 14px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
+  line-height: 1.5;
 }
 
-.viewStudyButton:hover {
-  background: #e2e8f0;
-  transform: translateX(4px);
+/* Member Progress Bars - Stacked with Avatars */
+.memberProgressBars {
+  background: white;
+  border: 1px solid #e8d4bc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
-/* Members */
-.membersList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+.progressBarsTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3a2f26;
+  margin: 0 0 16px 0;
 }
 
-.memberCard {
+.memberProgressItem {
+  margin-bottom: 14px;
+}
+
+.memberProgressItem:last-child {
+  margin-bottom: 0;
+}
+
+.memberProgressRow {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
-  border-radius: 10px;
-  padding: 12px;
-  border: 1px solid #f1f5f9;
-  transition: all 0.2s;
-}
-
-.memberCard:hover {
-  border-color: #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .memberAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6b46c1 0%, #9333ea 100%);
+  background: linear-gradient(135deg, #b07b4c 0%, #8b6239 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(139, 98, 57, 0.2);
+}
+
+.memberProgressContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.memberProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.memberProgressName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a2f26;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.youLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b07b4c;
+}
+
+.memberProgressCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b5d4f;
+  white-space: nowrap;
+}
+
+.memberProgressBarTrack {
+  width: 100%;
+  height: 10px;
+  background: rgba(176, 123, 76, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.memberProgressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(176, 123, 76, 0.6), rgba(139, 98, 57, 0.5));
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.currentUserBar {
+  background: linear-gradient(90deg, #b07b4c, #8b6239);
+  box-shadow: 0 0 8px rgba(176, 123, 76, 0.4);
+}
+
+/* Current Day Focus - Matching Study Widget */
+.currentDayFocus {
+  background: rgba(247, 242, 234, 0.5);
+  border: 1px solid rgba(176, 123, 76, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.dayTitle {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #5a4d41;
+  line-height: 1.4;
+}
+
+.scriptureSection {
+  margin-bottom: 16px;
+}
+
+.verseWithButton {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: rgba(176, 123, 76, 0.05);
+  border-left: 3px solid #b07b4c;
+  border-radius: 4px;
+}
+
+.verseContent {
+  flex: 1;
+}
+
+.verseRef {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b07b4c;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verseText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #3a2f26;
+  font-style: italic;
+}
+
+.contentSection {
+  margin-bottom: 16px;
+}
+
+.dayContent {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5a4d41;
+  white-space: pre-wrap;
+}
+
+.reflectionSection {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(42, 90, 77, 0.05);
+  border-left: 3px solid #2a5a4d;
+  border-radius: 4px;
+}
+
+.reflectionTitle {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2a5a4d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reflectionText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3a2f26;
+  white-space: pre-wrap;
+}
+
+.prayerSection {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.06) 0%, rgba(139, 98, 57, 0.04) 100%);
+  border-left: 3px solid #b07b4c;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(139, 98, 57, 0.08);
+}
+
+.prayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.prayerTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b6239;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.prayerTitle::before {
+  content: "🙏";
+  font-size: 14px;
+}
+
+.prayerText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a4d41;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+/* Day Actions */
+.dayActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.completeBtn,
+.completedBtn {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.completeBtn {
+  background: linear-gradient(135deg, #b07b4c 0%, #8d6239 100%);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(176, 123, 76, 0.3);
+}
+
+.completeBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(176, 123, 76, 0.4);
+}
+
+.completedBtn {
+  background: linear-gradient(135deg, #2a5a4d 0%, #1e4239 100%);
+  color: #f0e6d2;
+  box-shadow: 0 2px 6px rgba(42, 90, 77, 0.3);
+}
+
+.completedBtn:hover {
+  background: linear-gradient(135deg, #35705f 0%, #2a5a4d 100%);
+}
+
+/* Completed Card */
+.completedCard {
+  background: linear-gradient(145deg, #f9f6f0, #ffffff);
+  border: 2px solid #6b9f6b;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.completedIcon {
+  font-size: 48px;
+  color: #6b9f6b;
+  margin-bottom: 12px;
+}
+
+.completedTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2a2118;
+  margin: 0 0 8px 0;
+}
+
+.completedText {
+  font-size: 14px;
+  color: #6b5d4f;
+  margin: 0;
+}
+
+/* Sections - simple and compact */
+.section {
+  background: white;
+  border: 1px solid #e8d4bc;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3a2f26;
+  margin: 0 0 12px 0;
+}
+
+/* Members list */
+.membersList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.memberCard:hover {
+  background: #f9f6f0;
+}
+
+.memberAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b07b4c 0%, #8b6239 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -276,88 +510,81 @@
   min-width: 0;
 }
 
-.memberUserId {
-  font-size: 14px;
+.memberName {
+  font-size: 13px;
   font-weight: 500;
-  color: #1e293b;
+  color: #2a2118;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .memberRole {
-  font-size: 12px;
-  color: #6b46c1;
+  font-size: 11px;
+  color: #b07b4c;
   font-weight: 500;
 }
 
-/* Empty State */
+/* Empty state */
 .emptyState {
   background: white;
   border-radius: 12px;
-  padding: 48px 24px;
+  padding: 40px 20px;
   text-align: center;
-  border: 2px dashed #e2e8f0;
+  border: 1px dashed #e8d4bc;
 }
 
 .emptyIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 40px;
+  margin-bottom: 12px;
 }
 
 .emptyState h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1e293b;
+  color: #2a2118;
   margin: 0 0 8px 0;
 }
 
 .emptyState p {
   font-size: 14px;
-  color: #64748b;
-  margin: 0 0 24px 0;
+  color: #6b5d4f;
+  margin: 0 0 20px 0;
 }
 
 .startStudyButton {
-  background: #6b46c1;
+  background: linear-gradient(145deg, #b07b4c, #8b6239);
   color: white;
   border: none;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.2s;
 }
 
 .startStudyButton:hover {
-  background: #5a3a9f;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
-}
-
-/* Study View Container */
-.studyViewContainer {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  margin-top: 1.5rem;
-  overflow: hidden;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .circleView {
-    padding: 16px;
+    padding: 12px;
   }
 
   .circleName {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .circleHeader {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .inviteButton {
+    width: 100%;
   }
 
   .membersList {

@@ -6,10 +6,13 @@ import styles from './circle-home.module.css';
 import InviteModal from './InviteModal';
 import PrivacySettingsModal from './PrivacySettingsModal';
 import StartStudyModal from './StartStudyModal';
-import SharedStudyView from './SharedStudyView';
 import ProgressHeatmap from './ProgressHeatmap';
 import ActivityFeed from './ActivityFeed';
 import CircleStatsCard from './CircleStatsCard';
+import MemberProgressIndicator from './MemberProgressIndicator';
+import ReflectionCard from './ReflectionCard';
+import PrayerRequestCard from './PrayerRequestCard';
+import SharedVerseCard from './SharedVerseCard';
 
 interface Member {
   id: string;
@@ -29,6 +32,21 @@ interface Study {
   duration: number;
   startDate: string;
   status: string;
+  memberPlans: Array<{
+    userId: string;
+    userName?: string;
+    studyPlan: {
+      id: string;
+      userId: string;
+      days: Array<{
+        id: string;
+        dayNumber: number;
+        title: string;
+        completed: boolean;
+        completedAt: string | null;
+      }>;
+    };
+  }>;
   _count: {
     memberPlans: number;
   };
@@ -55,6 +73,73 @@ interface CircleHomeProps {
   circleId: string;
 }
 
+interface Reflection {
+  id: string;
+  userId: string;
+  dayNumber: number;
+  content: string;
+  verseHighlight?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reactions: Array<{
+    id: string;
+    userId: string;
+    type: 'amen' | 'praying' | 'insightful' | 'encouraging';
+    createdAt: string;
+  }>;
+  comments: Array<{
+    id: string;
+    userId: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  _count: {
+    reactions: number;
+    comments: number;
+  };
+}
+
+interface Prayer {
+  id: string;
+  userId: string;
+  title?: string | null;
+  content: string;
+  source: string;
+  sourceReference?: string | null;
+  dayNumber?: number | null;
+  status: string;
+  answeredAt?: string | null;
+  createdAt: string;
+  prayerSupport: Array<{
+    id: string;
+    userId: string;
+    createdAt: string;
+  }>;
+  _count: {
+    prayerSupport: number;
+  };
+}
+
+interface Verse {
+  id: string;
+  userId: string;
+  reference: string;
+  text: string;
+  note?: string | null;
+  fromDayNumber?: number | null;
+  createdAt: string;
+  reactions: Array<{
+    id: string;
+    userId: string;
+    type: 'amen' | 'saved' | 'memorizing';
+    createdAt: string;
+  }>;
+  _count: {
+    reactions: number;
+  };
+}
+
 export default function CircleHome({ circleId }: CircleHomeProps) {
   const { user } = useUser();
   const [circle, setCircle] = useState<Circle | null>(null);
@@ -63,7 +148,9 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showStartStudyModal, setShowStartStudyModal] = useState(false);
-  const [expandedStudyId, setExpandedStudyId] = useState<string | null>(null);
+  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
+  const [verses, setVerses] = useState<Verse[]>([]);
 
   useEffect(() => {
     fetchCircle();
@@ -72,18 +159,68 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const fetchCircle = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/circles/${circleId}`);
+      const response = await fetch(`/api/circles/${circleId}`, {
+        cache: 'no-store',
+      });
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch circle');
       }
 
+      console.log('[CircleHome] Loaded circle with plans:', data.circle.plans);
       setCircle(data.circle);
+
+      // Fetch shared content
+      fetchSharedContent();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch circle');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSharedContent = async () => {
+    await Promise.all([
+      fetchReflections(),
+      fetchPrayers(),
+      fetchVerses(),
+    ]);
+  };
+
+  const fetchReflections = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/reflections?limit=5`);
+      const data = await response.json();
+      if (response.ok) {
+        setReflections(data.reflections || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch reflections:', err);
+    }
+  };
+
+  const fetchPrayers = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/prayers?limit=5`);
+      const data = await response.json();
+      if (response.ok) {
+        setPrayers(data.prayers || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch prayers:', err);
+    }
+  };
+
+  const fetchVerses = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/verses?limit=5`);
+      const data = await response.json();
+      if (response.ok) {
+        setVerses(data.verses || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch verses:', err);
     }
   };
 
@@ -109,103 +246,341 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
 
   const activeStudy = circle.plans.find((p) => p.status === 'active');
 
+  // Calculate member progress for active study
+  const memberProgress = activeStudy?.memberPlans?.map((mp) => {
+    const completedDays = mp.studyPlan.days.filter((d) => d.completed).length;
+    const lastCompleted = mp.studyPlan.days
+      .filter((d) => d.completed && d.completedAt)
+      .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+
+    return {
+      userId: mp.userId,
+      userName: mp.userName,
+      completedDays,
+      totalDays: activeStudy.duration,
+      lastCompletedAt: lastCompleted?.completedAt || undefined,
+    };
+  }) || [];
+
   return (
     <div className={styles.container}>
+      {/* Compact header */}
       <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.titleSection}>
-            <a href="/circles" className={styles.backLink}>
-              ← Back to Circles
-            </a>
-            <h1 className={styles.title}>{circle.name}</h1>
-            {circle.description && (
-              <p className={styles.description}>{circle.description}</p>
-            )}
-          </div>
-
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <div className={styles.statValue}>{circle._count.members}</div>
-              <div className={styles.statLabel}>Members</div>
-            </div>
-            <div className={styles.stat}>
-              <div className={styles.statValue}>{circle._count.plans}</div>
-              <div className={styles.statLabel}>Studies</div>
-            </div>
+        <div className={styles.headerTop}>
+          <a href="/circles" className={styles.backLink}>
+            ← Back to Circles
+          </a>
+          <div className={styles.headerActions}>
+            <button
+              className={styles.settingsButton}
+              onClick={() => setShowPrivacyModal(true)}
+              title="Privacy Settings"
+            >
+              <svg viewBox="0 0 24 24" className={styles.settingsIcon}>
+                <path
+                  d="M12 15a3 3 0 100-6 3 3 0 000 6z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              </svg>
+            </button>
+            <button
+              className={styles.inviteButton}
+              onClick={() => setShowInviteModal(true)}
+            >
+              + Invite
+            </button>
           </div>
         </div>
 
-        <div className={styles.actions}>
-          <button
-            className={styles.settingsButton}
-            onClick={() => setShowPrivacyModal(true)}
-            title="Privacy Settings"
-          >
-            <svg viewBox="0 0 24 24" className={styles.settingsIcon}>
-              <path
-                d="M12 15a3 3 0 100-6 3 3 0 000 6z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
-          </button>
-          <button
-            className={styles.inviteButton}
-            onClick={() => setShowInviteModal(true)}
-          >
-            + Invite Members
-          </button>
+        <div className={styles.headerMain}>
+          <h1 className={styles.title}>{circle.name}</h1>
+          {circle.description && (
+            <p className={styles.description}>{circle.description}</p>
+          )}
+          <div className={styles.meta}>
+            <span>{circle._count.members} members</span>
+            {activeStudy && (
+              <>
+                <span className={styles.metaSeparator}>•</span>
+                <span>{activeStudy.title}</span>
+                <span className={styles.metaSeparator}>•</span>
+                <span>{activeStudy.duration} days</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
+      {/* Main unified content */}
       <div className={styles.content}>
-        <div className={styles.mainColumn}>
-          {activeStudy ? (
-            <div className={styles.activeStudyCard}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Active Study</h2>
-                <div className={styles.badge}>In Progress</div>
+        {activeStudy ? (
+          <>
+            {/* Study info - compact */}
+            <div className={styles.studyInfo}>
+              <p>Your group is studying together through this {activeStudy.duration}-day plan.</p>
+            </div>
+
+            {/* Individual progress bars for each member - stacked */}
+            {activeStudy.memberPlans && activeStudy.memberPlans.length > 0 && (
+              <div className={styles.memberProgressBars}>
+                <h3 className={styles.progressBarsTitle}>Member Progress</h3>
+                {activeStudy.memberPlans.map((mp) => {
+                  const completedDays = mp.studyPlan.days.filter((d) => d.completed).length;
+                  const percentage = (completedDays / activeStudy.duration) * 100;
+                  const isCurrentUser = mp.userId === user?.id;
+                  const displayName = mp.userName || mp.userId;
+                  const initials = mp.userName
+                    ? mp.userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                    : mp.userId.substring(0, 2).toUpperCase();
+
+                  return (
+                    <div key={mp.userId} className={styles.memberProgressItem}>
+                      <div className={styles.memberProgressRow}>
+                        <div className={styles.memberAvatar}>
+                          {initials}
+                        </div>
+                        <div className={styles.memberProgressContent}>
+                          <div className={styles.memberProgressHeader}>
+                            <span className={styles.memberProgressName}>
+                              {displayName.length > 20 ? displayName.substring(0, 20) + '...' : displayName}
+                              {isCurrentUser && <span className={styles.youLabel}> (You)</span>}
+                            </span>
+                            <span className={styles.memberProgressCount}>
+                              {completedDays}/{activeStudy.duration}
+                            </span>
+                          </div>
+                          <div className={styles.memberProgressBarTrack}>
+                            <div
+                              className={`${styles.memberProgressBarFill} ${isCurrentUser ? styles.currentUserBar : ''}`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className={styles.studyInfo}>
-                <div className={styles.studyIcon}>📖</div>
-                <div>
-                  <h3 className={styles.studyTitle}>{activeStudy.title}</h3>
-                  <div className={styles.studyMeta}>
-                    {activeStudy.duration} days • Started{' '}
-                    {new Date(activeStudy.startDate).toLocaleDateString()}
-                  </div>
-                  <div className={styles.studyParticipants}>
-                    {activeStudy._count.memberPlans}{' '}
-                    {activeStudy._count.memberPlans === 1
-                      ? 'member'
-                      : 'members'}{' '}
-                    participating
-                  </div>
-                </div>
+            )}
+
+            {/* Current day study - matching Study widget exactly */}
+            {(() => {
+              const userPlan = activeStudy.memberPlans?.find((mp) => mp.userId === user?.id);
+              if (userPlan) {
+                const completedDays = userPlan.studyPlan.days.filter((d) => d.completed).length;
+                const currentDayNumber = completedDays + 1;
+                const currentDay = userPlan.studyPlan.days.find((d) => d.dayNumber === currentDayNumber);
+
+                if (currentDay && currentDayNumber <= activeStudy.duration) {
+                  return (
+                    <div className={styles.currentDayFocus}>
+                      <h5 className={styles.dayTitle}>{currentDay.title}</h5>
+
+                      {/* Scripture Section */}
+                      {currentDay.verseReference && (
+                        <div className={styles.scriptureSection}>
+                          <div className={styles.verseWithButton}>
+                            <div className={styles.verseContent}>
+                              <p className={styles.verseRef}>
+                                {currentDay.verseReference}
+                              </p>
+                              {currentDay.verseText && (
+                                <p className={styles.verseText}>
+                                  &quot;{currentDay.verseText}&quot;
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Main Content */}
+                      <div className={styles.contentSection}>
+                        <p className={styles.dayContent}>
+                          {currentDay.content}
+                        </p>
+                      </div>
+
+                      {/* Reflection Questions */}
+                      {currentDay.reflection && (
+                        <div className={styles.reflectionSection}>
+                          <h6 className={styles.reflectionTitle}>
+                            Reflection
+                          </h6>
+                          <p className={styles.reflectionText}>
+                            {currentDay.reflection}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Prayer */}
+                      {currentDay.prayer && (
+                        <div className={styles.prayerSection}>
+                          <div className={styles.prayerHeader}>
+                            <h6 className={styles.prayerTitle}>Prayer</h6>
+                          </div>
+                          <p className={styles.prayerText}>
+                            {currentDay.prayer}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className={styles.dayActions}>
+                        <button
+                          className={
+                            currentDay.completed
+                              ? styles.completedBtn
+                              : styles.completeBtn
+                          }
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(
+                                `/api/study-plans/${userPlan.studyPlan.id}/progress`,
+                                {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    dayId: currentDay.id,
+                                    completed: !currentDay.completed,
+                                  }),
+                                }
+                              );
+                              if (response.ok) {
+                                fetchCircle();
+                              }
+                            } catch (error) {
+                              console.error('Failed to toggle completion:', error);
+                            }
+                          }}
+                        >
+                          {currentDay.completed
+                            ? '✓ Completed'
+                            : 'Mark Complete'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                } else if (currentDayNumber > activeStudy.duration) {
+                  return (
+                    <div className={styles.completedCard}>
+                      <div className={styles.completedIcon}>✓</div>
+                      <h3 className={styles.completedTitle}>Study Completed!</h3>
+                      <p className={styles.completedText}>
+                        Congratulations on completing this {activeStudy.duration}-day journey together!
+                      </p>
+                    </div>
+                  );
+                }
+              }
+              return null;
+            })()}
+
+            {/* Progress heatmap */}
+            <ProgressHeatmap
+              circleId={circle.id}
+              studyPlanId={activeStudy.id}
+              totalDays={activeStudy.duration}
+            />
+
+            {/* Member progress */}
+            {memberProgress.length > 0 && (
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Circle Progress</h3>
+                <MemberProgressIndicator members={memberProgress} />
               </div>
-              <div className={styles.studyActions}>
-                <button
-                  className={styles.viewStudyButton}
-                  onClick={() => setExpandedStudyId(expandedStudyId === activeStudy.id ? null : activeStudy.id)}
-                >
-                  {expandedStudyId === activeStudy.id ? '▲ Collapse Study' : '▼ View Study'}
-                </button>
+            )}
+
+            {/* Activity feed */}
+            <ActivityFeed circleId={circle.id} limit={10} />
+
+            {/* Shared content */}
+            {reflections.length > 0 && (
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Recent Reflections</h3>
+                {reflections.map((reflection) => (
+                  <ReflectionCard
+                    key={reflection.id}
+                    reflection={reflection}
+                    circleId={circleId}
+                    onUpdate={fetchReflections}
+                  />
+                ))}
+              </div>
+            )}
+
+            {prayers.length > 0 && (
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Prayer Requests</h3>
+                {prayers.map((prayer) => (
+                  <PrayerRequestCard
+                    key={prayer.id}
+                    prayer={prayer}
+                    circleId={circleId}
+                    onUpdate={fetchPrayers}
+                  />
+                ))}
+              </div>
+            )}
+
+            {verses.length > 0 && (
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Shared Verses</h3>
+                {verses.map((verse) => (
+                  <SharedVerseCard
+                    key={verse.id}
+                    verse={verse}
+                    circleId={circleId}
+                    onUpdate={fetchVerses}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Stats - compact */}
+            <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy.id} />
+
+            {/* Members - compact */}
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Members</h3>
+              <div className={styles.membersList}>
+                {circle.members.map((member) => {
+                  const displayName = member.userName || member.userId;
+                  const initials = member.userName
+                    ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                    : member.userId.substring(0, 2).toUpperCase();
+
+                  return (
+                    <div key={member.id} className={styles.memberCard}>
+                      <div className={styles.memberAvatar}>{initials}</div>
+                      <div className={styles.memberInfo}>
+                        <div className={styles.memberName}>{displayName}</div>
+                        <div className={styles.memberRole}>
+                          {member.role === 'owner' && '👑 '}
+                          {member.role}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          ) : (
-            <div className={styles.emptyStudyCard}>
+          </>
+        ) : (
+          <>
+            {/* No active study state */}
+            <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>📚</div>
-              <h3 className={styles.emptyTitle}>No Active Study</h3>
-              <p className={styles.emptyText}>
-                Start a study together to begin your shared Scripture journey.
-              </p>
+              <h3>No Active Study</h3>
+              <p>Start a study together to begin your shared Scripture journey.</p>
               {canManage && (
                 <button
                   className={styles.startStudyButton}
@@ -215,92 +590,37 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                 </button>
               )}
             </div>
-          )}
 
-          {expandedStudyId && activeStudy && (
-            <div className={styles.studyViewContainer}>
-              <SharedStudyView
-                circleId={circle.id}
-                studyPlanId={expandedStudyId}
-              />
-            </div>
-          )}
+            {/* Members even without study */}
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Members</h3>
+              <div className={styles.membersList}>
+                {circle.members.map((member) => {
+                  const displayName = member.userName || member.userId;
+                  const initials = member.userName
+                    ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                    : member.userId.substring(0, 2).toUpperCase();
 
-          {activeStudy && !expandedStudyId && (
-            <ProgressHeatmap
-              circleId={circle.id}
-              studyPlanId={activeStudy.id}
-              totalDays={activeStudy.duration}
-            />
-          )}
-
-          {!expandedStudyId && (
-            <>
-              <ActivityFeed circleId={circle.id} limit={15} />
-              <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy?.id} />
-            </>
-          )}
-        </div>
-
-        <div className={styles.sidebar}>
-          <div className={styles.membersCard}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>Members</h2>
-              <div className={styles.memberCount}>
-                {circle._count.members}/{circle.maxMembers}
+                  return (
+                    <div key={member.id} className={styles.memberCard}>
+                      <div className={styles.memberAvatar}>{initials}</div>
+                      <div className={styles.memberInfo}>
+                        <div className={styles.memberName}>{displayName}</div>
+                        <div className={styles.memberRole}>
+                          {member.role === 'owner' && '👑 '}
+                          {member.role}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div className={styles.membersList}>
-              {circle.members.map((member) => {
-                const displayName = member.userName || member.userId;
-                const initials = member.userName
-                  ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
-                  : member.userId.substring(0, 2).toUpperCase();
-
-                return (
-                  <div key={member.id} className={styles.memberItem}>
-                    <div className={styles.memberAvatar}>
-                      {initials}
-                    </div>
-                    <div className={styles.memberInfo}>
-                      <div className={styles.memberName}>
-                        {displayName}
-                      </div>
-                      <div className={styles.memberRole}>
-                        {member.role === 'owner' && '👑 '}
-                        {member.role}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className={styles.quickStats}>
-            <h3 className={styles.quickStatsTitle}>Circle Stats</h3>
-            <div className={styles.quickStatItem}>
-              <span className={styles.quickStatLabel}>Total Prayers</span>
-              <span className={styles.quickStatValue}>
-                {circle._count.prayers}
-              </span>
-            </div>
-            <div className={styles.quickStatItem}>
-              <span className={styles.quickStatLabel}>Shared Verses</span>
-              <span className={styles.quickStatValue}>
-                {circle._count.verses}
-              </span>
-            </div>
-            <div className={styles.quickStatItem}>
-              <span className={styles.quickStatLabel}>Created</span>
-              <span className={styles.quickStatValue}>
-                {new Date(circle.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
+      {/* Modals */}
       {showInviteModal && (
         <InviteModal
           circleId={circle.id}

@@ -169,7 +169,7 @@ export default function ReflectionCard({
               {reflection.userId.length > 20 ? '...' : ''}
               {isOwner && <span className={styles.youBadge}>You</span>}
             </div>
-            <div className={styles.timestamp}>
+            <div className={styles.timestamp} suppressHydrationWarning>
               Day {reflection.dayNumber} • {getRelativeTime(reflection.createdAt)}
               {reflection.updatedAt !== reflection.createdAt && (
                 <span className={styles.edited}>(edited)</span>
@@ -252,7 +252,7 @@ export default function ReflectionCard({
                           <span className={styles.youBadgeSmall}>you</span>
                         )}
                       </span>
-                      <span className={styles.commentTime}>
+                      <span className={styles.commentTime} suppressHydrationWarning>
                         {getRelativeTime(comment.createdAt)}
                       </span>
                     </div>

@@ -7,7 +7,6 @@ import MemberProgressIndicator from './MemberProgressIndicator';
 import ReflectionCard from './ReflectionCard';
 import PrayerRequestCard from './PrayerRequestCard';
 import SharedVerseCard from './SharedVerseCard';
-import ActivityFeed from './ActivityFeed';
 
 interface StudyDay {
   id: string;
@@ -122,15 +121,9 @@ export default function SharedStudyView({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasJoined, setHasJoined] = useState(false);
-
-  // Phase 2: Shared content state
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [verses, setVerses] = useState<Verse[]>([]);
-  const [contentLoading, setContentLoading] = useState(false);
-
-  // Phase 3: Mobile tabs
-  const [activeTab, setActiveTab] = useState<'study' | 'circle'>('study');
 
   useEffect(() => {
     fetchStudyPlan();
@@ -156,7 +149,6 @@ export default function SharedStudyView({
 
       setStudyPlan(data.studyPlan);
 
-      // Check if current user has joined
       const userPlan = data.studyPlan.memberPlans.find(
         (mp: MemberPlan) => mp.userId === user?.id
       );
@@ -186,8 +178,7 @@ export default function SharedStudyView({
         throw new Error(data.message || 'Failed to join study');
       }
 
-      // Redirect to the new study plan
-      window.location.href = `/study`;
+      fetchStudyPlan();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join study');
       setLoading(false);
@@ -195,19 +186,17 @@ export default function SharedStudyView({
   };
 
   const fetchSharedContent = async () => {
-    setContentLoading(true);
     await Promise.all([
       fetchReflections(),
       fetchPrayers(),
       fetchVerses(),
     ]);
-    setContentLoading(false);
   };
 
   const fetchReflections = async () => {
     try {
       const response = await fetch(
-        `/api/circles/${circleId}/reflections?limit=10`
+        `/api/circles/${circleId}/reflections?limit=5`
       );
       const data = await response.json();
 
@@ -222,7 +211,7 @@ export default function SharedStudyView({
   const fetchPrayers = async () => {
     try {
       const response = await fetch(
-        `/api/circles/${circleId}/prayers?limit=10`
+        `/api/circles/${circleId}/prayers?limit=5`
       );
       const data = await response.json();
 
@@ -237,7 +226,7 @@ export default function SharedStudyView({
   const fetchVerses = async () => {
     try {
       const response = await fetch(
-        `/api/circles/${circleId}/verses?limit=10`
+        `/api/circles/${circleId}/verses?limit=5`
       );
       const data = await response.json();
 
@@ -287,37 +276,23 @@ export default function SharedStudyView({
   if (!hasJoined) {
     return (
       <div className={styles.container}>
-        <div className={styles.header}>
-          <a href={`/circles/${circleId}`} className={styles.backLink}>
-            ← Back to Circle
-          </a>
-        </div>
-
         <div className={styles.joinPrompt}>
-          <div className={styles.studyInfo}>
-            <div className={styles.studyIcon}>📖</div>
-            <div>
-              <h1 className={styles.studyTitle}>{studyPlan.title}</h1>
-              {studyPlan.description && (
-                <p className={styles.studyDescription}>
-                  {studyPlan.description}
-                </p>
-              )}
-              <div className={styles.studyMeta}>
-                {studyPlan.duration} days • Started{' '}
-                {new Date(studyPlan.startDate).toLocaleDateString()}
-              </div>
-              <div className={styles.studyParticipants}>
-                {studyPlan._count.memberPlans} members participating
-              </div>
+          <div className={styles.studyHeader}>
+            <h1 className={styles.studyTitle}>{studyPlan.title}</h1>
+            {studyPlan.description && (
+              <p className={styles.studyDescription}>
+                {studyPlan.description}
+              </p>
+            )}
+            <div className={styles.studyMeta}>
+              {studyPlan.duration} days • {studyPlan._count.memberPlans} members
             </div>
           </div>
 
           <div className={styles.joinCard}>
-            <h2 className={styles.joinTitle}>Join This Study</h2>
-            <p className={styles.joinDescription}>
-              Create your personal study plan to join your circle members in
-              this {studyPlan.duration}-day journey through Scripture.
+            <p>
+              Join this study to participate with your circle in this {studyPlan.duration}-day
+              journey through Scripture.
             </p>
             <button
               className={styles.joinButton}
@@ -337,124 +312,80 @@ export default function SharedStudyView({
   const userPlan = studyPlan.memberPlans.find(
     (mp) => mp.userId === user?.id
   );
-
-  const hasNewActivity = reflections.length + prayers.length + verses.length > 0;
+  const completedDays = userPlan?.studyPlan.days.filter(d => d.completed).length || 0;
 
   return (
     <div className={styles.container}>
+      {/* Single unified header - compact */}
       <div className={styles.header}>
-        <a href={`/circles/${circleId}`} className={styles.backLink}>
-          ← Back to Circle
-        </a>
-        <h1 className={styles.title}>{studyPlan.title}</h1>
-      </div>
-
-      {/* Mobile tabs */}
-      <div className={styles.mobileTabs}>
-        <button
-          className={`${styles.mobileTab} ${activeTab === 'study' ? styles.mobileTabActive : ''}`}
-          onClick={() => setActiveTab('study')}
-        >
-          <span className={styles.mobileTabIcon}>📖</span>
-          <span>My Study</span>
-        </button>
-        <button
-          className={`${styles.mobileTab} ${activeTab === 'circle' ? styles.mobileTabActive : ''}`}
-          onClick={() => setActiveTab('circle')}
-        >
-          <span className={styles.mobileTabIcon}>👥</span>
-          <span>Circle</span>
-          {hasNewActivity && <span className={styles.activityBadge} />}
-        </button>
-      </div>
-
-      <div className={styles.splitView}>
-        <div className={`${styles.personalStudy} ${activeTab === 'study' ? styles.tabActive : ''}`}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>My Study</h2>
-            <a href="/study" className={styles.viewLink}>
-              Open Full View →
-            </a>
-          </div>
-          <div className={styles.studyPreview}>
-            <p className={styles.previewText}>
-              Your personal study plan is active. Open the full study view to
-              read Scripture, reflect, and engage with the daily content.
-            </p>
-            <a href="/study" className={styles.openStudyButton}>
-              Open Study Plan
-            </a>
+        <div>
+          <h1 className={styles.title}>{studyPlan.title}</h1>
+          <div className={styles.meta}>
+            <span>{studyPlan.duration} days</span>
+            <span className={styles.metaSeparator}>•</span>
+            <span>{studyPlan._count.memberPlans} members</span>
+            <span className={styles.metaSeparator}>•</span>
+            <span>Day {completedDays + 1}</span>
           </div>
         </div>
+      </div>
 
-        <div className={`${styles.circleContext} ${activeTab === 'circle' ? styles.tabActive : ''}`}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Circle Activity</h2>
+      {/* Single unified content area - no nested containers */}
+      <div className={styles.content}>
+        {/* Main study area */}
+        <div className={styles.mainArea}>
+          <div className={styles.studyInfo}>
+            <p>Your group is studying together through this {studyPlan.duration}-day plan. Continue your personal study to stay in sync with your circle.</p>
           </div>
 
-          <MemberProgressIndicator members={memberProgress} />
+          {/* Member progress - compact */}
+          <div className={styles.progressSection}>
+            <h3 className={styles.sectionTitle}>Circle Progress</h3>
+            <MemberProgressIndicator members={memberProgress} />
+          </div>
 
-          <ActivityFeed circleId={circleId} limit={20} />
-
-          <div className={styles.contentSection}>
-            <h3 className={styles.contentSectionTitle}>Shared Reflections</h3>
-            {contentLoading ? (
-              <div className={styles.contentLoading}>Loading reflections...</div>
-            ) : reflections.length > 0 ? (
-              reflections.map((reflection) => (
+          {/* Shared content - integrated */}
+          {reflections.length > 0 && (
+            <div className={styles.contentSection}>
+              <h3 className={styles.sectionTitle}>Recent Reflections</h3>
+              {reflections.map((reflection) => (
                 <ReflectionCard
                   key={reflection.id}
                   reflection={reflection}
                   circleId={circleId}
                   onUpdate={fetchReflections}
                 />
-              ))
-            ) : (
-              <div className={styles.emptyContent}>
-                <p>No reflections shared yet. Be the first to share your thoughts!</p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
-          <div className={styles.contentSection}>
-            <h3 className={styles.contentSectionTitle}>Prayer Requests</h3>
-            {contentLoading ? (
-              <div className={styles.contentLoading}>Loading prayers...</div>
-            ) : prayers.length > 0 ? (
-              prayers.map((prayer) => (
+          {prayers.length > 0 && (
+            <div className={styles.contentSection}>
+              <h3 className={styles.sectionTitle}>Prayer Requests</h3>
+              {prayers.map((prayer) => (
                 <PrayerRequestCard
                   key={prayer.id}
                   prayer={prayer}
                   circleId={circleId}
                   onUpdate={fetchPrayers}
                 />
-              ))
-            ) : (
-              <div className={styles.emptyContent}>
-                <p>No prayer requests yet. Share a prayer need with your circle.</p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
-          <div className={styles.contentSection}>
-            <h3 className={styles.contentSectionTitle}>Shared Verses</h3>
-            {contentLoading ? (
-              <div className={styles.contentLoading}>Loading verses...</div>
-            ) : verses.length > 0 ? (
-              verses.map((verse) => (
+          {verses.length > 0 && (
+            <div className={styles.contentSection}>
+              <h3 className={styles.sectionTitle}>Shared Verses</h3>
+              {verses.map((verse) => (
                 <SharedVerseCard
                   key={verse.id}
                   verse={verse}
                   circleId={circleId}
                   onUpdate={fetchVerses}
                 />
-              ))
-            ) : (
-              <div className={styles.emptyContent}>
-                <p>No verses shared yet. Share a meaningful verse with your circle.</p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -56,6 +56,19 @@ export async function GET(
             createdAt: 'desc',
           },
           include: {
+            memberPlans: {
+              include: {
+                studyPlan: {
+                  include: {
+                    days: {
+                      orderBy: {
+                        dayNumber: 'asc',
+                      },
+                    },
+                  },
+                },
+              },
+            },
             _count: {
               select: {
                 memberPlans: true,
@@ -81,9 +94,13 @@ export async function GET(
       );
     }
 
-    // Fetch user names from Clerk for all members
-    const userIds = circle.members.map((m) => m.userId);
-    const userNames = await getFormattedUserNames(userIds);
+    // Fetch user names from Clerk for all members and plan members
+    const memberUserIds = circle.members.map((m) => m.userId);
+    const planMemberUserIds = circle.plans.flatMap((plan) =>
+      plan.memberPlans.map((mp) => mp.userId)
+    );
+    const allUserIds = [...new Set([...memberUserIds, ...planMemberUserIds])];
+    const userNames = await getFormattedUserNames(allUserIds);
 
     // Add user names to members
     const membersWithNames = circle.members.map((member) => ({
@@ -91,13 +108,30 @@ export async function GET(
       userName: userNames[member.userId] || 'Unknown User',
     }));
 
-    return NextResponse.json({
-      success: true,
-      circle: {
-        ...circle,
-        members: membersWithNames,
+    // Add user names to plan member plans
+    const plansWithNames = circle.plans.map((plan) => ({
+      ...plan,
+      memberPlans: plan.memberPlans.map((mp) => ({
+        ...mp,
+        userName: userNames[mp.userId] || 'Unknown User',
+      })),
+    }));
+
+    return NextResponse.json(
+      {
+        success: true,
+        circle: {
+          ...circle,
+          members: membersWithNames,
+          plans: plansWithNames,
+        },
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (error) {
     console.error('[API] Failed to fetch circle:', error);
     return NextResponse.json(

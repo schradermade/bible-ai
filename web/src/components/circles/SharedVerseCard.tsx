@@ -119,7 +119,7 @@ export default function SharedVerseCard({
               {verse.userId.length > 20 ? '...' : ''}
               {isOwner && <span className={styles.youBadge}>You</span>}
             </div>
-            <div className={styles.timestamp}>
+            <div className={styles.timestamp} suppressHydrationWarning>
               {verse.fromDayNumber && `Day ${verse.fromDayNumber} • `}
               {getRelativeTime(verse.createdAt)}
             </div>

@@ -154,7 +154,7 @@ export default function PrayerRequestCard({
           </svg>
           <span>Prayer Answered</span>
           {prayer.answeredAt && (
-            <span className={styles.answeredDate}>
+            <span className={styles.answeredDate} suppressHydrationWarning>
               {getRelativeTime(prayer.answeredAt)}
             </span>
           )}
@@ -170,7 +170,7 @@ export default function PrayerRequestCard({
               {prayer.userId.length > 20 ? '...' : ''}
               {isOwner && <span className={styles.youBadge}>You</span>}
             </div>
-            <div className={styles.timestamp}>
+            <div className={styles.timestamp} suppressHydrationWarning>
               <span className={styles.sourceIcon}>{getSourceIcon()}</span>
               {prayer.dayNumber && `Day ${prayer.dayNumber} • `}
               {getRelativeTime(prayer.createdAt)}

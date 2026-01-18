@@ -280,7 +280,7 @@ export default function ActivityFeed({ circleId, limit = 20 }: ActivityFeedProps
                 </div>
                 <div className={styles.activityMeta}>
                   <p className={styles.activityText}>{getActivityText(activity)}</p>
-                  <span className={styles.activityTime}>
+                  <span className={styles.activityTime} suppressHydrationWarning>
                     {getRelativeTime(activity.createdAt)}
                   </span>
                 </div>
