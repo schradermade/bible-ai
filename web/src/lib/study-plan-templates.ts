@@ -664,26 +664,36 @@ export const STUDY_PLAN_TEMPLATES: Record<string, Template> = {
 export const TEMPLATE_OPTIONS = [
   {
     id: 'template_grace',
+    value: 'template_grace',
+    icon: '✨',
     title: 'Understanding Grace',
     description: 'Explore God\'s unmerited favor and transforming love'
   },
   {
     id: 'template_gospel',
+    value: 'template_gospel',
+    icon: '✝️',
     title: 'The Gospel',
     description: 'Understand the good news of Jesus Christ'
   },
   {
     id: 'template_prayer_fasting',
+    value: 'template_prayer_fasting',
+    icon: '🙏',
     title: 'Prayer & Fasting',
     description: 'Deepen your communion with God'
   },
   {
     id: 'template_love_compassion',
+    value: 'template_love_compassion',
+    icon: '❤️',
     title: 'Love & Compassion',
     description: 'Living out Christ\'s love in the world'
   },
   {
     id: 'template_faith_action',
+    value: 'template_faith_action',
+    icon: '🔥',
     title: 'Faith in Action',
     description: 'Putting your faith into practice'
   }

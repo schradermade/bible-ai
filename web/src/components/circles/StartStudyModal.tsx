@@ -114,10 +114,10 @@ export default function StartStudyModal({
             <div className={styles.templateGrid}>
               {TEMPLATE_OPTIONS.map((template) => (
                 <button
-                  key={template.value}
+                  key={template.id}
                   type="button"
-                  className={`${styles.templateCard} ${selectedTemplate === template.value ? styles.templateCardActive : ''}`}
-                  onClick={() => setSelectedTemplate(template.value)}
+                  className={`${styles.templateCard} ${selectedTemplate === template.id ? styles.templateCardActive : ''}`}
+                  onClick={() => setSelectedTemplate(template.id)}
                 >
                   <div className={styles.templateIcon}>{template.icon}</div>
                   <div className={styles.templateTitle}>{template.title}</div>
