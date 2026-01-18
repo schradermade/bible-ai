@@ -18,6 +18,45 @@ export default function InviteModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [inviteMode, setInviteMode] = useState<'link' | 'email'>('email');
+  const [email, setEmail] = useState('');
+  const [invitationSent, setInvitationSent] = useState(false);
+
+  const sendEmailInvitation = async () => {
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/circles/${circleId}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send invitation');
+      }
+
+      setInvitationSent(true);
+      setEmail('');
+      setTimeout(() => setInvitationSent(false), 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to send invitation'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generateInvitation = async () => {
     try {
@@ -80,12 +119,61 @@ export default function InviteModal({
             <div>
               <div className={styles.circleName}>{circleName}</div>
               <div className={styles.circleHint}>
-                Share this link with people you want to invite
+                Invite members via email or shareable link
               </div>
             </div>
           </div>
 
-          {!invitationUrl ? (
+          {/* Mode Toggle */}
+          <div className={styles.modeToggle}>
+            <button
+              className={`${styles.modeButton} ${inviteMode === 'email' ? styles.modeButtonActive : ''}`}
+              onClick={() => setInviteMode('email')}
+            >
+              📧 Email Invitation
+            </button>
+            <button
+              className={`${styles.modeButton} ${inviteMode === 'link' ? styles.modeButtonActive : ''}`}
+              onClick={() => setInviteMode('link')}
+            >
+              🔗 Share Link
+            </button>
+          </div>
+
+          {/* Email Invitation Mode */}
+          {inviteMode === 'email' && (
+            <div className={styles.emailSection}>
+              <p className={styles.description}>
+                Enter an email address to send a direct invitation. They'll receive a personalized link to join {circleName}.
+              </p>
+              <div className={styles.emailForm}>
+                <input
+                  type="email"
+                  className={styles.emailInput}
+                  placeholder="friend@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendEmailInvitation()}
+                  disabled={loading}
+                />
+                <button
+                  className={styles.sendButton}
+                  onClick={sendEmailInvitation}
+                  disabled={loading || !email.trim()}
+                >
+                  {loading ? 'Sending...' : 'Send Invitation'}
+                </button>
+              </div>
+              {invitationSent && (
+                <div className={styles.success}>
+                  ✓ Invitation sent successfully!
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Link Invitation Mode */}
+          {inviteMode === 'link' && !invitationUrl && (
             <div className={styles.generateSection}>
               <p className={styles.description}>
                 Generate a shareable invitation link that anyone can use to join
@@ -99,7 +187,9 @@ export default function InviteModal({
                 {loading ? 'Generating...' : 'Generate Invitation Link'}
               </button>
             </div>
-          ) : (
+          )}
+
+          {inviteMode === 'link' && invitationUrl && (
             <div className={styles.linkSection}>
               <label className={styles.label}>Invitation Link</label>
               <div className={styles.linkContainer}>

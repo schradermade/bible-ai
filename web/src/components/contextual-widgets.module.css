@@ -1743,3 +1743,159 @@
   font-weight: 600;
   color: #ffffff;
 }
+
+/* Invitations Section */
+.invitationsSection {
+  margin-bottom: 16px;
+}
+
+.invitationsSectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8b6239;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.invitationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.invitationCard {
+  background: linear-gradient(145deg, rgba(176, 123, 76, 0.08), rgba(176, 123, 76, 0.04));
+  border: 2px solid rgba(176, 123, 76, 0.25);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.invitationCard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 98, 57, 0.12);
+  border-color: rgba(176, 123, 76, 0.4);
+}
+
+.invitationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.invitationCircleName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #2c2217;
+}
+
+.invitationExpiry {
+  font-size: 10px;
+  font-weight: 600;
+  color: #c44536;
+  background: rgba(196, 69, 54, 0.1);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.invitationDescription {
+  font-size: 12px;
+  color: #6b5d4f;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.invitationMeta {
+  font-size: 11px;
+  color: #8b6239;
+  margin-bottom: 10px;
+}
+
+.invitationMembers {
+  font-weight: 500;
+}
+
+.invitationError {
+  background: rgba(196, 69, 54, 0.1);
+  color: #c44536;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.invitationActions {
+  display: flex;
+  gap: 8px;
+}
+
+.invitationDeclineButton,
+.invitationAcceptButton {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.invitationDeclineButton {
+  background: white;
+  color: #8b6239;
+  border: 1.5px solid rgba(176, 123, 76, 0.3);
+}
+
+.invitationDeclineButton:hover:not(:disabled) {
+  background: rgba(176, 123, 76, 0.05);
+  border-color: rgba(176, 123, 76, 0.5);
+}
+
+.invitationAcceptButton {
+  background: linear-gradient(135deg, #b07b4c, #8b6239);
+  color: white;
+}
+
+.invitationAcceptButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(139, 98, 57, 0.3);
+}
+
+.invitationDeclineButton:disabled,
+.invitationAcceptButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.invitationBadge {
+  background: linear-gradient(135deg, #c44536, #a83426);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.circlesSectionDivider {
+  margin: 16px 0;
+  padding: 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8b6239;
+}

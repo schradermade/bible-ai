@@ -78,6 +78,26 @@ interface Circle {
   }>;
 }
 
+interface CircleInvitation {
+  id: string;
+  token: string;
+  circleId: string;
+  invitedBy: string;
+  invitedEmail: string | null;
+  status: string;
+  expiresAt: string;
+  createdAt: string;
+  circle: {
+    id: string;
+    name: string;
+    description: string | null;
+    maxMembers: number;
+    _count: {
+      members: number;
+    };
+  };
+}
+
 interface ContextualWidgetsProps {
   myVerses: SavedVerse[];
   onLoadHistory: (response: string) => void;
@@ -100,6 +120,10 @@ export default function ContextualWidgets({
   const [studyProgress, setStudyProgress] = useState(0);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [isLoadingCircles, setIsLoadingCircles] = useState(true);
+  const [invitations, setInvitations] = useState<CircleInvitation[]>([]);
+  const [isLoadingInvitations, setIsLoadingInvitations] = useState(true);
+  const [invitationErrors, setInvitationErrors] = useState<Record<string, string>>({});
+  const [processingInvitations, setProcessingInvitations] = useState<Set<string>>(new Set());
   const [generatingPrayerForVerse, setGeneratingPrayerForVerse] = useState<
     string | null
   >(null);
@@ -138,7 +162,6 @@ export default function ContextualWidgets({
   const [showPlanCompletion, setShowPlanCompletion] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [showCreateCircle, setShowCreateCircle] = useState(false);
-  const [isCreatingCircle, setIsCreatingCircle] = useState(false);
 
   // Pagination state for widgets
   const [visibleVersesCount, setVisibleVersesCount] = useState(5);
@@ -381,6 +404,32 @@ export default function ContextualWidgets({
     };
 
     loadCircles();
+  }, [user]);
+
+  // Load invitations
+  useEffect(() => {
+    const loadInvitations = async () => {
+      if (!user) {
+        setInvitations([]);
+        setIsLoadingInvitations(false);
+        return;
+      }
+
+      setIsLoadingInvitations(true);
+      try {
+        const response = await fetch('/api/invitations');
+        if (response.ok) {
+          const data = await response.json();
+          setInvitations(data.invitations || []);
+        }
+      } catch (error) {
+        console.error('Failed to load invitations:', error);
+      } finally {
+        setIsLoadingInvitations(false);
+      }
+    };
+
+    loadInvitations();
   }, [user]);
 
   const toggleWidget = (widgetId: string) => {
@@ -1067,34 +1116,81 @@ export default function ContextualWidgets({
     }
   };
 
-  const handleCreateCircle = async (name: string, description: string) => {
-    setIsCreatingCircle(true);
-    setShowCreateCircle(false);
+  // Helper for expiration display
+  const getExpirationText = (expiresAt: string): string => {
+    const now = new Date();
+    const expires = new Date(expiresAt);
+    const diffMs = expires.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 1) {
+      const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+      if (diffHours < 1) return 'Expires soon';
+      return `Expires in ${diffHours}h`;
+    }
+    return `Expires in ${diffDays}d`;
+  };
+
+  // Accept invitation handler
+  const handleAcceptInvitation = async (invitation: CircleInvitation) => {
+    setProcessingInvitations(prev => new Set(prev).add(invitation.id));
+    setInvitationErrors(prev => {
+      const { [invitation.id]: _, ...rest } = prev;
+      return rest;
+    });
 
     try {
-      const response = await fetch('/api/circles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description }),
+      const response = await fetch(`/api/invitations/${invitation.token}/accept`, {
+        method: 'POST'
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create circle');
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to accept');
       }
 
-      const data = await response.json();
-      // Add new circle to list
-      setCircles([data.circle, ...circles]);
+      // Remove from invitations
+      setInvitations(prev => prev.filter(inv => inv.id !== invitation.id));
 
-      // Optionally, select the newly created circle
-      if (onSelectCircle) {
-        onSelectCircle(data.circle.id);
+      // Refresh circles
+      const circlesResponse = await fetch('/api/circles');
+      if (circlesResponse.ok) {
+        const data = await circlesResponse.json();
+        setCircles(data.circles || []);
       }
     } catch (error) {
-      console.error('Failed to create circle:', error);
-      alert('Failed to create circle. Please try again.');
+      setInvitationErrors(prev => ({
+        ...prev,
+        [invitation.id]: error instanceof Error ? error.message : 'Failed to accept'
+      }));
     } finally {
-      setIsCreatingCircle(false);
+      setProcessingInvitations(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(invitation.id);
+        return newSet;
+      });
+    }
+  };
+
+  // Decline invitation handler
+  const handleDeclineInvitation = async (invitation: CircleInvitation) => {
+    const previousInvitations = invitations;
+    setInvitations(prev => prev.filter(inv => inv.id !== invitation.id));
+
+    try {
+      const response = await fetch(`/api/invitations/${invitation.token}/decline`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to decline');
+      }
+    } catch (error) {
+      setInvitations(previousInvitations);
+      setInvitationErrors(prev => ({
+        ...prev,
+        [invitation.id]: error instanceof Error ? error.message : 'Failed to decline'
+      }));
     }
   };
 
@@ -1133,12 +1229,16 @@ export default function ContextualWidgets({
                 </svg>
               </button>
             </div>
-            <span className={styles.countBadge}>{circles.length}</span>
+            {invitations.length > 0 ? (
+              <span className={styles.invitationBadge}>{invitations.length}</span>
+            ) : (
+              <span className={styles.countBadge}>{circles.length}</span>
+            )}
           </div>
           <div
             className={`${styles.widgetContent} ${collapsedWidgets.circles ? styles.collapsed : ''}`}
           >
-            {isLoadingCircles && (
+            {(isLoadingCircles || isLoadingInvitations) && (
               <div className={styles.creatingPlan}>
                 <svg
                   width="40"
@@ -1159,7 +1259,72 @@ export default function ContextualWidgets({
               </div>
             )}
 
-            {!isLoadingCircles && circles.length === 0 && (
+            {/* Pending Invitations */}
+            {invitations.length > 0 && (
+              <div className={styles.invitationsSection}>
+                <div className={styles.invitationsSectionTitle}>
+                  📬 Pending Invitations
+                </div>
+                <div className={styles.invitationsList}>
+                  {invitations.map((invitation) => (
+                    <div key={invitation.id} className={styles.invitationCard}>
+                      <div className={styles.invitationHeader}>
+                        <span className={styles.invitationCircleName}>
+                          {invitation.circle.name}
+                        </span>
+                        <span className={styles.invitationExpiry}>
+                          {getExpirationText(invitation.expiresAt)}
+                        </span>
+                      </div>
+
+                      {invitation.circle.description && (
+                        <p className={styles.invitationDescription}>
+                          {invitation.circle.description}
+                        </p>
+                      )}
+
+                      <div className={styles.invitationMeta}>
+                        <span className={styles.invitationMembers}>
+                          {invitation.circle._count.members}/{invitation.circle.maxMembers} members
+                        </span>
+                      </div>
+
+                      {invitationErrors[invitation.id] && (
+                        <div className={styles.invitationError}>
+                          {invitationErrors[invitation.id]}
+                        </div>
+                      )}
+
+                      <div className={styles.invitationActions}>
+                        <button
+                          className={styles.invitationDeclineButton}
+                          onClick={() => handleDeclineInvitation(invitation)}
+                          disabled={processingInvitations.has(invitation.id)}
+                        >
+                          Decline
+                        </button>
+                        <button
+                          className={styles.invitationAcceptButton}
+                          onClick={() => handleAcceptInvitation(invitation)}
+                          disabled={processingInvitations.has(invitation.id)}
+                        >
+                          {processingInvitations.has(invitation.id) ? 'Accepting...' : 'Accept'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Divider if both invitations and circles exist */}
+            {invitations.length > 0 && circles.length > 0 && (
+              <div className={styles.circlesSectionDivider}>
+                <span>Your Circles</span>
+              </div>
+            )}
+
+            {!isLoadingCircles && circles.length === 0 && invitations.length === 0 && (
               <div className={styles.studyPlanEmpty}>
                 <div className={styles.emptyIcon}>👥</div>
                 <h4>Study Together</h4>
@@ -2173,13 +2338,19 @@ export default function ContextualWidgets({
         )}
 
       {/* Create Circle Modal */}
-      {showCreateCircle && (
-        <CreateCircleModal
-          isOpen={showCreateCircle}
-          onClose={() => setShowCreateCircle(false)}
-          onCreate={handleCreateCircle}
-        />
-      )}
+      {showCreateCircle &&
+        createPortal(
+          <CreateCircleModal
+            onClose={() => setShowCreateCircle(false)}
+            onCircleCreated={(circle) => {
+              setCircles([circle, ...circles]);
+              if (onSelectCircle) {
+                onSelectCircle(circle.id);
+              }
+            }}
+          />,
+          document.body
+        )}
     </>
   );
 }

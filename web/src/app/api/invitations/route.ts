@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -16,14 +16,51 @@ export async function GET() {
   }
 
   try {
-    // Note: For now, we're not filtering by email since we don't have
-    // a user email mapping. In Phase 3, we'll implement email invitations
-    // properly with Clerk user data.
+    // Get user email from Clerk
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses?.[0]?.emailAddress;
 
-    // For now, return empty array (invitations work via shareable links)
+    if (!userEmail) {
+      return NextResponse.json({
+        success: true,
+        invitations: [],
+      });
+    }
+
+    // Fetch pending invitations for this user's email
+    const invitations = await prisma.circleInvitation.findMany({
+      where: {
+        invitedEmail: userEmail,
+        status: 'pending',
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        circle: {
+          include: {
+            _count: {
+              select: {
+                members: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Filter out invitations for full circles
+    const availableInvitations = invitations.filter(
+      (invitation) =>
+        invitation.circle._count.members < invitation.circle.maxMembers
+    );
+
     return NextResponse.json({
       success: true,
-      invitations: [],
+      invitations: availableInvitations,
     });
   } catch (error) {
     console.error('[API] Failed to fetch invitations:', error);
