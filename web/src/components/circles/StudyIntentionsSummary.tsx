@@ -40,7 +40,10 @@ export default function StudyIntentionsSummary({
   onGenerateStudy,
 }: StudyIntentionsSummaryProps) {
   const submittedCount = intentions.length;
-  const canGenerate = submittedCount >= 2;
+  // For solo circles (1 member), require 1 submission
+  // For group circles, require at least 2 submissions
+  const minSubmissions = totalMembers === 1 ? 1 : Math.max(2, Math.ceil(totalMembers * 0.5));
+  const canGenerate = submittedCount >= minSubmissions;
 
   const hasCompleted = (userId: string) => {
     return intentions.some((intention) => intention.userId === userId);
@@ -49,23 +52,29 @@ export default function StudyIntentionsSummary({
   return (
     <div className={styles.summaryContainer}>
       <div className={styles.summaryHeader}>
-        <h3>Group Study Input</h3>
+        <h3>{totalMembers === 1 ? 'Your Study Input' : 'Group Study Input'}</h3>
         <div className={styles.submissionStatus}>
-          {submittedCount}/{totalMembers} members have submitted
+          {totalMembers === 1
+            ? submittedCount > 0
+              ? 'Input submitted'
+              : 'No input yet'
+            : `${submittedCount}/${totalMembers} members have submitted`}
         </div>
       </div>
 
-      {/* Visual indicator for how to track submissions */}
-      <div className={styles.indicatorGuide}>
-        <div className={styles.guideIcon}>💡</div>
-        <div className={styles.guideContent}>
-          <p className={styles.guideText}>
-            Check member avatars above — a <span className={styles.goldBadge}>gold-bordered checkmark</span> means they've submitted their input
-          </p>
+      {/* Visual indicator for how to track submissions - only for group circles */}
+      {totalMembers > 1 && (
+        <div className={styles.indicatorGuide}>
+          <div className={styles.guideIcon}>💡</div>
+          <div className={styles.guideContent}>
+            <p className={styles.guideText}>
+              Check member avatars above — a <span className={styles.goldBadge}>gold-bordered checkmark</span> means they've submitted their input
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Generate button (only for creator, only when >= 2 submissions) */}
+      {/* Generate button (only for creator, only when minimum submissions met) */}
       {isCreator && canGenerate && (
         <div className={styles.generateButtonWrapper}>
           <button className={styles.generateStudyButton} onClick={onGenerateStudy}>

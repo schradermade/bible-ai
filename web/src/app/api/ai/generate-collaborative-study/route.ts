@@ -208,13 +208,17 @@ export async function POST(request: Request) {
 
     // Validate minimum submissions
     const totalMembers = circle.members.length;
-    const minSubmissions = Math.max(2, Math.ceil(totalMembers * 0.5));
+    // For solo circles (1 member), require 1 submission
+    // For group circles, require at least 2 submissions or 50% of members
+    const minSubmissions = totalMembers === 1 ? 1 : Math.max(2, Math.ceil(totalMembers * 0.5));
 
     if (intentions.length < minSubmissions) {
       return NextResponse.json(
         {
           error: 'insufficient_data',
-          message: `Need at least ${minSubmissions} member submissions to generate a study`,
+          message: totalMembers === 1
+            ? 'You need to submit your study input before generating'
+            : `Need at least ${minSubmissions} member submissions to generate a study`,
         },
         { status: 400 }
       );
