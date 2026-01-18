@@ -193,13 +193,14 @@ model StudyCircle {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members        StudyCircleMember[]
-  plans          CircleStudyPlan[]
-  invitations    CircleInvitation[]
-  prayers        CirclePrayerRequest[]
-  verses         CircleSharedVerse[]
-  highlights     CircleVerseHighlight[]
-  encouragements CircleEncouragement[]
+  members         StudyCircleMember[]
+  plans           CircleStudyPlan[]
+  invitations     CircleInvitation[]
+  prayers         CirclePrayerRequest[]
+  verses          CircleSharedVerse[]
+  highlights      CircleVerseHighlight[]
+  encouragements  CircleEncouragement[]
+  studyIntentions CircleStudyIntention[]
 
   @@index([createdBy])
 }
@@ -446,4 +447,33 @@ model CircleEncouragementReaction {
 
   @@unique([responseId, userId, type])
   @@index([responseId])
+}
+
+model CircleStudyIntention {
+  id        String   @id @default(cuid())
+  circleId  String
+  circle    StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  userId    String
+
+  // Topic Cards (store as JSON array)
+  selectedTopics  String   @db.Text  // JSON: ["faith_doubt", "relationships", "prayer"]
+
+  // Depth Slider (1-10 scale)
+  depthLevel      Int      // 1 (foundational) to 10 (deep theological)
+
+  // Current Season (string enum)
+  currentSeason   String   // "seeking", "growing", "struggling", "celebrating", "distant", "serving"
+
+  // Study Pace (string enum)
+  studyPace       String   // "light", "moderate", "deep"
+
+  // Heart Question (optional text)
+  heartQuestion   String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([circleId, userId])  // One intention per user per circle
+  @@index([circleId])
+  @@index([userId])
 }

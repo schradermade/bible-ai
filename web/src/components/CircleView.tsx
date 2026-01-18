@@ -14,6 +14,9 @@ import VerseHighlightCard from './circles/VerseHighlightCard';
 import AddHighlightModal from './circles/AddHighlightModal';
 import EncouragementPromptCard from './circles/EncouragementPromptCard';
 import AddEncouragementPromptModal from './circles/AddEncouragementPromptModal';
+import StudyIntentionsForm from './circles/StudyIntentionsForm';
+import StudyIntentionsSummary from './circles/StudyIntentionsSummary';
+import AIStudyGenerationModal from './circles/AIStudyGenerationModal';
 
 interface CircleMember {
   id: string;
@@ -209,6 +212,10 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [showAddHighlightModal, setShowAddHighlightModal] = useState(false);
   const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] = useState(false);
   const [prayerFilter, setPrayerFilter] = useState<'all' | 'active' | 'answered'>('all');
+  const [intentions, setIntentions] = useState<any[]>([]);
+  const [hasSubmittedIntention, setHasSubmittedIntention] = useState(false);
+  const [showGenerationModal, setShowGenerationModal] = useState(false);
+  const [totalMembers, setTotalMembers] = useState(0);
 
   const loadCircle = async () => {
     setIsLoading(true);
@@ -328,6 +335,21 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     }
   };
 
+  const fetchIntentions = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/study-intentions`);
+      const data = await response.json();
+      if (response.ok) {
+        setIntentions(data.intentions || []);
+        setTotalMembers(data.totalMembers || 0);
+        const userIntention = data.intentions?.find((i: any) => i.userId === user?.id);
+        setHasSubmittedIntention(!!userIntention);
+      }
+    } catch (err) {
+      console.error('Failed to fetch intentions:', err);
+    }
+  };
+
   useEffect(() => {
     loadCircle();
   }, [circleId]);
@@ -342,6 +364,16 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           const completedDays = userPlan.studyPlan.days.filter((d) => d.completed).length;
           setCurrentDayNumber(completedDays + 1);
         }
+      }
+    }
+  }, [circle, user]);
+
+  // Fetch intentions when circle loads if no active study
+  useEffect(() => {
+    if (circle && user) {
+      const activePlan = circle.plans.find((p) => p.status === 'active');
+      if (!activePlan) {
+        fetchIntentions();
       }
     }
   }, [circle, user]);
@@ -848,17 +880,31 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           </>
         ) : (
           <>
-            {/* No active study state */}
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📚</div>
-              <h3>No Active Study</h3>
-              <p>Start a study plan to begin your circle's journey together</p>
-              <button
-                className={styles.startStudyButton}
-                onClick={() => setShowStartStudyModal(true)}
-              >
-                Start New Study
-              </button>
+            {/* Study Intentions Flow */}
+            <div className={styles.studyInitiationSection}>
+              {!hasSubmittedIntention ? (
+                <StudyIntentionsForm
+                  circleId={circleId}
+                  onSubmit={() => {
+                    fetchIntentions();
+                  }}
+                />
+              ) : circle.createdBy === user?.id ? (
+                <StudyIntentionsSummary
+                  intentions={intentions}
+                  totalMembers={totalMembers}
+                  isCreator={true}
+                  onGenerateStudy={() => setShowGenerationModal(true)}
+                />
+              ) : (
+                <div className={styles.waitingMessage}>
+                  <div className={styles.sealedScrollIcon}>📜</div>
+                  <h3>Your intention has been sealed</h3>
+                  <p className={styles.waitingSubtitle}>
+                    Waiting for the circle creator to generate the study
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Members even without study */}
@@ -932,6 +978,18 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             fetchEncouragements();
           }}
           currentDay={currentDayNumber}
+        />
+      )}
+
+      {showGenerationModal && (
+        <AIStudyGenerationModal
+          circleId={circle.id}
+          intentions={intentions}
+          onClose={() => setShowGenerationModal(false)}
+          onStudyCreated={() => {
+            setShowGenerationModal(false);
+            loadCircle();
+          }}
         />
       )}
     </div>

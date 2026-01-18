@@ -700,6 +700,34 @@
   transform: translateY(-1px);
 }
 
+/* Waiting Message for Study Intentions */
+.waitingMessage {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.sealedScrollIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.waitingMessage h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem 0;
+}
+
+.waitingSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
 /* Share Insight Button */
 .highlightButton {
   padding: 6px 12px;

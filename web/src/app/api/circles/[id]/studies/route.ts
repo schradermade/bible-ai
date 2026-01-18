@@ -101,19 +101,9 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { templateSource, duration } = body;
+    const { templateSource, duration, aiGenerated, generatedPlan } = body;
 
-    // Validate inputs
-    if (!templateSource || typeof templateSource !== 'string') {
-      return NextResponse.json(
-        {
-          error: 'invalid_payload',
-          message: 'Template source is required',
-        },
-        { status: 400 }
-      );
-    }
-
+    // Validate duration
     if (duration !== 7 && duration !== 21) {
       return NextResponse.json(
         {
@@ -124,21 +114,66 @@ export async function POST(
       );
     }
 
-    // Get template data
-    const template = STUDY_PLAN_TEMPLATES[templateSource];
-    if (!template) {
-      return NextResponse.json(
-        {
-          error: 'invalid_source',
-          message: 'Invalid template source',
-        },
-        { status: 400 }
-      );
-    }
+    let templateDays: any[];
+    let title: string;
+    let description: string;
+    let finalTemplateSource: string;
 
-    const templateDays = template.getDays(duration as 7 | 21);
-    const title = `${duration}-Day ${duration === 7 ? 'Journey' : 'Deep Dive'}: ${template.title}`;
-    const description = template.description;
+    if (aiGenerated && generatedPlan) {
+      // AI-generated study mode
+      if (!generatedPlan.title || !generatedPlan.description || !generatedPlan.days) {
+        return NextResponse.json(
+          {
+            error: 'invalid_payload',
+            message: 'Generated plan must include title, description, and days',
+          },
+          { status: 400 }
+        );
+      }
+
+      if (generatedPlan.days.length !== duration) {
+        return NextResponse.json(
+          {
+            error: 'invalid_payload',
+            message: `Generated plan must have exactly ${duration} days`,
+          },
+          { status: 400 }
+        );
+      }
+
+      templateDays = generatedPlan.days;
+      title = generatedPlan.title;
+      description = generatedPlan.description;
+      finalTemplateSource = 'ai_collaborative';
+    } else {
+      // Template mode
+      if (!templateSource || typeof templateSource !== 'string') {
+        return NextResponse.json(
+          {
+            error: 'invalid_payload',
+            message: 'Template source is required',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Get template data
+      const template = STUDY_PLAN_TEMPLATES[templateSource];
+      if (!template) {
+        return NextResponse.json(
+          {
+            error: 'invalid_source',
+            message: 'Invalid template source',
+          },
+          { status: 400 }
+        );
+      }
+
+      templateDays = template.getDays(duration as 7 | 21);
+      title = `${duration}-Day ${duration === 7 ? 'Journey' : 'Deep Dive'}: ${template.title}`;
+      description = template.description;
+      finalTemplateSource = templateSource;
+    }
 
     // Fetch all circle members
     const circle = await prisma.studyCircle.findUnique({
@@ -165,7 +200,7 @@ export async function POST(
       const plan = await tx.circleStudyPlan.create({
         data: {
           circleId,
-          templateSource,
+          templateSource: finalTemplateSource,
           duration,
           title,
           description,
@@ -184,7 +219,7 @@ export async function POST(
             title,
             description,
             duration,
-            source: `circle_${templateSource}`,
+            source: `circle_${finalTemplateSource}`,
             status: 'active',
           },
         });
