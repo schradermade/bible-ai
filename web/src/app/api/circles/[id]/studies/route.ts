@@ -231,7 +231,9 @@ export async function POST(
             dayNumber: day.dayNumber,
             title: day.title,
             content: day.content,
-            reflection: day.reflection,
+            reflection: Array.isArray(day.reflection)
+              ? day.reflection.join('\n')
+              : day.reflection,
             prayer: day.prayer || null,
             verseReference: day.verseReference || null,
             verseText: day.verseText || null,

@@ -83,21 +83,6 @@ export default function StudyIntentionsSummary({
         </div>
       </div>
 
-      {/* Sealed scroll cards for each submission */}
-      <div className={styles.scrollsList}>
-        {intentions.map((intention) => (
-          <div key={intention.id} className={styles.sealedScroll}>
-            <div className={styles.scrollAvatar}>
-              {getUserInitials(intention.userName)}
-            </div>
-            <div className={styles.scrollContent}>
-              <div className={styles.scrollName}>{intention.userName}</div>
-              <div className={styles.scrollSealed}>Sealed 📜</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Generate button (only for creator, only when >= 2 submissions) */}
       {isCreator && canGenerate && (
         <button className={styles.generateStudyButton} onClick={onGenerateStudy}>

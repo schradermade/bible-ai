@@ -100,9 +100,9 @@ REQUIREMENTS:
 2. Balance multiple topics proportionally - weave in the top 2-3 topics throughout the study
 3. Honor the emotional/spiritual seasons represented - acknowledge both struggles and celebrations
 4. Calibrate daily content length to match the group's pace preference:
-   - Light: 300-400 words per day
-   - Moderate: 400-600 words per day
-   - Deep: 600-800 words per day
+   - Light: 250-350 words per day
+   - Moderate: 350-450 words per day
+   - Deep: 450-550 words per day
 5. Incorporate heart questions as recurring thematic threads throughout the study
 6. Match theological depth to the group's average preference (Level ${Math.round(avgDepth)}/10)
 
@@ -115,7 +115,7 @@ OUTPUT FORMAT (valid JSON only):
       "dayNumber": 1,
       "title": "Compelling day title (4-6 words)",
       "content": "Main teaching content - pastoral, warm, Scripture-grounded. Match the word count to the group's pace preference.",
-      "reflection": "2-3 thoughtful reflection questions that encourage personal application",
+      "reflection": "A string containing 2-3 thoughtful reflection questions separated by newlines that encourage personal application",
       "prayer": "A short prayer prompt (2-3 sentences) that ties the day's teaching to conversation with God",
       "verseReference": "Book Chapter:Verse",
       "verseText": "Full verse text from ESV or similar translation"
@@ -124,11 +124,14 @@ OUTPUT FORMAT (valid JSON only):
 }
 
 CRITICAL INSTRUCTIONS:
-- Return ONLY valid JSON, no markdown formatting, no code blocks
+- Return ONLY valid JSON, no markdown formatting, no code blocks, no backticks
 - Include exactly ${duration} days in the days array
 - Every day must have all fields: dayNumber, title, content, reflection, prayer, verseReference, verseText
 - Use diverse Scripture passages - don't repeat the same verses
 - Ensure day numbers are sequential from 1 to ${duration}
+- All string values must properly escape quotes and special characters
+- Use double quotes for JSON property names and string values
+- Do not include any text before or after the JSON object
 
 TONE: Calm, pastoral, Scripture-grounded, inclusive of diverse perspectives, warm and encouraging
 AVOID: Forcing consensus, minimizing struggles, one-size-fits-all advice, overly dramatic language, clichés`;
@@ -244,23 +247,60 @@ export async function POST(request: Request) {
       model: 'gpt-4o',
       messages: [
         {
+          role: 'system',
+          content: 'You are a pastoral study designer. Always return valid, complete JSON.',
+        },
+        {
           role: 'user',
           content: prompt,
         },
       ],
       temperature: 0.7,
-      max_tokens: duration === 7 ? 4000 : 12000,
+      max_tokens: duration === 7 ? 8000 : 16000,
       response_format: { type: 'json_object' },
     });
 
-    const responseContent = completion.choices[0]?.message?.content?.trim();
+    const finishReason = completion.choices[0]?.finish_reason;
+    let responseContent = completion.choices[0]?.message?.content?.trim();
 
     if (!responseContent) {
       throw new Error('No study generated');
     }
 
+    // Check if response was truncated
+    if (finishReason === 'length') {
+      console.error('[API] Response was truncated due to token limit');
+      console.error('[API] Response length:', responseContent.length);
+      throw new Error('Study generation was incomplete. This is a system issue - please contact support or try a shorter duration.');
+    }
+
+    // Remove markdown code blocks if present
+    if (responseContent.startsWith('```')) {
+      responseContent = responseContent.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    }
+
     // Parse JSON response
-    const parsedResponse = JSON.parse(responseContent);
+    let parsedResponse;
+    try {
+      parsedResponse = JSON.parse(responseContent);
+    } catch (jsonError) {
+      // Write to file for debugging
+      const fs = require('fs');
+      const debugPath = '/tmp/ai-study-debug.json';
+      try {
+        fs.writeFileSync(debugPath, responseContent);
+        console.error('[API] Invalid JSON written to:', debugPath);
+      } catch (fsError) {
+        console.error('[API] Could not write debug file');
+      }
+
+      console.error('[API] Failed to parse AI response (first 1000 chars):', responseContent.substring(0, 1000));
+      console.error('[API] Failed to parse AI response (last 500 chars):', responseContent.substring(responseContent.length - 500));
+      console.error('[API] JSON parse error:', jsonError);
+      console.error('[API] Full response length:', responseContent.length);
+      throw new Error('AI generated invalid JSON. Please try regenerating.');
+    }
+
     const { title, description, days } = parsedResponse;
 
     if (!title || !description || !Array.isArray(days) || days.length !== duration) {

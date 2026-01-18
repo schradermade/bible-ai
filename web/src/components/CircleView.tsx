@@ -393,16 +393,26 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     }
   }, [circle, user]);
 
-  // Poll encouragements every 30 seconds
+  // Poll all data every 30 seconds for real-time updates
   useEffect(() => {
     if (!circle) return;
 
     const interval = setInterval(() => {
-      fetchEncouragements();
+      // Refresh circle data without loading spinner (member updates, study progress)
+      refreshCircle();
+
+      // Refresh shared content (reflections, prayers, verses, highlights, encouragements)
+      fetchSharedContent();
+
+      // Refresh study intentions if no active study
+      const activePlan = circle.plans.find((p) => p.status === 'active');
+      if (!activePlan) {
+        fetchIntentions();
+      }
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [circleId, circle]);
+  }, [circleId, circle, refreshCircle, fetchSharedContent, fetchIntentions]);
 
   if (isLoading) {
     return (
