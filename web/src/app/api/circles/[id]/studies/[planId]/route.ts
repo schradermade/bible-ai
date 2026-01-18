@@ -206,7 +206,9 @@ export async function PATCH(
     }
 
     // Update status to archived and clear old intentions
-    const [updatedStudyPlan] = await prisma.$transaction([
+    console.log(`[Archive] Archiving study ${planId} for circle ${circleId}`);
+
+    const [updatedStudyPlan, deletedIntentions] = await prisma.$transaction([
       prisma.circleStudyPlan.update({
         where: { id: planId },
         data: { status: 'archived' },
@@ -217,9 +219,12 @@ export async function PATCH(
       }),
     ]);
 
+    console.log(`[Archive] Deleted ${deletedIntentions.count} study intentions for circle ${circleId}`);
+
     return NextResponse.json({
       success: true,
       studyPlan: updatedStudyPlan,
+      deletedIntentions: deletedIntentions.count,
     });
   } catch (error) {
     console.error('[API] Failed to archive study plan:', error);

@@ -307,42 +307,17 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
         throw new Error(data.message || 'Failed to archive study');
       }
 
-      // Clear intentions state immediately
+      // Clear intentions state and keep it cleared
+      // Don't fetch again - we know they should be empty after archive
       setIntentions([]);
       setHasSubmittedIntention(false);
+      setTotalMembers(circle.members.length);
 
-      // Wait for DB transaction to complete and propagate
+      // Wait for DB transaction to complete
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Refresh circle data to show updated state
       await refreshCircle();
-
-      // Wait a bit more before fetching intentions
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Fetch fresh intentions with cache-busting timestamp (should be empty after archive)
-      const response2 = await fetch(
-        `/api/circles/${circleId}/study-intentions?t=${Date.now()}`,
-        {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-          },
-        }
-      );
-
-      if (response2.ok) {
-        const data = await response2.json();
-        console.log('[Archive] Fetched intentions after archive:', data.intentions);
-        setIntentions(data.intentions || []);
-        setTotalMembers(data.totalMembers || 0);
-        const userIntention = data.intentions?.find(
-          (i: any) => i.userId === user?.id
-        );
-        console.log('[Archive] User intention found:', !!userIntention);
-        setHasSubmittedIntention(!!userIntention);
-      }
     } catch (error) {
       console.error('Failed to archive study:', error);
       alert(error instanceof Error ? error.message : 'Failed to archive study');
