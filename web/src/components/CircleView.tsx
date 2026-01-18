@@ -483,8 +483,16 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
 
   return (
     <div className={styles.circleView}>
-      {/* Study Circle Title */}
-      <h2 className={styles.studyCircleTitle}>Study Circle</h2>
+      {/* Top header with title and invite */}
+      <div className={styles.topHeader}>
+        <h2 className={styles.studyCircleTitle}>Study Circle</h2>
+        <button
+          className={styles.inviteButton}
+          onClick={() => setShowInviteModal(true)}
+        >
+          + Invite
+        </button>
+      </div>
 
       {/* Compact header */}
       <div className={styles.header}>
@@ -517,12 +525,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             )}
           </div>
         </div>
-        <button
-          className={styles.inviteButton}
-          onClick={() => setShowInviteModal(true)}
-        >
-          + Invite
-        </button>
       </div>
 
       {/* Main unified content area */}

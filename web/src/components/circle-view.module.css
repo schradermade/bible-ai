@@ -23,13 +23,20 @@
   color: #b07b4c;
 }
 
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .studyCircleTitle {
   font-size: 28px;
   font-weight: 700;
   color: #5a4a30;
-  text-align: center;
-  margin: 0 0 16px 0;
+  margin: 0;
   letter-spacing: 0.02em;
+  flex: 1;
 }
 
 .loading,
