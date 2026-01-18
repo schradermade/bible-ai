@@ -1097,7 +1097,7 @@ export default function ContextualWidgets({
                               />
                             )}
                           </svg>
-                          {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? 'Memorized!' : 'Mark as Memorized'}
+                          {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? 'Memorized!' : 'Memorize'}
                         </button>
                         <button
                           className={styles.createPrayerButton}
