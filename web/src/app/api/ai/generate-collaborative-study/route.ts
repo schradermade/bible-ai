@@ -248,7 +248,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: 'system',
-          content: 'You are a pastoral study designer. Always return valid, complete JSON.',
+          content: 'You are a pastoral study designer. Always return valid, complete JSON. Keep content concise to avoid truncation.',
         },
         {
           role: 'user',
@@ -256,7 +256,7 @@ export async function POST(request: Request) {
         },
       ],
       temperature: 0.7,
-      max_tokens: duration === 7 ? 8000 : 16000,
+      max_tokens: duration === 7 ? 12000 : 24000,
       response_format: { type: 'json_object' },
     });
 
@@ -284,21 +284,73 @@ export async function POST(request: Request) {
     try {
       parsedResponse = JSON.parse(responseContent);
     } catch (jsonError) {
-      // Write to file for debugging
-      const fs = require('fs');
-      const debugPath = '/tmp/ai-study-debug.json';
-      try {
-        fs.writeFileSync(debugPath, responseContent);
-        console.error('[API] Invalid JSON written to:', debugPath);
-      } catch (fsError) {
-        console.error('[API] Could not write debug file');
-      }
+      // Try to repair common JSON issues
+      console.log('[API] JSON parse failed, attempting repair...');
 
-      console.error('[API] Failed to parse AI response (first 1000 chars):', responseContent.substring(0, 1000));
-      console.error('[API] Failed to parse AI response (last 500 chars):', responseContent.substring(responseContent.length - 500));
-      console.error('[API] JSON parse error:', jsonError);
-      console.error('[API] Full response length:', responseContent.length);
-      throw new Error('AI generated invalid JSON. Please try regenerating.');
+      // Check if it's an unterminated string at the end
+      if (responseContent.includes('Unterminated') || responseContent.slice(-1) !== '}') {
+        // Try to close any open strings and objects
+        let repairedContent = responseContent;
+
+        // Count unclosed quotes
+        const quoteCount = (repairedContent.match(/(?<!\\)"/g) || []).length;
+        if (quoteCount % 2 !== 0) {
+          // Odd number of quotes - add closing quote
+          repairedContent += '"';
+        }
+
+        // Count unclosed braces
+        const openBraces = (repairedContent.match(/{/g) || []).length;
+        const closeBraces = (repairedContent.match(/}/g) || []).length;
+        if (openBraces > closeBraces) {
+          repairedContent += '}'.repeat(openBraces - closeBraces);
+        }
+
+        // Count unclosed brackets
+        const openBrackets = (repairedContent.match(/\[/g) || []).length;
+        const closeBrackets = (repairedContent.match(/\]/g) || []).length;
+        if (openBrackets > closeBrackets) {
+          repairedContent += ']'.repeat(openBrackets - closeBrackets);
+        }
+
+        try {
+          parsedResponse = JSON.parse(repairedContent);
+          console.log('[API] JSON repair successful!');
+        } catch (repairError) {
+          console.error('[API] JSON repair failed');
+          // Write to file for debugging
+          const fs = require('fs');
+          const debugPath = '/tmp/ai-study-debug.json';
+          try {
+            fs.writeFileSync(debugPath, responseContent);
+            console.error('[API] Invalid JSON written to:', debugPath);
+          } catch (fsError) {
+            console.error('[API] Could not write debug file');
+          }
+
+          console.error('[API] Failed to parse AI response (first 1000 chars):', responseContent.substring(0, 1000));
+          console.error('[API] Failed to parse AI response (last 500 chars):', responseContent.substring(responseContent.length - 500));
+          console.error('[API] JSON parse error:', jsonError);
+          console.error('[API] Full response length:', responseContent.length);
+          throw new Error('AI generated invalid JSON. Please try regenerating.');
+        }
+      } else {
+        // Not a simple truncation issue
+        const fs = require('fs');
+        const debugPath = '/tmp/ai-study-debug.json';
+        try {
+          fs.writeFileSync(debugPath, responseContent);
+          console.error('[API] Invalid JSON written to:', debugPath);
+        } catch (fsError) {
+          console.error('[API] Could not write debug file');
+        }
+
+        console.error('[API] Failed to parse AI response (first 1000 chars):', responseContent.substring(0, 1000));
+        console.error('[API] Failed to parse AI response (last 500 chars):', responseContent.substring(responseContent.length - 500));
+        console.error('[API] JSON parse error:', jsonError);
+        console.error('[API] Full response length:', responseContent.length);
+        throw new Error('AI generated invalid JSON. Please try regenerating.');
+      }
     }
 
     const { title, description, days } = parsedResponse;
