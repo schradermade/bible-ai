@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import styles from './shared-study-view.module.css';
 import MemberProgressIndicator from './MemberProgressIndicator';
+import ReflectionCard from './ReflectionCard';
+import PrayerRequestCard from './PrayerRequestCard';
+import SharedVerseCard from './SharedVerseCard';
+import ActivityFeed from './ActivityFeed';
 
 interface StudyDay {
   id: string;
@@ -41,6 +45,73 @@ interface SharedStudyViewProps {
   studyPlanId: string;
 }
 
+interface Reflection {
+  id: string;
+  userId: string;
+  dayNumber: number;
+  content: string;
+  verseHighlight?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reactions: Array<{
+    id: string;
+    userId: string;
+    type: string;
+    createdAt: string;
+  }>;
+  comments: Array<{
+    id: string;
+    userId: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  _count: {
+    reactions: number;
+    comments: number;
+  };
+}
+
+interface Prayer {
+  id: string;
+  userId: string;
+  title?: string | null;
+  content: string;
+  source: string;
+  sourceReference?: string | null;
+  dayNumber?: number | null;
+  status: string;
+  answeredAt?: string | null;
+  createdAt: string;
+  prayerSupport: Array<{
+    id: string;
+    userId: string;
+    createdAt: string;
+  }>;
+  _count: {
+    prayerSupport: number;
+  };
+}
+
+interface Verse {
+  id: string;
+  userId: string;
+  reference: string;
+  text: string;
+  note?: string | null;
+  fromDayNumber?: number | null;
+  createdAt: string;
+  reactions: Array<{
+    id: string;
+    userId: string;
+    type: string;
+    createdAt: string;
+  }>;
+  _count: {
+    reactions: number;
+  };
+}
+
 export default function SharedStudyView({
   circleId,
   studyPlanId,
@@ -51,9 +122,21 @@ export default function SharedStudyView({
   const [error, setError] = useState<string | null>(null);
   const [hasJoined, setHasJoined] = useState(false);
 
+  // Phase 2: Shared content state
+  const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
+  const [verses, setVerses] = useState<Verse[]>([]);
+  const [contentLoading, setContentLoading] = useState(false);
+
   useEffect(() => {
     fetchStudyPlan();
   }, [circleId, studyPlanId]);
+
+  useEffect(() => {
+    if (hasJoined) {
+      fetchSharedContent();
+    }
+  }, [hasJoined, circleId]);
 
   const fetchStudyPlan = async () => {
     try {
@@ -104,6 +187,61 @@ export default function SharedStudyView({
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join study');
       setLoading(false);
+    }
+  };
+
+  const fetchSharedContent = async () => {
+    setContentLoading(true);
+    await Promise.all([
+      fetchReflections(),
+      fetchPrayers(),
+      fetchVerses(),
+    ]);
+    setContentLoading(false);
+  };
+
+  const fetchReflections = async () => {
+    try {
+      const response = await fetch(
+        `/api/circles/${circleId}/reflections?limit=10`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setReflections(data.reflections || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch reflections:', err);
+    }
+  };
+
+  const fetchPrayers = async () => {
+    try {
+      const response = await fetch(
+        `/api/circles/${circleId}/prayers?limit=10`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setPrayers(data.prayers || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch prayers:', err);
+    }
+  };
+
+  const fetchVerses = async () => {
+    try {
+      const response = await fetch(
+        `/api/circles/${circleId}/verses?limit=10`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setVerses(data.verses || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch verses:', err);
     }
   };
 
@@ -230,25 +368,66 @@ export default function SharedStudyView({
 
           <MemberProgressIndicator members={memberProgress} />
 
-          <div className={styles.placeholderCard}>
-            <h3 className={styles.placeholderTitle}>Shared Reflections</h3>
-            <p className={styles.placeholderText}>
-              Reflections shared by members will appear here (Phase 2)
-            </p>
+          <ActivityFeed circleId={circleId} limit={20} />
+
+          <div className={styles.contentSection}>
+            <h3 className={styles.contentSectionTitle}>Shared Reflections</h3>
+            {contentLoading ? (
+              <div className={styles.contentLoading}>Loading reflections...</div>
+            ) : reflections.length > 0 ? (
+              reflections.map((reflection) => (
+                <ReflectionCard
+                  key={reflection.id}
+                  reflection={reflection}
+                  circleId={circleId}
+                  onUpdate={fetchReflections}
+                />
+              ))
+            ) : (
+              <div className={styles.emptyContent}>
+                <p>No reflections shared yet. Be the first to share your thoughts!</p>
+              </div>
+            )}
           </div>
 
-          <div className={styles.placeholderCard}>
-            <h3 className={styles.placeholderTitle}>Prayer Requests</h3>
-            <p className={styles.placeholderText}>
-              Circle prayer requests will appear here (Phase 2)
-            </p>
+          <div className={styles.contentSection}>
+            <h3 className={styles.contentSectionTitle}>Prayer Requests</h3>
+            {contentLoading ? (
+              <div className={styles.contentLoading}>Loading prayers...</div>
+            ) : prayers.length > 0 ? (
+              prayers.map((prayer) => (
+                <PrayerRequestCard
+                  key={prayer.id}
+                  prayer={prayer}
+                  circleId={circleId}
+                  onUpdate={fetchPrayers}
+                />
+              ))
+            ) : (
+              <div className={styles.emptyContent}>
+                <p>No prayer requests yet. Share a prayer need with your circle.</p>
+              </div>
+            )}
           </div>
 
-          <div className={styles.placeholderCard}>
-            <h3 className={styles.placeholderTitle}>Shared Verses</h3>
-            <p className={styles.placeholderText}>
-              Verses shared by members will appear here (Phase 2)
-            </p>
+          <div className={styles.contentSection}>
+            <h3 className={styles.contentSectionTitle}>Shared Verses</h3>
+            {contentLoading ? (
+              <div className={styles.contentLoading}>Loading verses...</div>
+            ) : verses.length > 0 ? (
+              verses.map((verse) => (
+                <SharedVerseCard
+                  key={verse.id}
+                  verse={verse}
+                  circleId={circleId}
+                  onUpdate={fetchVerses}
+                />
+              ))
+            ) : (
+              <div className={styles.emptyContent}>
+                <p>No verses shared yet. Share a meaningful verse with your circle.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

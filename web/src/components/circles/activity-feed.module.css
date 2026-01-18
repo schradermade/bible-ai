@@ -1,0 +1,279 @@
+.container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.refreshButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.refreshButton:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.refreshButton:active {
+  transform: rotate(180deg);
+}
+
+.refreshIcon {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  transition: color 0.15s;
+}
+
+.refreshButton:hover .refreshIcon {
+  color: #2563eb;
+}
+
+.loading,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.loading {
+  color: #6b7280;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.9375rem;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.emptyIcon svg {
+  width: 32px;
+  height: 32px;
+  color: #9ca3af;
+}
+
+.emptyTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+.emptyText {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.activityItem {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.timelineLine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.activityIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activityIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.activityIcon.reflection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.activityIcon.prayer {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.activityIcon.verse {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.activityIcon.default {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+.connector {
+  width: 2px;
+  flex: 1;
+  min-height: 24px;
+  background: linear-gradient(180deg, #d1d5db 0%, transparent 100%);
+  margin-top: 8px;
+}
+
+.activityContent {
+  flex: 1;
+  padding-bottom: 2rem;
+}
+
+.activityItem:last-child .activityContent {
+  padding-bottom: 0;
+}
+
+.activityHeader {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.activityMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityText {
+  font-size: 0.9375rem;
+  color: #374151;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.5;
+}
+
+.activityText strong {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.activityTime {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+}
+
+.activityPreview {
+  padding: 0.875rem;
+  background: #f9fafb;
+  border-left: 3px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1.25rem;
+  }
+
+  .timeline {
+    gap: 0;
+  }
+
+  .activityItem {
+    gap: 0.75rem;
+  }
+
+  .activityIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .activityIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+}
