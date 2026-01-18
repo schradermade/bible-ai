@@ -49,9 +49,9 @@ export default function CreateCircleModal({
       }
 
       onCircleCreated(data.circle);
+      onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create circle');
-    } finally {
       setLoading(false);
     }
   };
