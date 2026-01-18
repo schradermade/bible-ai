@@ -401,9 +401,7 @@
 
 .completeBtn,
 .completedBtn {
-  flex: 1;
-  min-width: 120px;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
@@ -457,6 +455,10 @@
   transition: all 0.2s ease;
   margin-top: -20px;
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .viewAllDaysBtn:hover {

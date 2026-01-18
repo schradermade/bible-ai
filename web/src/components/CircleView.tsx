@@ -701,9 +701,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                               Updating...
                             </>
                           ) : currentDay.completed ? (
-                            '✓ Completed'
+                            `✓ Day ${currentDay.dayNumber} Complete`
                           ) : (
-                            'Mark Complete'
+                            `Mark Day ${currentDay.dayNumber} Complete`
                           )}
                         </button>
                       </div>
@@ -739,6 +739,26 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                     onClick={() => setShowAllDays(!showAllDays)}
                   >
                     {showAllDays ? 'Hide' : 'View'} All Days
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      style={{
+                        transform: showAllDays
+                          ? 'rotate(180deg)'
+                          : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                      }}
+                    >
+                      <path
+                        d="M4 6L8 10L12 6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </button>
                 );
               }
