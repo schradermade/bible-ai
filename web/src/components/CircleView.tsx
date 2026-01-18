@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useUser } from '@clerk/nextjs';
 import styles from './circle-view.module.css';
 import CircleStatsCard from './circles/CircleStatsCard';
@@ -219,6 +220,12 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [hasSubmittedIntention, setHasSubmittedIntention] = useState(false);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
   const [totalMembers, setTotalMembers] = useState(0);
+  const [showPlanCompletion, setShowPlanCompletion] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const loadCircle = async () => {
     setIsLoading(true);
@@ -253,8 +260,11 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   // Refresh circle data without showing loading spinner
   const refreshCircle = async () => {
     try {
-      const response = await fetch(`/api/circles/${circleId}`, {
+      const response = await fetch(`/api/circles/${circleId}?t=${Date.now()}`, {
         cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
       });
 
       if (!response.ok) {
@@ -365,9 +375,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
     loadCircle();
   }, [circleId]);
 
-  // Update current day number when circle loads
+  // Set initial current day number when circle first loads
   useEffect(() => {
-    if (circle && user) {
+    if (circle && user && currentDayNumber === 1) {
       const activePlan = circle.plans.find((p) => p.status === 'active');
       if (activePlan) {
         const userPlan = activePlan.memberPlans?.find(
@@ -381,7 +391,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
         }
       }
     }
-  }, [circle, user]);
+  }, [circle, user, currentDayNumber]);
 
   // Fetch intentions when circle loads if no active study
   useEffect(() => {
@@ -684,7 +694,21 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                                 }
                               );
                               if (response.ok) {
+                                // Check if this is the last day being completed
+                                const isLastDay = currentDay.dayNumber === activePlan.duration;
+                                const wasNotCompleted = !currentDay.completed;
+
+                                // Small delay to ensure database update completes
+                                await new Promise(resolve => setTimeout(resolve, 300));
                                 await refreshCircle();
+
+                                // Show celebration modal if completing the last day
+                                if (isLastDay && wasNotCompleted) {
+                                  setShowPlanCompletion(true);
+                                  setTimeout(() => {
+                                    setShowPlanCompletion(false);
+                                  }, 6000);
+                                }
                               }
                             } catch (error) {
                               console.error(
@@ -1171,6 +1195,34 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           }}
         />
       )}
+
+      {/* Plan Completion Celebration */}
+      {isMounted &&
+        showPlanCompletion &&
+        circle &&
+        createPortal(
+          <div className={styles.planCompletionModal}>
+            <div className={styles.planCompletionContent}>
+              <div className={styles.completionIcon}>🎉</div>
+              <h2>Journey Complete!</h2>
+              <p>
+                Congratulations on completing your Circle study with{' '}
+                {circle.members
+                  .map((m) => m.userName || 'A member')
+                  .join(', ')
+                  .replace(/, ([^,]*)$/, ' and $1')}
+                !
+              </p>
+              <p className={styles.completionEncouragement}>
+                You&apos;ve taken meaningful steps in your spiritual growth together. Keep building on this momentum!
+              </p>
+              <button onClick={() => setShowPlanCompletion(false)}>
+                Continue
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
