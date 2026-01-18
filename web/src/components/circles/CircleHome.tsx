@@ -7,6 +7,7 @@ import InviteModal from './InviteModal';
 import PrivacySettingsModal from './PrivacySettingsModal';
 import ProgressHeatmap from './ProgressHeatmap';
 import ActivityFeed from './ActivityFeed';
+import CircleStatsCard from './CircleStatsCard';
 
 interface Member {
   id: string;
@@ -217,6 +218,8 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
           )}
 
           <ActivityFeed circleId={circle.id} limit={15} />
+
+          <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy?.id} />
         </div>
 
         <div className={styles.sidebar}>
