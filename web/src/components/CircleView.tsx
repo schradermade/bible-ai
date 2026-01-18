@@ -10,6 +10,11 @@ import MemberProgressIndicator from './circles/MemberProgressIndicator';
 import ReflectionCard from './circles/ReflectionCard';
 import PrayerRequestCard from './circles/PrayerRequestCard';
 import SharedVerseCard from './circles/SharedVerseCard';
+import VerseHighlightCard from './circles/VerseHighlightCard';
+import AddHighlightModal from './circles/AddHighlightModal';
+import EncouragementPromptCard from './circles/EncouragementPromptCard';
+import AddEncouragementResponseModal from './circles/AddEncouragementResponseModal';
+import AddEncouragementPromptModal from './circles/AddEncouragementPromptModal';
 
 interface CircleMember {
   id: string;
@@ -36,6 +41,11 @@ interface CirclePlan {
         id: string;
         dayNumber: number;
         title: string;
+        content: string;
+        reflection: string;
+        prayer?: string | null;
+        verseReference?: string | null;
+        verseText?: string | null;
         completed: boolean;
         completedAt: string | null;
       }>;
@@ -128,6 +138,58 @@ interface Verse {
   };
 }
 
+interface VerseHighlight {
+  id: string;
+  userId: string;
+  reference: string;
+  text: string;
+  insight?: string | null;
+  fromDayNumber?: number | null;
+  createdAt: string;
+  reactions: Array<{
+    id: string;
+    userId: string;
+    type: 'amen' | 'insightful' | 'saved';
+    createdAt: string;
+  }>;
+  _count: {
+    reactions: number;
+  };
+}
+
+interface Encouragement {
+  id: string;
+  promptText: string;
+  createdBy: string;
+  createdByName?: string;
+  dayNumber?: number | null;
+  createdAt: string;
+  responses: Array<{
+    id: string;
+    userId: string;
+    userName?: string;
+    content: string;
+    source: 'ai_generated' | 'user_custom';
+    scriptureRef?: string | null;
+    scriptureText?: string | null;
+    reflection?: string | null;
+    prayerPrompt?: string | null;
+    createdAt: string;
+    reactions: Array<{
+      id: string;
+      userId: string;
+      type: 'amen' | 'encouraging' | 'blessed';
+      createdAt: string;
+    }>;
+    _count: {
+      reactions: number;
+    };
+  }>;
+  _count: {
+    responses: number;
+  };
+}
+
 export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const { user } = useUser();
   const [circle, setCircle] = useState<Circle | null>(null);
@@ -138,10 +200,17 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [verses, setVerses] = useState<Verse[]>([]);
+  const [highlights, setHighlights] = useState<VerseHighlight[]>([]);
+  const [encouragements, setEncouragements] = useState<Encouragement[]>([]);
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
   const [showAllDays, setShowAllDays] = useState(false);
   const [visibleDaysCount, setVisibleDaysCount] = useState(7);
   const [currentDayNumber, setCurrentDayNumber] = useState(1);
+  const [showAddHighlightModal, setShowAddHighlightModal] = useState(false);
+  const [showAddEncouragementPromptModal, setShowAddEncouragementPromptModal] = useState(false);
+  const [showAddEncouragementResponseModal, setShowAddEncouragementResponseModal] = useState(false);
+  const [selectedEncouragement, setSelectedEncouragement] = useState<Encouragement | null>(null);
+  const [prayerFilter, setPrayerFilter] = useState<'all' | 'active' | 'answered'>('all');
 
   const loadCircle = async () => {
     setIsLoading(true);
@@ -194,8 +263,10 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const fetchSharedContent = async () => {
     await Promise.all([
       fetchReflections(),
+      fetchEncouragements(),
       fetchPrayers(),
       fetchVerses(),
+      fetchHighlights(),
     ]);
   };
 
@@ -232,6 +303,30 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
       }
     } catch (err) {
       console.error('Failed to fetch verses:', err);
+    }
+  };
+
+  const fetchHighlights = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/highlights?limit=5`);
+      const data = await response.json();
+      if (response.ok) {
+        setHighlights(data.highlights || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch highlights:', err);
+    }
+  };
+
+  const fetchEncouragements = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}/encouragements?limit=3`);
+      const data = await response.json();
+      if (response.ok) {
+        setEncouragements(data.encouragements || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch encouragements:', err);
     }
   };
 
@@ -416,6 +511,13 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                                 </p>
                               )}
                             </div>
+                            <button
+                              className={styles.highlightButton}
+                              onClick={() => setShowAddHighlightModal(true)}
+                              title="Share your insight on this verse"
+                            >
+                              💡 Share Insight
+                            </button>
                           </div>
                         </div>
                       )}
@@ -592,19 +694,86 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
               </div>
             )}
 
-            {prayers.length > 0 && (
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Prayer Requests</h3>
-                {prayers.map((prayer) => (
-                  <PrayerRequestCard
-                    key={prayer.id}
-                    prayer={prayer}
-                    circleId={circleId}
-                    onUpdate={fetchPrayers}
-                  />
-                ))}
+            {/* Encouragement Prompts Section */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Encouragement Prompts</h3>
+                <button
+                  className={styles.addButton}
+                  onClick={() => setShowAddEncouragementPromptModal(true)}
+                >
+                  + Add Prompt
+                </button>
               </div>
-            )}
+              {encouragements.length === 0 ? (
+                <div className={styles.emptyMessage}>
+                  <p>No encouragement prompts yet. Be the first to share one!</p>
+                </div>
+              ) : (
+                encouragements.map((encouragement) => (
+                  <EncouragementPromptCard
+                    key={encouragement.id}
+                    encouragement={encouragement}
+                    circleId={circleId}
+                    onUpdate={fetchEncouragements}
+                    onAddResponse={(enc) => {
+                      setSelectedEncouragement(enc);
+                      setShowAddEncouragementResponseModal(true);
+                    }}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Prayer Requests with Filters */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Prayer Requests</h3>
+                <div className={styles.filterButtons}>
+                  <button
+                    className={prayerFilter === 'all' ? styles.filterActive : styles.filterButton}
+                    onClick={() => setPrayerFilter('all')}
+                  >
+                    All
+                  </button>
+                  <button
+                    className={prayerFilter === 'active' ? styles.filterActive : styles.filterButton}
+                    onClick={() => setPrayerFilter('active')}
+                  >
+                    Active
+                  </button>
+                  <button
+                    className={prayerFilter === 'answered' ? styles.filterActive : styles.filterButton}
+                    onClick={() => setPrayerFilter('answered')}
+                  >
+                    Answered
+                  </button>
+                </div>
+              </div>
+              {(() => {
+                const filteredPrayers = prayers.filter(prayer => {
+                  if (prayerFilter === 'all') return true;
+                  if (prayerFilter === 'active') return prayer.status === 'ongoing';
+                  if (prayerFilter === 'answered') return prayer.status === 'answered';
+                  return true;
+                });
+
+                return filteredPrayers.length === 0 ? (
+                  <div className={styles.emptyMessage}>
+                    <p>No {prayerFilter !== 'all' ? prayerFilter : ''} prayer requests yet.</p>
+                  </div>
+                ) : (
+                  filteredPrayers.map((prayer) => (
+                    <PrayerRequestCard
+                      key={prayer.id}
+                      prayer={prayer}
+                      circleId={circleId}
+                      onUpdate={fetchPrayers}
+                    />
+                  ))
+                );
+              })()}
+            </div>
 
             {verses.length > 0 && (
               <div className={styles.section}>
@@ -619,6 +788,25 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 ))}
               </div>
             )}
+
+            {/* Verse Highlights Section */}
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Verse Highlights & Insights</h3>
+              {highlights.length === 0 ? (
+                <div className={styles.emptyMessage}>
+                  <p>No verse highlights yet. Use the "💡 Share Insight" button on today's scripture to add one!</p>
+                </div>
+              ) : (
+                highlights.map((highlight) => (
+                  <VerseHighlightCard
+                    key={highlight.id}
+                    highlight={highlight}
+                    circleId={circleId}
+                    onUpdate={fetchHighlights}
+                  />
+                ))
+              )}
+            </div>
 
             {/* Stats - compact, at bottom */}
             <div className={styles.section}>
@@ -713,6 +901,50 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
           circleName={circle.name}
           onClose={() => setShowStartStudyModal(false)}
           onStudyCreated={loadCircle}
+        />
+      )}
+
+      {showAddHighlightModal && (
+        <AddHighlightModal
+          circleId={circle.id}
+          isOpen={true}
+          onClose={() => setShowAddHighlightModal(false)}
+          onSuccess={() => {
+            setShowAddHighlightModal(false);
+            fetchHighlights();
+          }}
+          currentDay={currentDayNumber}
+        />
+      )}
+
+      {showAddEncouragementPromptModal && (
+        <AddEncouragementPromptModal
+          circleId={circle.id}
+          isOpen={true}
+          onClose={() => setShowAddEncouragementPromptModal(false)}
+          onSuccess={() => {
+            setShowAddEncouragementPromptModal(false);
+            fetchEncouragements();
+          }}
+          currentDay={currentDayNumber}
+        />
+      )}
+
+      {showAddEncouragementResponseModal && selectedEncouragement && (
+        <AddEncouragementResponseModal
+          circleId={circle.id}
+          encouragementId={selectedEncouragement.id}
+          promptText={selectedEncouragement.promptText}
+          isOpen={true}
+          onClose={() => {
+            setShowAddEncouragementResponseModal(false);
+            setSelectedEncouragement(null);
+          }}
+          onSuccess={() => {
+            setShowAddEncouragementResponseModal(false);
+            setSelectedEncouragement(null);
+            fetchEncouragements();
+          }}
         />
       )}
     </div>

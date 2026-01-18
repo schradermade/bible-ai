@@ -172,12 +172,15 @@ export default function PrayerRequestCard({
             </div>
             <div className={styles.timestamp} suppressHydrationWarning>
               <span className={styles.sourceIcon}>{getSourceIcon()}</span>
-              {prayer.dayNumber && `Day ${prayer.dayNumber} • `}
               {getRelativeTime(prayer.createdAt)}
             </div>
           </div>
         </div>
       </div>
+
+      {prayer.dayNumber && (
+        <div className={styles.dayBadge}>Day {prayer.dayNumber}</div>
+      )}
 
       {prayer.title && <h3 className={styles.title}>{prayer.title}</h3>}
 

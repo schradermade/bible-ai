@@ -193,11 +193,13 @@ model StudyCircle {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members     StudyCircleMember[]
-  plans       CircleStudyPlan[]
-  invitations CircleInvitation[]
-  prayers     CirclePrayerRequest[]
-  verses      CircleSharedVerse[]
+  members        StudyCircleMember[]
+  plans          CircleStudyPlan[]
+  invitations    CircleInvitation[]
+  prayers        CirclePrayerRequest[]
+  verses         CircleSharedVerse[]
+  highlights     CircleVerseHighlight[]
+  encouragements CircleEncouragement[]
 
   @@index([createdBy])
 }
@@ -371,4 +373,77 @@ model CircleVerseReaction {
 
   @@unique([verseId, userId, type])
   @@index([verseId])
+}
+
+model CircleVerseHighlight {
+  id            String   @id @default(cuid())
+  circleId      String
+  circle        StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  userId        String
+  reference     String      // "John 3:16"
+  text          String      @db.Text
+  insight       String?     @db.Text
+  fromDayNumber Int?
+  createdAt     DateTime    @default(now())
+  reactions     CircleHighlightReaction[]
+
+  @@index([circleId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model CircleHighlightReaction {
+  id          String               @id @default(cuid())
+  highlightId String
+  highlight   CircleVerseHighlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+  userId      String
+  type        String               // "amen", "insightful", "saved"
+  createdAt   DateTime             @default(now())
+
+  @@unique([highlightId, userId, type])
+  @@index([highlightId])
+}
+
+model CircleEncouragement {
+  id         String   @id @default(cuid())
+  circleId   String
+  circle     StudyCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  promptText String   @db.Text
+  createdBy  String
+  dayNumber  Int?
+  createdAt  DateTime @default(now())
+  responses  CircleEncouragementResponse[]
+
+  @@index([circleId])
+  @@index([createdAt])
+}
+
+model CircleEncouragementResponse {
+  id              String              @id @default(cuid())
+  encouragementId String
+  encouragement   CircleEncouragement @relation(fields: [encouragementId], references: [id], onDelete: Cascade)
+  userId          String
+  content         String              @db.Text
+  source          String              // "ai_generated" | "user_custom"
+  scriptureRef    String?
+  scriptureText   String?             @db.Text
+  reflection      String?             @db.Text
+  prayerPrompt    String?             @db.Text
+  createdAt       DateTime            @default(now())
+  reactions       CircleEncouragementReaction[]
+
+  @@index([encouragementId])
+  @@index([userId])
+}
+
+model CircleEncouragementReaction {
+  id         String                      @id @default(cuid())
+  responseId String
+  response   CircleEncouragementResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  userId     String
+  type       String                      // "amen", "encouraging", "blessed"
+  createdAt  DateTime                    @default(now())
+
+  @@unique([responseId, userId, type])
+  @@index([responseId])
 }

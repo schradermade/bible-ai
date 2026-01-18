@@ -99,6 +99,21 @@
   letter-spacing: 0.025em;
 }
 
+.dayBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
 .timestamp {
   font-size: 0.8125rem;
   color: #6b7280;

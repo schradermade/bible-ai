@@ -1,0 +1,324 @@
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+/* Very compact prompt header - single line */
+.promptHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.promptAuthor {
+  font-weight: 600;
+  color: #374151;
+}
+
+.youBadge {
+  display: inline;
+  padding: 0.125rem 0.375rem;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 3px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.promptTime {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.dayBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  border-radius: 3px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+}
+
+/* Prompt text - compact, single line or minimal */
+.promptText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.error {
+  padding: 0.5rem 0.75rem;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 0.8125rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Very compact response list - like comments */
+.responsesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.responseCard {
+  padding: 0.625rem 0.75rem;
+  background: #fafafa;
+  border-left: 2px solid #84cc16;
+  border-radius: 4px;
+}
+
+.responseHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.75rem;
+}
+
+.responseAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.responseMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+}
+
+.responseAuthor {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.youBadgeSmall {
+  font-size: 0.625rem;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.responseTime {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+.aiBadge {
+  display: inline-flex;
+  padding: 0.0625rem 0.375rem;
+  background: #ddd6fe;
+  color: #7c3aed;
+  border-radius: 3px;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.responseContent {
+  font-size: 0.8125rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+/* AI sections - very minimal, inline style */
+.aiSections {
+  margin-top: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.scriptureSection,
+.reflectionSection,
+.prayerSection {
+  padding: 0.375rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.scriptureSection {
+  background: rgba(245, 158, 11, 0.06);
+  color: #78350f;
+  font-style: italic;
+}
+
+.scriptureRef {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.scriptureText {
+  font-size: 0.75rem;
+  color: #78350f;
+  font-style: italic;
+}
+
+.reflectionSection {
+  background: rgba(132, 204, 22, 0.04);
+  color: #4d7c0f;
+}
+
+.reflectionTitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #3f6212;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.reflectionText {
+  font-size: 0.75rem;
+}
+
+.prayerSection {
+  background: rgba(99, 102, 241, 0.04);
+  color: #4f46e5;
+}
+
+.prayerTitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #4338ca;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.prayerText {
+  font-size: 0.75rem;
+}
+
+/* Minimal inline reactions */
+.responseReactions {
+  display: flex;
+  gap: 0.25rem;
+  padding-top: 0.375rem;
+  margin-top: 0.375rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.reactionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.reactionButton:hover:not(:disabled) {
+  border-color: #84cc16;
+  background: #f7fee7;
+}
+
+.reactionButton.active {
+  background: #f7fee7;
+  border-color: #84cc16;
+}
+
+.reactionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reactionEmoji {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.reactionCount {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.625rem;
+}
+
+/* Compact add response button */
+.footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.addResponseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: white;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.addResponseButton:hover {
+  border-color: #84cc16;
+  color: #3f6212;
+  background: #f7fee7;
+}
+
+.addIcon {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 0.875rem 1rem;
+  }
+
+  .responseReactions {
+    flex-wrap: wrap;
+  }
+}
