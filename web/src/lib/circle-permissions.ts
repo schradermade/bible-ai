@@ -5,7 +5,7 @@
  * All API endpoints should use these functions to verify access rights.
  */
 
-import { prisma } from './prisma';
+import prisma from './prisma';
 
 /**
  * Verify that a user is a member of a circle
