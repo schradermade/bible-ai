@@ -140,6 +140,25 @@ export async function POST(
     const title = `${duration}-Day ${duration === 7 ? 'Journey' : 'Deep Dive'}: ${template.title}`;
     const description = template.description;
 
+    // Fetch all circle members
+    const circle = await prisma.studyCircle.findUnique({
+      where: { id: circleId },
+      include: {
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+
+    if (!circle) {
+      return NextResponse.json(
+        { error: 'not_found', message: 'Circle not found' },
+        { status: 404 }
+      );
+    }
+
     // Create circle study plan in a transaction
     const circleStudyPlan = await prisma.$transaction(async (tx) => {
       // Create circle study plan
@@ -156,40 +175,43 @@ export async function POST(
         },
       });
 
-      // Create individual study plan for the creator
-      const creatorStudyPlan = await tx.studyPlan.create({
-        data: {
-          userId,
-          title,
-          description,
-          duration,
-          source: `circle_${templateSource}`,
-          status: 'active',
-        },
-      });
+      // Create individual study plans for ALL circle members
+      for (const member of circle.members) {
+        // Create individual study plan
+        const memberStudyPlan = await tx.studyPlan.create({
+          data: {
+            userId: member.userId,
+            title,
+            description,
+            duration,
+            source: `circle_${templateSource}`,
+            status: 'active',
+          },
+        });
 
-      // Create study plan days
-      await tx.studyPlanDay.createMany({
-        data: templateDays.map((day) => ({
-          studyPlanId: creatorStudyPlan.id,
-          dayNumber: day.dayNumber,
-          title: day.title,
-          content: day.content,
-          reflection: day.reflection,
-          prayer: day.prayer || null,
-          verseReference: day.verseReference || null,
-          verseText: day.verseText || null,
-        })),
-      });
+        // Create study plan days
+        await tx.studyPlanDay.createMany({
+          data: templateDays.map((day) => ({
+            studyPlanId: memberStudyPlan.id,
+            dayNumber: day.dayNumber,
+            title: day.title,
+            content: day.content,
+            reflection: day.reflection,
+            prayer: day.prayer || null,
+            verseReference: day.verseReference || null,
+            verseText: day.verseText || null,
+          })),
+        });
 
-      // Link creator's study plan to circle study plan
-      await tx.memberStudyPlan.create({
-        data: {
-          circleStudyPlanId: plan.id,
-          userId,
-          studyPlanId: creatorStudyPlan.id,
-        },
-      });
+        // Link member's study plan to circle study plan
+        await tx.memberStudyPlan.create({
+          data: {
+            circleStudyPlanId: plan.id,
+            userId: member.userId,
+            studyPlanId: memberStudyPlan.id,
+          },
+        });
+      }
 
       return await tx.circleStudyPlan.findUnique({
         where: { id: plan.id },

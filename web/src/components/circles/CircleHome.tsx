@@ -151,6 +151,7 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [verses, setVerses] = useState<Verse[]>([]);
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
 
   useEffect(() => {
     fetchCircle();
@@ -177,6 +178,24 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
       setError(err instanceof Error ? err.message : 'Failed to fetch circle');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Refresh circle data without showing loading spinner
+  const refreshCircle = async () => {
+    try {
+      const response = await fetch(`/api/circles/${circleId}`, {
+        cache: 'no-store',
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh circle');
+      }
+
+      setCircle(data.circle);
+    } catch (err) {
+      console.error('Failed to refresh circle:', err);
     }
   };
 
@@ -310,7 +329,7 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
             {activeStudy && (
               <>
                 <span className={styles.metaSeparator}>•</span>
-                <span>{activeStudy.title}</span>
+                <span>{activeStudy.title.replace(/^\d+-Day (Journey|Deep Dive): /, '')}</span>
                 <span className={styles.metaSeparator}>•</span>
                 <span>{activeStudy.duration} days</span>
               </>
@@ -323,11 +342,6 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
       <div className={styles.content}>
         {activeStudy ? (
           <>
-            {/* Study info - compact */}
-            <div className={styles.studyInfo}>
-              <p>Your group is studying together through this {activeStudy.duration}-day plan.</p>
-            </div>
-
             {/* Individual progress bars for each member - stacked */}
             {activeStudy.memberPlans && activeStudy.memberPlans.length > 0 && (
               <div className={styles.memberProgressBars}>
@@ -441,30 +455,41 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                               ? styles.completedBtn
                               : styles.completeBtn
                           }
+                          disabled={isMarkingComplete}
                           onClick={async () => {
+                            setIsMarkingComplete(true);
                             try {
                               const response = await fetch(
                                 `/api/study-plans/${userPlan.studyPlan.id}/progress`,
                                 {
-                                  method: 'POST',
+                                  method: 'PATCH',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({
-                                    dayId: currentDay.id,
+                                    dayNumber: currentDay.dayNumber,
                                     completed: !currentDay.completed,
                                   }),
                                 }
                               );
                               if (response.ok) {
-                                fetchCircle();
+                                await refreshCircle();
                               }
                             } catch (error) {
                               console.error('Failed to toggle completion:', error);
+                            } finally {
+                              setIsMarkingComplete(false);
                             }
                           }}
                         >
-                          {currentDay.completed
-                            ? '✓ Completed'
-                            : 'Mark Complete'}
+                          {isMarkingComplete ? (
+                            <>
+                              <div className={styles.buttonSpinner}></div>
+                              Updating...
+                            </>
+                          ) : currentDay.completed ? (
+                            '✓ Completed'
+                          ) : (
+                            'Mark Complete'
+                          )}
                         </button>
                       </div>
                     </div>
