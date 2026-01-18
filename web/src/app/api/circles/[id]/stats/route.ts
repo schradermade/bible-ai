@@ -9,7 +9,7 @@ import { verifyCircleMember } from '@/lib/circle-permissions';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -17,7 +17,8 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const circleId = params.id;
+    const { id } = await params;
+    const circleId = id;
 
     // Verify membership
     const membership = await verifyCircleMember(circleId, userId);

@@ -9,10 +9,10 @@ export const runtime = 'nodejs';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     // Fetch invitation with circle details
     const invitation = await prisma.circleInvitation.findUnique({

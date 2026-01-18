@@ -13,7 +13,7 @@ const VALID_REACTION_TYPES = ['amen', 'saved', 'memorizing'];
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string; verseId: string } }
+  { params }: { params: Promise<{ id: string; verseId: string }> }
 ) {
   const { userId } = await auth();
 
@@ -22,7 +22,7 @@ export async function POST(
   }
 
   try {
-    const { id: circleId, verseId } = params;
+    const { id: circleId, verseId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);

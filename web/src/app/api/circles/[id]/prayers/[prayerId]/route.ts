@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; prayerId: string } }
+  { params }: { params: Promise<{ id: string; prayerId: string }> }
 ) {
   const { userId } = await auth();
 
@@ -20,7 +20,7 @@ export async function PATCH(
   }
 
   try {
-    const { id: circleId, prayerId } = params;
+    const { id: circleId, prayerId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);
@@ -151,7 +151,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; prayerId: string } }
+  { params }: { params: Promise<{ id: string; prayerId: string }> }
 ) {
   const { userId } = await auth();
 
@@ -160,7 +160,7 @@ export async function DELETE(
   }
 
   try {
-    const { id: circleId, prayerId } = params;
+    const { id: circleId, prayerId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);

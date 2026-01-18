@@ -23,7 +23,7 @@ type Activity = {
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -32,7 +32,7 @@ export async function GET(
   }
 
   try {
-    const { id: circleId } = params;
+    const { id: circleId } = await params;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20');
 

@@ -12,7 +12,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string; planId: string } }
+  { params }: { params: Promise<{ id: string; planId: string }> }
 ) {
   const { userId } = await auth();
 
@@ -21,7 +21,7 @@ export async function POST(
   }
 
   try {
-    const { id: circleId, planId } = params;
+    const { id: circleId, planId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);

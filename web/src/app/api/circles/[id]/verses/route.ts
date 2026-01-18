@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -20,7 +20,7 @@ export async function GET(
   }
 
   try {
-    const { id: circleId } = params;
+    const { id: circleId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);
@@ -81,7 +81,7 @@ export async function GET(
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -90,7 +90,7 @@ export async function POST(
   }
 
   try {
-    const { id: circleId } = params;
+    const { id: circleId } = await params;
 
     // Verify user is a member
     const member = await verifyCircleMember(circleId, userId);
@@ -202,7 +202,7 @@ export async function POST(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
 
@@ -211,7 +211,7 @@ export async function DELETE(
   }
 
   try {
-    const { id: circleId } = params;
+    const { id: circleId } = await params;
     const { searchParams } = new URL(request.url);
     const verseId = searchParams.get('verseId');
 

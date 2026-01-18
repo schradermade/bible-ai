@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   const { userId: requestingUserId } = await auth();
 
@@ -20,7 +20,7 @@ export async function PATCH(
   }
 
   try {
-    const { id: circleId, userId: targetUserId } = params;
+    const { id: circleId, userId: targetUserId } = await params;
 
     // Verify requesting user is a member
     const requestingMember = await verifyCircleMember(circleId, requestingUserId);
@@ -128,7 +128,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   const { userId: requestingUserId } = await auth();
 
@@ -137,7 +137,7 @@ export async function DELETE(
   }
 
   try {
-    const { id: circleId, userId: targetUserId } = params;
+    const { id: circleId, userId: targetUserId } = await params;
 
     // Check if user is admin or removing themselves
     const isAdmin = await verifyCircleAdmin(circleId, requestingUserId);

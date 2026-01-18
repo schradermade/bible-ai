@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   const { userId } = await auth();
 
@@ -20,7 +20,7 @@ export async function POST(
   }
 
   try {
-    const { token } = params;
+    const { token } = await params;
 
     // Fetch invitation
     const invitation = await prisma.circleInvitation.findUnique({
