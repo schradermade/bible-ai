@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     }
 
     const maxMembersCount =
-      typeof maxMembers === 'number' && maxMembers >= 2 && maxMembers <= 8
+      typeof maxMembers === 'number' && maxMembers >= 1 && maxMembers <= 8
         ? maxMembers
         : 8;
 

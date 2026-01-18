@@ -14,6 +14,7 @@ export default function CreateCircleModal({
 }: CreateCircleModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isSolo, setIsSolo] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +38,7 @@ export default function CreateCircleModal({
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim() || null,
-          maxMembers: 8,
+          maxMembers: isSolo ? 1 : 8,
         }),
       });
 
@@ -71,6 +72,46 @@ export default function CreateCircleModal({
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
+            <label className={styles.label}>
+              Study Type <span className={styles.required}>*</span>
+            </label>
+            <div className={styles.radioGroup}>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="studyType"
+                  checked={!isSolo}
+                  onChange={() => setIsSolo(false)}
+                  disabled={loading}
+                  className={styles.radio}
+                />
+                <div className={styles.radioContent}>
+                  <span className={styles.radioTitle}>Group Study</span>
+                  <span className={styles.radioDescription}>
+                    Study with 2-8 friends
+                  </span>
+                </div>
+              </label>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  name="studyType"
+                  checked={isSolo}
+                  onChange={() => setIsSolo(true)}
+                  disabled={loading}
+                  className={styles.radio}
+                />
+                <div className={styles.radioContent}>
+                  <span className={styles.radioTitle}>Solo Study</span>
+                  <span className={styles.radioDescription}>
+                    Study on your own
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div className={styles.field}>
             <label htmlFor="circle-name" className={styles.label}>
               Circle Name <span className={styles.required}>*</span>
             </label>
@@ -80,7 +121,7 @@ export default function CreateCircleModal({
               className={styles.input}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Sunday School Group"
+              placeholder={isSolo ? "e.g., My Personal Study" : "e.g., Sunday School Group"}
               maxLength={100}
               disabled={loading}
               autoFocus
@@ -133,8 +174,9 @@ export default function CreateCircleModal({
         <div className={styles.info}>
           <div className={styles.infoIcon}>ℹ️</div>
           <div className={styles.infoText}>
-            You'll be able to invite members after creating the circle.
-            Circles can have 2-8 members.
+            {isSolo
+              ? "Solo circles are perfect for personal study with AI-generated plans."
+              : "You'll be able to invite members after creating the circle. Group circles can have 2-8 members."}
           </div>
         </div>
       </div>
