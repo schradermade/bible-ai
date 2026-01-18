@@ -419,3 +419,12 @@
   font-weight: 600;
   color: #1a1a1a;
 }
+
+/* Study View Container */
+.studyViewContainer {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  overflow: hidden;
+}

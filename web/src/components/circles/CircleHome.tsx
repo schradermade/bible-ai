@@ -6,6 +6,7 @@ import styles from './circle-home.module.css';
 import InviteModal from './InviteModal';
 import PrivacySettingsModal from './PrivacySettingsModal';
 import StartStudyModal from './StartStudyModal';
+import SharedStudyView from './SharedStudyView';
 import ProgressHeatmap from './ProgressHeatmap';
 import ActivityFeed from './ActivityFeed';
 import CircleStatsCard from './CircleStatsCard';
@@ -62,6 +63,7 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showStartStudyModal, setShowStartStudyModal] = useState(false);
+  const [expandedStudyId, setExpandedStudyId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCircle();
@@ -189,12 +191,12 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
                 </div>
               </div>
               <div className={styles.studyActions}>
-                <a
-                  href={`/circles/${circle.id}/study/${activeStudy.id}`}
+                <button
                   className={styles.viewStudyButton}
+                  onClick={() => setExpandedStudyId(expandedStudyId === activeStudy.id ? null : activeStudy.id)}
                 >
-                  View Study
-                </a>
+                  {expandedStudyId === activeStudy.id ? '▲ Collapse Study' : '▼ View Study'}
+                </button>
               </div>
             </div>
           ) : (
@@ -215,7 +217,16 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
             </div>
           )}
 
-          {activeStudy && (
+          {expandedStudyId && activeStudy && (
+            <div className={styles.studyViewContainer}>
+              <SharedStudyView
+                circleId={circle.id}
+                studyPlanId={expandedStudyId}
+              />
+            </div>
+          )}
+
+          {activeStudy && !expandedStudyId && (
             <ProgressHeatmap
               circleId={circle.id}
               studyPlanId={activeStudy.id}
@@ -223,9 +234,12 @@ export default function CircleHome({ circleId }: CircleHomeProps) {
             />
           )}
 
-          <ActivityFeed circleId={circle.id} limit={15} />
-
-          <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy?.id} />
+          {!expandedStudyId && (
+            <>
+              <ActivityFeed circleId={circle.id} limit={15} />
+              <CircleStatsCard circleId={circle.id} studyPlanId={activeStudy?.id} />
+            </>
+          )}
         </div>
 
         <div className={styles.sidebar}>
