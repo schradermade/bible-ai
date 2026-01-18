@@ -137,7 +137,7 @@ export default function InviteModal({
 
         <div className={styles.content}>
           <div className={styles.circleInfo}>
-            <div className={styles.circleIcon}>⭕</div>
+            <div className={styles.circleIcon}>👥</div>
             <div>
               <div className={styles.circleName}>{circleName}</div>
               <div className={styles.circleHint}>

@@ -24,17 +24,18 @@
     0 20px 25px -5px rgba(31, 26, 22, 0.15),
     0 10px 10px -5px rgba(31, 26, 22, 0.1);
   border: 1px solid rgba(176, 123, 76, 0.2);
+  position: relative;
 }
 
 .closeButton {
   position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
+  top: 1rem;
+  right: 1rem;
   width: 32px;
   height: 32px;
   border: none;
-  background: transparent;
-  color: #9b8b7e;
+  background: rgba(176, 123, 76, 0.1);
+  color: #5a4d41;
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -43,11 +44,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 .closeButton:hover {
-  background: rgba(176, 123, 76, 0.1);
-  color: #5a4d41;
+  background: rgba(176, 123, 76, 0.2);
+  color: #3a2f26;
+  transform: scale(1.05);
 }
 
 .modalTitle {
@@ -186,10 +189,44 @@
   text-align: center;
 }
 
+/* Button Row */
+.buttonRow {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* Cancel Button */
+.cancelButton {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #6b5d4f;
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(176, 123, 76, 0.4);
+  transform: translateY(-1px);
+  color: #5a4d41;
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Generate Button - Warm brown gradient */
 .generateButton {
-  width: calc(100% - 3rem);
-  margin: 0 1.5rem 1.5rem 1.5rem;
+  flex: 2;
   padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, #b07b4c, #8d6239);
   color: white;

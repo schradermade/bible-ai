@@ -465,11 +465,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   if (isLoading) {
     return (
       <div className={styles.circleView}>
-        <div className={styles.header}>
-          <button className={styles.closeButton} onClick={onClose}>
-            ← Back to Chat
-          </button>
-        </div>
         <div className={styles.loading}>
           <div className={styles.spinner}></div>
           <p>Loading circle...</p>
@@ -481,11 +476,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   if (error || !circle) {
     return (
       <div className={styles.circleView}>
-        <div className={styles.header}>
-          <button className={styles.closeButton} onClick={onClose}>
-            ← Back to Chat
-          </button>
-        </div>
         <div className={styles.error}>
           <p>{error || 'Circle not found'}</p>
           <button className={styles.retryButton} onClick={onClose}>
@@ -852,20 +842,26 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                         Congratulations on completing this {activePlan.duration}
                         -day journey together!
                       </p>
-                      <button
-                        className={styles.archiveButton}
-                        onClick={() => handleArchiveStudy(activePlan.id)}
-                        disabled={isArchiving}
-                      >
-                        {isArchiving ? (
-                          <>
-                            <div className={styles.buttonSpinner}></div>
-                            Archiving...
-                          </>
-                        ) : (
-                          'Archive Study'
-                        )}
-                      </button>
+                      {circle.createdBy === user?.id ? (
+                        <button
+                          className={styles.archiveButton}
+                          onClick={() => handleArchiveStudy(activePlan.id)}
+                          disabled={isArchiving}
+                        >
+                          {isArchiving ? (
+                            <>
+                              <div className={styles.buttonSpinner}></div>
+                              Archiving...
+                            </>
+                          ) : (
+                            'Archive Study'
+                          )}
+                        </button>
+                      ) : (
+                        <p className={styles.completedSubtext}>
+                          Your Study Circle host can start a new study when ready
+                        </p>
+                      )}
                     </div>
                   );
                 }

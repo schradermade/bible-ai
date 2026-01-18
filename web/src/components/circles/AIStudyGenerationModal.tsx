@@ -205,21 +205,30 @@ export default function AIStudyGenerationModal({
             {/* Error Message */}
             {error && <div className={styles.error}>{error}</div>}
 
-            {/* Generate Button */}
-            <button
-              className={styles.generateButton}
-              onClick={handleGenerate}
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <>
-                  <span className={styles.spinner}></span>
-                  Generating personalized study...
-                </>
-              ) : (
-                'Generate Study with AI'
-              )}
-            </button>
+            {/* Action Buttons */}
+            <div className={styles.buttonRow}>
+              <button
+                className={styles.cancelButton}
+                onClick={onClose}
+                disabled={isGenerating}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.generateButton}
+                onClick={handleGenerate}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <span className={styles.spinner}></span>
+                    Generating personalized study...
+                  </>
+                ) : (
+                  'Generate Study with AI'
+                )}
+              </button>
+            </div>
           </>
         ) : (
           <>

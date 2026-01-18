@@ -718,6 +718,13 @@
   margin: 0 0 16px 0;
 }
 
+.completedSubtext {
+  font-size: 13px;
+  color: #9b8b7e;
+  margin: 0;
+  font-style: italic;
+}
+
 .archiveButton {
   background: linear-gradient(145deg, #8b6239, #6b4d2e);
   color: white;
