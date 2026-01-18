@@ -104,7 +104,6 @@ export default function ContextualWidgets({
     circles: false,
     prayer: false,
     myVerses: false,
-    memory: false,
     searchHistory: false,
   });
   const [highlightedItems, setHighlightedItems] = useState<Set<string>>(
@@ -121,8 +120,6 @@ export default function ContextualWidgets({
   // Pagination state for widgets
   const [visibleVersesCount, setVisibleVersesCount] = useState(5);
   const [visiblePrayersCount, setVisiblePrayersCount] = useState(5);
-  const [visibleMemoryCount, setVisibleMemoryCount] = useState(5);
-  const [visibleDaysCount, setVisibleDaysCount] = useState(7);
 
   // Handle client-side mounting for portal
   useEffect(() => {
@@ -384,133 +381,88 @@ export default function ContextualWidgets({
     }));
   };
 
-  const handleMemorizeVerse = async (verse: SavedVerse) => {
+  const handleToggleMemorizeVerse = async (verse: SavedVerse) => {
     // Check if verse already exists in memory verses
-    const exists = memoryVerses.some((v) => v.reference === verse.reference);
-    if (exists) return;
+    const existingVerse = memoryVerses.find((v) => v.reference === verse.reference);
 
-    // Generate temporary ID for optimistic UI update
-    const tempId = `${Date.now()}-${Math.random()}`;
-    const newMemoryVerse: MemoryVerse = {
-      id: tempId,
-      reference: verse.reference,
-      text: verse.text,
-      memorized: false, // Not yet memorized, just added to practice list
-    };
+    if (!existingVerse) {
+      // Verse doesn't exist - add it to memory list with memorized: false
+      const tempId = `${Date.now()}-${Math.random()}`;
+      const newMemoryVerse: MemoryVerse = {
+        id: tempId,
+        reference: verse.reference,
+        text: verse.text,
+        memorized: false,
+      };
 
-    // Optimistically add to UI (highlight will be handled by useEffect)
-    setMemoryVerses([newMemoryVerse, ...memoryVerses]);
+      // Optimistically add to UI
+      setMemoryVerses([newMemoryVerse, ...memoryVerses]);
 
-    try {
-      // Save to database immediately (with memorized: false)
-      const response = await fetch('/api/verses/memorized', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reference: verse.reference,
-          text: verse.text || null,
-          markAsMemorized: false, // Just add to list, not marking as memorized yet
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save verse to memory list');
-      }
-
-      const data = await response.json();
-      // Update with real database ID (keeping same reference so animation continues)
-      setMemoryVerses((prev) =>
-        prev.map((v) => (v.id === tempId ? { ...v, id: data.verse.id } : v))
-      );
-    } catch (error) {
-      console.error('Failed to add verse to memory list:', error);
-      // Revert on error
-      setMemoryVerses((prev) => prev.filter((v) => v.id !== tempId));
-    }
-  };
-
-  const toggleMemorized = async (id: string) => {
-    const verse = memoryVerses.find((v) => v.id === id);
-    if (!verse) return;
-
-    const newMemorizedState = !verse.memorized;
-
-    // Optimistically update UI
-    setMemoryVerses(
-      memoryVerses.map((v) =>
-        v.id === id ? { ...v, memorized: newMemorizedState } : v
-      )
-    );
-
-    try {
-      if (newMemorizedState) {
-        // Mark as memorized in database
+      try {
         const response = await fetch('/api/verses/memorized', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             reference: verse.reference,
             text: verse.text || null,
-            markAsMemorized: true, // Explicitly mark as memorized
+            markAsMemorized: false,
           }),
         });
 
         if (!response.ok) {
-          throw new Error('Failed to save memorized verse');
+          throw new Error('Failed to save verse to memory list');
         }
 
         const data = await response.json();
-        // Update with real database ID
         setMemoryVerses((prev) =>
-          prev.map((v) =>
-            v.id === id ? { ...v, id: data.verse.id, memorized: true } : v
-          )
+          prev.map((v) => (v.id === tempId ? { ...v, id: data.verse.id } : v))
         );
-      } else {
-        // Unmark as memorized (set memorizedAt to null)
+      } catch (error) {
+        console.error('Failed to add verse to memory list:', error);
+        setMemoryVerses((prev) => prev.filter((v) => v.id !== tempId));
+      }
+    } else {
+      // Verse exists - toggle memorized status
+      const newMemorizedState = !existingVerse.memorized;
+
+      // Optimistically update UI
+      setMemoryVerses(
+        memoryVerses.map((v) =>
+          v.id === existingVerse.id ? { ...v, memorized: newMemorizedState } : v
+        )
+      );
+
+      try {
         const response = await fetch('/api/verses/memorized', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             reference: verse.reference,
             text: verse.text || null,
-            markAsMemorized: false, // Unmark as memorized
+            markAsMemorized: newMemorizedState,
           }),
         });
 
         if (!response.ok) {
           throw new Error('Failed to update memorized status');
         }
+
+        if (newMemorizedState) {
+          const data = await response.json();
+          setMemoryVerses((prev) =>
+            prev.map((v) =>
+              v.id === existingVerse.id ? { ...v, id: data.verse.id, memorized: true } : v
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Failed to update memorized status:', error);
+        setMemoryVerses(
+          memoryVerses.map((v) =>
+            v.id === existingVerse.id ? { ...v, memorized: !newMemorizedState } : v
+          )
+        );
       }
-    } catch (error) {
-      console.error('Failed to update memorized status:', error);
-      // Revert on error
-      setMemoryVerses(
-        memoryVerses.map((v) =>
-          v.id === id ? { ...v, memorized: !newMemorizedState } : v
-        )
-      );
-    }
-  };
-
-  const deleteMemoryVerse = async (id: string) => {
-    const verse = memoryVerses.find((v) => v.id === id);
-    if (!verse) return;
-
-    // Optimistically remove from UI
-    setMemoryVerses(memoryVerses.filter((v) => v.id !== id));
-
-    try {
-      // Remove from database
-      await fetch('/api/verses/memorized', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference: verse.reference }),
-      });
-    } catch (error) {
-      console.error('Failed to delete verse:', error);
-      // Revert on error
-      setMemoryVerses([...memoryVerses]);
     }
   };
 
@@ -1117,8 +1069,8 @@ export default function ContextualWidgets({
                       </p>
                       <div className={styles.verseActions}>
                         <button
-                          className={styles.memorizeButton}
-                          onClick={() => handleMemorizeVerse(verse)}
+                          className={`${styles.memorizedButton} ${memoryVerses.find(m => m.reference === verse.reference)?.memorized ? styles.memorizedActive : ''}`}
+                          onClick={() => handleToggleMemorizeVerse(verse)}
                         >
                           <svg
                             width="14"
@@ -1127,15 +1079,25 @@ export default function ContextualWidgets({
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                           >
-                            <path
-                              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                            {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? (
+                              <path
+                                d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            ) : (
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="9"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              />
+                            )}
                           </svg>
-                          Memorize
+                          {memoryVerses.find(m => m.reference === verse.reference)?.memorized ? 'Memorized!' : 'Mark as Memorized'}
                         </button>
                         <button
                           className={styles.createPrayerButton}
@@ -1210,137 +1172,6 @@ export default function ContextualWidgets({
                   <button
                     className={styles.showMoreButton}
                     onClick={() => setVisibleVersesCount(5)}
-                  >
-                    Show Less
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Memory Verses Widget */}
-        <div className={styles.widget}>
-          <div
-            className={styles.widgetHeader}
-            onClick={() => toggleWidget('memory')}
-          >
-            <div className={styles.widgetTitleRow}>
-              <h3 className={styles.widgetTitle}>
-                <span className={styles.widgetIcon}>🧠</span> Memorize
-              </h3>
-              <button className={styles.chevronButton}>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  style={{
-                    transform: collapsedWidgets.memory
-                      ? 'rotate(-90deg)'
-                      : 'rotate(0deg)',
-                  }}
-                >
-                  <path
-                    d="M4 6L8 10L12 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-            <span className={styles.countBadge}>{memoryVerses.length}</span>
-          </div>
-          <div
-            className={`${styles.widgetContent} ${collapsedWidgets.memory ? styles.collapsed : ''}`}
-          >
-            {memoryVerses.length === 0 ? (
-              <p className={styles.emptyState}>No verses saved yet</p>
-            ) : (
-              <>
-                <div className={styles.versesList}>
-                  {memoryVerses.slice(0, visibleMemoryCount).map((verse) => (
-                    <div
-                      key={verse.reference}
-                      className={`${styles.verseCard} ${highlightedItems.has(`memory-${verse.reference}`) ? styles.itemNewlyAdded : ''}`}
-                    >
-                      <div className={styles.verseCardHeader}>
-                        <span className={styles.verseReference}>
-                          {verse.reference}
-                        </span>
-                        <button
-                          className={styles.deleteButton}
-                          onClick={() => deleteMemoryVerse(verse.id)}
-                          aria-label="Delete verse"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M18 6L6 18M6 6L18 18"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className={styles.verseText}>
-                        &quot;{verse.text}&quot;
-                      </p>
-                      <button
-                        className={`${styles.memorizedButton} ${verse.memorized ? styles.memorizedActive : ''}`}
-                        onClick={() => toggleMemorized(verse.id)}
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          {verse.memorized ? (
-                            <path
-                              d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          ) : (
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="9"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            />
-                          )}
-                        </svg>
-                        {verse.memorized ? 'Memorized!' : 'Mark as Memorized'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                {memoryVerses.length > visibleMemoryCount && (
-                  <button
-                    className={styles.showMoreButton}
-                    onClick={() => setVisibleMemoryCount((prev) => prev + 5)}
-                  >
-                    Show More ({memoryVerses.length - visibleMemoryCount} more)
-                  </button>
-                )}
-                {visibleMemoryCount > 5 && memoryVerses.length > 5 && (
-                  <button
-                    className={styles.showMoreButton}
-                    onClick={() => setVisibleMemoryCount(5)}
                   >
                     Show Less
                   </button>
