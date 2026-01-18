@@ -601,6 +601,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 if (currentDay && currentDayNumber <= activePlan.duration) {
                   return (
                     <div className={styles.currentDayFocus}>
+                      <div className={styles.dayNumber}>Day {currentDay.dayNumber}</div>
                       <h5 className={styles.dayTitle}>{currentDay.title}</h5>
 
                       {/* Scripture Section */}
@@ -703,7 +704,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                           ) : currentDay.completed ? (
                             `✓ Day ${currentDay.dayNumber} Complete`
                           ) : (
-                            `Mark Day ${currentDay.dayNumber} Complete`
+                            <>
+                              Mark Day {currentDay.dayNumber} Complete ✓
+                            </>
                           )}
                         </button>
                       </div>

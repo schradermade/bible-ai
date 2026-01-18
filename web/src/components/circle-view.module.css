@@ -267,6 +267,15 @@
   box-sizing: border-box;
 }
 
+.dayNumber {
+  font-size: 18px;
+  font-weight: 700;
+  color: #8b6239;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
 .dayTitle {
   margin: 0 0 8px;
   font-size: 14px;
@@ -511,7 +520,7 @@
 }
 
 .dayNumber {
-  font-size: 10px;
+  font-size: 18px;
   font-weight: 700;
   color: #9b8b7e;
   text-transform: uppercase;
