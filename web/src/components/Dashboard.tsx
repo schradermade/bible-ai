@@ -119,6 +119,21 @@ export default function Dashboard() {
   const [hasWidgetsScrollableContent, setHasWidgetsScrollableContent] = useState(false);
   const widgetsSidebarRef = useRef<HTMLElement>(null);
   const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
+  const [welcomeMinimized, setWelcomeMinimized] = useState(false);
+
+  // Load welcome minimized state from localStorage
+  useEffect(() => {
+    const minimized = localStorage.getItem('welcomeMinimized');
+    if (minimized === 'true') {
+      setWelcomeMinimized(true);
+    }
+  }, []);
+
+  // Save welcome minimized state to localStorage
+  const handleWelcomeMinimizedChange = (minimized: boolean) => {
+    setWelcomeMinimized(minimized);
+    localStorage.setItem('welcomeMinimized', minimized ? 'true' : 'false');
+  };
 
   // Scroll detection for widgets sidebar
   useEffect(() => {
@@ -584,6 +599,8 @@ export default function Dashboard() {
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         conversationRefreshTrigger={conversationRefreshTrigger}
+        welcomeMinimized={messages.length === 0 && welcomeMinimized}
+        onRestoreWelcome={() => handleWelcomeMinimizedChange(false)}
       />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
@@ -609,6 +626,8 @@ export default function Dashboard() {
               onGeneratePrayerFromChat={handleGeneratePrayerFromChat}
               recentConversation={recentConversation}
               onContinueConversation={handleSelectConversation}
+              welcomeMinimized={welcomeMinimized}
+              onWelcomeMinimizedChange={handleWelcomeMinimizedChange}
             />
           </div>
         )}
