@@ -5,6 +5,7 @@ import styles from './circle-view.module.css';
 import CircleStatsCard from './circles/CircleStatsCard';
 import InviteModal from './circles/InviteModal';
 import StartStudyModal from './circles/StartStudyModal';
+import SharedStudyView from './circles/SharedStudyView';
 
 interface CircleMember {
   id: string;
@@ -47,6 +48,7 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showStartStudyModal, setShowStartStudyModal] = useState(false);
+  const [expandedStudyId, setExpandedStudyId] = useState<string | null>(null);
 
   const loadCircle = async () => {
     setIsLoading(true);
@@ -177,52 +179,64 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                 members joined
               </span>
             </div>
-            <a
-              href={`/circles/${circle.id}/study/${activePlan.id}`}
+            <button
               className={styles.viewStudyButton}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => setExpandedStudyId(expandedStudyId === activePlan.id ? null : activePlan.id)}
             >
-              View Study →
-            </a>
+              {expandedStudyId === activePlan.id ? '▲ Collapse Study' : '▼ View Study'}
+            </button>
           </div>
         </div>
       )}
 
-      {/* Stats Section */}
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Circle Statistics</h2>
-        <CircleStatsCard circleId={circle.id} />
-      </div>
-
-      {/* Members Section */}
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>
-          Members ({circle.members.length})
-        </h2>
-        <div className={styles.membersList}>
-          {circle.members.map((member) => {
-            const displayName = member.userName || member.userId;
-            const initials = member.userName
-              ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
-              : member.userId.substring(0, 2).toUpperCase();
-
-            return (
-              <div key={member.id} className={styles.memberCard}>
-                <div className={styles.memberAvatar}>
-                  {initials}
-                </div>
-                <div className={styles.memberInfo}>
-                  <span className={styles.memberUserId}>{displayName}</span>
-                  {member.role === 'owner' && (
-                    <span className={styles.memberRole}>Owner</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+      {/* Expanded Study View */}
+      {expandedStudyId && activePlan && (
+        <div className={styles.studyViewContainer}>
+          <SharedStudyView
+            circleId={circle.id}
+            studyPlanId={expandedStudyId}
+          />
         </div>
-      </div>
+      )}
+
+      {/* Stats Section - Hidden when study is expanded */}
+      {!expandedStudyId && (
+        <>
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Circle Statistics</h2>
+            <CircleStatsCard circleId={circle.id} />
+          </div>
+
+          {/* Members Section */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              Members ({circle.members.length})
+            </h2>
+            <div className={styles.membersList}>
+              {circle.members.map((member) => {
+                const displayName = member.userName || member.userId;
+                const initials = member.userName
+                  ? member.userName.split(' ').map(n => n[0]).join('').toUpperCase()
+                  : member.userId.substring(0, 2).toUpperCase();
+
+                return (
+                  <div key={member.id} className={styles.memberCard}>
+                    <div className={styles.memberAvatar}>
+                      {initials}
+                    </div>
+                    <div className={styles.memberInfo}>
+                      <span className={styles.memberUserId}>{displayName}</span>
+                      {member.role === 'owner' && (
+                        <span className={styles.memberRole}>Owner</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* No Active Study CTA */}
       {!activePlan && (

@@ -222,6 +222,8 @@
   font-weight: 500;
   font-size: 14px;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
@@ -332,6 +334,15 @@
   background: #5a3a9f;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+}
+
+/* Study View Container */
+.studyViewContainer {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  overflow: hidden;
 }
 
 /* Responsive */
