@@ -139,6 +139,9 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+  const [showAllDays, setShowAllDays] = useState(false);
+  const [visibleDaysCount, setVisibleDaysCount] = useState(7);
+  const [currentDayNumber, setCurrentDayNumber] = useState(1);
 
   const loadCircle = async () => {
     setIsLoading(true);
@@ -235,6 +238,20 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
   useEffect(() => {
     loadCircle();
   }, [circleId]);
+
+  // Update current day number when circle loads
+  useEffect(() => {
+    if (circle && user) {
+      const activePlan = circle.plans.find((p) => p.status === 'active');
+      if (activePlan) {
+        const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user.id);
+        if (userPlan) {
+          const completedDays = userPlan.studyPlan.days.filter((d) => d.completed).length;
+          setCurrentDayNumber(completedDays + 1);
+        }
+      }
+    }
+  }, [circle, user]);
 
   if (isLoading) {
     return (
@@ -378,8 +395,6 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
             {(() => {
               const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
               if (userPlan) {
-                const completedDays = userPlan.studyPlan.days.filter((d) => d.completed).length;
-                const currentDayNumber = completedDays + 1;
                 const currentDay = userPlan.studyPlan.days.find((d) => d.dayNumber === currentDayNumber);
 
                 if (currentDay && currentDayNumber <= activePlan.duration) {
@@ -494,6 +509,70 @@ export default function CircleView({ circleId, onClose }: CircleViewProps) {
                     </div>
                   );
                 }
+              }
+              return null;
+            })()}
+
+            {/* All Days Toggle */}
+            {(() => {
+              const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
+              if (userPlan && userPlan.studyPlan.days.length > 1) {
+                return (
+                  <button
+                    className={styles.viewAllDaysBtn}
+                    onClick={() => setShowAllDays(!showAllDays)}
+                  >
+                    {showAllDays ? 'Hide' : 'View'} All Days
+                  </button>
+                );
+              }
+              return null;
+            })()}
+
+            {/* All Days List */}
+            {(() => {
+              const userPlan = activePlan.memberPlans?.find((mp) => mp.userId === user?.id);
+              if (showAllDays && userPlan) {
+                return (
+                  <>
+                    <div className={styles.allDaysList}>
+                      {userPlan.studyPlan.days.slice(0, visibleDaysCount).map((day) => (
+                        <div
+                          key={day.id}
+                          className={`${styles.dayItem} ${day.completed ? styles.dayCompleted : ''} ${day.dayNumber === currentDayNumber ? styles.dayActive : ''}`}
+                          onClick={() => setCurrentDayNumber(day.dayNumber)}
+                        >
+                          <div className={styles.dayItemHeader}>
+                            <span className={styles.dayNumber}>
+                              Day {day.dayNumber}
+                            </span>
+                            {day.completed && (
+                              <span className={styles.checkmark}>✓</span>
+                            )}
+                          </div>
+                          <p className={styles.dayItemTitle}>{day.title}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {userPlan.studyPlan.days.length > visibleDaysCount && (
+                      <button
+                        className={styles.showMoreButton}
+                        onClick={() => setVisibleDaysCount((prev) => prev + 7)}
+                      >
+                        Show More ({userPlan.studyPlan.days.length - visibleDaysCount}{' '}
+                        more days)
+                      </button>
+                    )}
+                    {visibleDaysCount > 7 && userPlan.studyPlan.days.length > 7 && (
+                      <button
+                        className={styles.showMoreButton}
+                        onClick={() => setVisibleDaysCount(7)}
+                      >
+                        Show Less
+                      </button>
+                    )}
+                  </>
+                );
               }
               return null;
             })()}
