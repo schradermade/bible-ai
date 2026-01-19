@@ -622,7 +622,7 @@ export default function Dashboard() {
 
         {/* Chat Conversation - Show when no panel is expanded and no circle selected */}
         {!expandedPanel && !selectedCircleId && (
-          <div className={`${styles.chatArea} ${messages.length > 0 ? styles.chatAreaWithMessages : ''} ${messages.length === 0 && welcomeMinimized ? styles.chatAreaHidden : ''}`}>
+          <div className={`${styles.chatArea} ${messages.length > 0 || welcomeMinimized ? styles.chatAreaWithMessages : ''}`}>
             <ChatConversation
               messages={messages}
               isStreaming={isLoadingContent}

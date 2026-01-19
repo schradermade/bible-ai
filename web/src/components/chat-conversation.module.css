@@ -311,6 +311,49 @@
   }
 }
 
+/* New Conversation Prompt */
+.newConversationPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  min-height: 300px;
+  background: transparent;
+}
+
+.promptIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  color: #b07b4c;
+  opacity: 0.5;
+}
+
+.promptIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.promptText {
+  font-size: 18px;
+  font-weight: 600;
+  color: #5d4e37;
+  margin: 0 0 12px 0;
+  max-width: 500px;
+  opacity: 0.8;
+}
+
+.promptSubtext {
+  font-size: 14px;
+  color: #8b6239;
+  margin: 0;
+  max-width: 450px;
+  line-height: 1.5;
+  opacity: 0.6;
+}
+
 /* Messages Container */
 .messagesContainer {
   display: flex;
