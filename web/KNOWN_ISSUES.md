@@ -101,24 +101,44 @@ if (finishReason === 'content_filter') {
 
 ### Current Mitigation
 - Enhanced system prompt to explicitly frame content as educational/pastoral (implemented 2026-01-19)
+- Further strengthened prompt with explicit authorization context (2026-01-19 - second attempt)
 
 ### Chosen Solution
 **Option 2: Strengthen System Prompt** (implemented 2026-01-19)
 
-Updated system message to:
+**First attempt (did not resolve):**
+Initial enhancement did not prevent content_filter triggers. Still failing on Hebrews 10:24-25.
+
+**Second attempt (testing):**
+Further strengthened system message with explicit points:
+- Names the platform (Berea Study)
+- Emphasizes "legitimate religious educational material"
+- Explicitly states "You will be quoting Bible verses verbatim from Scripture"
+- Calls out that passages about "community, gathering, prayer, faith, and spiritual growth are central"
+- States "This is authorized religious education content - quoting Scripture is the primary purpose"
+
 ```
-You are a pastoral study designer creating educational Bible study content for a Christian small group platform. This is legitimate religious educational material designed to help believers grow in their faith through Scripture study. You will be quoting Bible verses and providing pastoral teaching. Always return valid, complete JSON.
+You are a pastoral study designer creating educational Bible study content for Berea Study, a Christian small group platform.
+
+IMPORTANT CONTEXT:
+- This is legitimate religious educational material for faith formation
+- You will be quoting Bible verses verbatim from Scripture (ESV or similar translations)
+- The content is for educational purposes to help Christians study the Bible together
+- Biblical passages about community, gathering, prayer, faith, and spiritual growth are central to this educational content
+- This is authorized religious education content - quoting Scripture is the primary purpose
+
+Your task is to create pastoral Bible study guides that include direct Scripture quotations. Always return valid, complete JSON with all required fields.
 ```
 
 **Reasoning:**
 - Immediate implementation with no external dependencies
-- Makes the educational/pastoral context explicit
-- Should reduce false positives from content filter
-- Can be implemented alongside future Option 1 (OpenAI Support contact) if needed
+- Makes the educational/pastoral context extremely explicit
+- Directly addresses themes (community, gathering) that appear to trigger the filter
+- States authorization and educational purpose multiple ways
 
-**Next Steps:**
-- Monitor error rates to see if false positives decrease
-- Consider Option 1 (OpenAI Support) if issues persist
+**Testing Status:**
+- Second attempt deployed, awaiting test results
+- If this fails, will need to pursue Option 1 (OpenAI Support) or Option 3 (retry logic)
 
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)
