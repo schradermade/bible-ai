@@ -194,6 +194,11 @@
     0 0 0 1px rgba(176, 123, 76, 0.1);
 }
 
+/* Chat Area when showing welcome - reduce height for spacing */
+.chatAreaShowingWelcome {
+  height: calc(100vh - 244px);
+}
+
 /* Chat Area with messages - remove container styling */
 .chatAreaWithMessages {
   background: transparent;
