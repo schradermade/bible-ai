@@ -622,7 +622,7 @@ export default function ChatConversation({
   return (
     <div
       ref={containerRef}
-      className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''} ${welcomeMinimized ? styles.welcomeMinimizedContainer : ''}`}
+      className={`${styles.chatContainer} ${messages.length > 0 ? styles.hasMessages : ''} ${welcomeMinimized && messages.length === 0 ? styles.welcomeMinimizedContainer : ''}`}
     >
       {!welcomeMinimized && (
         <div className={styles.welcomeContainer}>
