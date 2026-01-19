@@ -254,7 +254,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: 'system',
-          content: 'You are a pastoral study designer. Always return valid, complete JSON. Keep content concise to avoid truncation.',
+          content: 'You are a pastoral study designer creating educational Bible study content for a Christian small group platform. This is legitimate religious educational material designed to help believers grow in their faith through Scripture study. You will be quoting Bible verses and providing pastoral teaching. Always return valid, complete JSON.',
         },
         {
           role: 'user',

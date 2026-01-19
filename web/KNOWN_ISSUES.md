@@ -100,10 +100,25 @@ if (finishReason === 'content_filter') {
 - Migration costs
 
 ### Current Mitigation
-- None (users see error and must manually retry)
+- Enhanced system prompt to explicitly frame content as educational/pastoral (implemented 2026-01-19)
 
 ### Chosen Solution
-- TBD (pending decision)
+**Option 2: Strengthen System Prompt** (implemented 2026-01-19)
+
+Updated system message to:
+```
+You are a pastoral study designer creating educational Bible study content for a Christian small group platform. This is legitimate religious educational material designed to help believers grow in their faith through Scripture study. You will be quoting Bible verses and providing pastoral teaching. Always return valid, complete JSON.
+```
+
+**Reasoning:**
+- Immediate implementation with no external dependencies
+- Makes the educational/pastoral context explicit
+- Should reduce false positives from content filter
+- Can be implemented alongside future Option 1 (OpenAI Support contact) if needed
+
+**Next Steps:**
+- Monitor error rates to see if false positives decrease
+- Consider Option 1 (OpenAI Support) if issues persist
 
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)
