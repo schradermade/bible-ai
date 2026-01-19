@@ -100,9 +100,9 @@ REQUIREMENTS:
 2. Balance multiple topics proportionally - weave in the top 2-3 topics throughout the study
 3. Honor the emotional/spiritual seasons represented - acknowledge both struggles and celebrations
 4. Calibrate daily content length to match the group's pace preference:
-   - Light: 250-350 words per day
-   - Moderate: 350-450 words per day
-   - Deep: 450-550 words per day
+   - Light: 200-300 words per day
+   - Moderate: 300-400 words per day
+   - Deep: 400-500 words per day
 5. Incorporate heart questions as recurring thematic threads throughout the study
 6. Match theological depth to the group's average preference (Level ${Math.round(avgDepth)}/10)
 
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
         },
       ],
       temperature: 0.7,
-      max_tokens: duration === 7 ? 12000 : 24000,
+      max_tokens: duration === 7 ? 16000 : 32000,
       response_format: { type: 'json_object' },
     });
 
@@ -271,11 +271,26 @@ export async function POST(request: Request) {
       throw new Error('No study generated');
     }
 
+    // Log response details for debugging
+    console.log('[API] Response length:', responseContent.length);
+    console.log('[API] Finish reason:', finishReason);
+    console.log('[API] Duration:', duration, 'days');
+
     // Check if response was truncated
     if (finishReason === 'length') {
       console.error('[API] Response was truncated due to token limit');
       console.error('[API] Response length:', responseContent.length);
       throw new Error('Study generation was incomplete. This is a system issue - please contact support or try a shorter duration.');
+    }
+
+    // Validate response isn't suspiciously short (likely truncated)
+    // A complete 7-day study should be at least 3000 chars, 21-day at least 8000
+    const minExpectedLength = duration === 7 ? 3000 : 8000;
+    if (responseContent.length < minExpectedLength) {
+      console.error('[API] Response appears incomplete');
+      console.error('[API] Expected at least', minExpectedLength, 'chars but got', responseContent.length);
+      console.error('[API] Last 200 chars:', responseContent.substring(responseContent.length - 200));
+      throw new Error('Generated study appears incomplete. Please try again.');
     }
 
     // Remove markdown code blocks if present
