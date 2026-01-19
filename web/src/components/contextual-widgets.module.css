@@ -1917,6 +1917,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #8b6239;
+  gap: 16px;
 }
 
 .versesSectionDivider {

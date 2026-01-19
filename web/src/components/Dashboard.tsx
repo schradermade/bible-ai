@@ -569,6 +569,9 @@ export default function Dashboard() {
     setPanelContent(null);
     setLastQuery('');
 
+    // Minimize welcome screen to show new conversation prompt
+    handleWelcomeMinimizedChange(true);
+
     // Close any expanded panel
     setExpandedPanel(null);
   };
