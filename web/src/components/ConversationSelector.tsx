@@ -150,6 +150,15 @@ export default function ConversationSelector({
         <>
           <div ref={dropdownRef} className={styles.dropdown}>
             <button
+              className={styles.newButton}
+              onClick={handleNewConversation}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              New
+            </button>
+            <button
               className={styles.closeButton}
               onClick={() => setIsOpen(false)}
               aria-label="Close conversation list"
@@ -160,15 +169,6 @@ export default function ConversationSelector({
             </button>
             <div className={styles.header}>
               <h3>My Conversations</h3>
-              <button
-                className={styles.newButton}
-                onClick={handleNewConversation}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                New
-              </button>
             </div>
 
             <div className={styles.conversationList}>
