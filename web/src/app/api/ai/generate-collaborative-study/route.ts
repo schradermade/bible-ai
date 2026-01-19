@@ -270,7 +270,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-5.2',  // Testing newest flagship model
+        model: 'gpt-5.2-latest',  // Per ChatGPT: use stable alias not dated snapshot
         messages: [
           {
             role: 'system',
