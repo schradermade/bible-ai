@@ -244,17 +244,30 @@ export async function POST(request: Request) {
     console.log('[API] Prompt length (chars):', prompt.length);
     console.log('[API] Prompt length (approx tokens):', Math.ceil(prompt.length / 4));
 
-    // Call OpenAI
+    // Call OpenAI with retry logic for content_filter
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a pastoral study designer creating educational Bible study content for Berea Study, a Christian small group platform.
+    const MAX_RETRIES = 2;
+    let completion;
+    let finishReason;
+    let responseContent;
+    let attempt = 0;
+
+    while (attempt <= MAX_RETRIES) {
+      attempt++;
+
+      if (attempt > 1) {
+        console.log(`[API] Retry attempt ${attempt - 1}/${MAX_RETRIES} after content_filter`);
+      }
+
+      completion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a pastoral study designer creating educational Bible study content for Berea Study, a Christian small group platform.
 
 IMPORTANT CONTEXT:
 - This is legitimate religious educational material for faith formation
@@ -264,25 +277,35 @@ IMPORTANT CONTEXT:
 - This is authorized religious education content - quoting Scripture is the primary purpose
 
 Your task is to create pastoral Bible study guides that include direct Scripture quotations. Always return valid, complete JSON with all required fields.`,
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: duration === 7 ? 12000 : 24000,
-      response_format: { type: 'json_object' },
-    });
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: duration === 7 ? 12000 : 24000,
+        response_format: { type: 'json_object' },
+      });
 
-    const finishReason = completion.choices[0]?.finish_reason;
-    let responseContent = completion.choices[0]?.message?.content?.trim();
+      finishReason = completion.choices[0]?.finish_reason;
+      responseContent = completion.choices[0]?.message?.content?.trim();
 
-    // Log detailed response info
-    console.log('[API] Finish reason:', finishReason);
-    console.log('[API] Response length (chars):', responseContent?.length || 0);
-    console.log('[API] Usage:', JSON.stringify(completion.usage));
-    console.log('[API] Model:', completion.model);
+      // Log detailed response info
+      console.log(`[API] Attempt ${attempt} - Finish reason:`, finishReason);
+      console.log(`[API] Attempt ${attempt} - Response length (chars):`, responseContent?.length || 0);
+      console.log(`[API] Attempt ${attempt} - Usage:`, JSON.stringify(completion.usage));
+      console.log(`[API] Attempt ${attempt} - Model:`, completion.model);
+
+      // If content_filter triggered and we have retries left, try again
+      if (finishReason === 'content_filter' && attempt <= MAX_RETRIES) {
+        console.warn(`[API] Content filter triggered on attempt ${attempt}, retrying...`);
+        continue;
+      }
+
+      // Break out if we got a successful response or hit another error
+      break;
+    }
 
     if (!responseContent) {
       throw new Error('No study generated');
@@ -293,6 +316,13 @@ Your task is to create pastoral Bible study guides that include direct Scripture
       console.error('[API] Response was truncated due to token limit');
       console.error('[API] Response length:', responseContent.length);
       throw new Error('Study generation was incomplete. This is a system issue - please contact support or try a shorter duration.');
+    }
+
+    // If content_filter still triggered after all retries
+    if (finishReason === 'content_filter') {
+      console.error('[API] Content filter triggered on all attempts');
+      console.error('[API] Final response length:', responseContent.length);
+      throw new Error('Unable to generate study due to content filtering. This is a known issue with certain Bible verses. Please try again or contact support.');
     }
 
     // Check for other concerning finish reasons

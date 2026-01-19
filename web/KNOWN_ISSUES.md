@@ -137,8 +137,51 @@ Your task is to create pastoral Bible study guides that include direct Scripture
 - States authorization and educational purpose multiple ways
 
 **Testing Status:**
-- Second attempt deployed, awaiting test results
-- If this fails, will need to pursue Option 1 (OpenAI Support) or Option 3 (retry logic)
+- Second attempt tested - FAILED. Still triggering content_filter on Hebrews 10:24-25
+- System prompt enhancement does not influence content filter decisions
+- Moving to Option 3 (retry logic)
+
+---
+
+**Option 3: Retry Logic** (implemented 2026-01-19)
+
+After exhausting Option 2 attempts, implemented automatic retry logic:
+- Retries up to 2 times when `finish_reason === 'content_filter'`
+- Total of 3 attempts (1 initial + 2 retries)
+- Logs each retry attempt for monitoring
+- If all retries fail, shows user-friendly error message
+
+**Implementation:**
+```typescript
+const MAX_RETRIES = 2;
+let attempt = 0;
+
+while (attempt <= MAX_RETRIES) {
+  attempt++;
+
+  // Make OpenAI call
+
+  if (finishReason === 'content_filter' && attempt <= MAX_RETRIES) {
+    console.warn(`[API] Content filter triggered on attempt ${attempt}, retrying...`);
+    continue;
+  }
+
+  break;
+}
+
+if (finishReason === 'content_filter') {
+  throw new Error('Unable to generate study due to content filtering. This is a known issue with certain Bible verses. Please try again or contact support.');
+}
+```
+
+**Expected Outcome:**
+- Reduces user-facing errors by automatically retrying on content_filter
+- Most retries should succeed (content_filter appears intermittent)
+- Better user experience without fixing root cause
+- Increased API costs (multiple calls per generation)
+
+**Long-term recommendation:**
+Still pursue Option 1 (OpenAI Support) to address root cause
 
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)
