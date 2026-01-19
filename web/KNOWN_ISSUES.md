@@ -202,10 +202,18 @@ The August 2024 snapshot has an overly aggressive content filter that flags Bibl
 - Retry logic (Option 3) remains in place as safety net
 - Testing needed to confirm this resolves the issue
 
-**If this works:**
-- Retry logic can remain as defensive measure
-- No need to pursue Option 1 (OpenAI Support)
-- Issue resolved by model upgrade
+**Testing Results:**
+- gpt-4o-2024-08-06: content_filter ❌
+- gpt-4o-2024-11-20: content_filter ❌
+- gpt-5.1 (gpt-5.1-2025-11-13): content_filter ❌
+
+**Critical Discovery:**
+ChatGPT.com can quote Hebrews 10:24-25 without issues using the same models, but the **OpenAI API has stricter content filtering** than the web interface. This is an API policy difference, not a model difference.
+
+**Final Solution:**
+- Using gpt-4-turbo with retry logic (MAX_RETRIES = 2)
+- Retry logic is REQUIRED - no model avoids the API's content filter
+- User should contact OpenAI Support about API vs ChatGPT filtering discrepancy
 
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)

@@ -249,7 +249,7 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const MAX_RETRIES = 0;  // Temporarily disabled to test model upgrade fix
+    const MAX_RETRIES = 2;  // Required: API content filter is stricter than ChatGPT web interface
     let completion;
     let finishReason;
     let responseContent;
@@ -263,7 +263,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-5.1',  // Testing GPT-5 model to avoid content_filter
+        model: 'gpt-4-turbo',  // GPT-5.1 also triggers content_filter, testing GPT-4 Turbo
         messages: [
           {
             role: 'system',
@@ -284,7 +284,7 @@ Your task is to create pastoral Bible study guides that include direct Scripture
           },
         ],
         temperature: 0.7,
-        max_completion_tokens: duration === 7 ? 12000 : 24000,  // GPT-5 uses max_completion_tokens instead of max_tokens
+        max_tokens: duration === 7 ? 12000 : 24000,
         response_format: { type: 'json_object' },
       });
 
