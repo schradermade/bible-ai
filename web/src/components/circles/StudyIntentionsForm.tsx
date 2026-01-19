@@ -76,8 +76,7 @@ export default function StudyIntentionsForm({
     });
   };
 
-  const isValid =
-    selectedTopics.length > 0 && currentSeason && studyPace;
+  const isValid = selectedTopics.length > 0 && currentSeason && studyPace;
 
   const handleSubmit = async () => {
     if (!isValid || isSubmitting) return;
@@ -86,19 +85,22 @@ export default function StudyIntentionsForm({
     setError('');
 
     try {
-      const response = await fetch(`/api/circles/${circleId}/study-intentions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          selectedTopics,
-          depthLevel,
-          currentSeason,
-          studyPace,
-          heartQuestion: heartQuestion.trim() || null,
-        }),
-      });
+      const response = await fetch(
+        `/api/circles/${circleId}/study-intentions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            selectedTopics,
+            depthLevel,
+            currentSeason,
+            studyPace,
+            heartQuestion: heartQuestion.trim() || null,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -119,14 +121,18 @@ export default function StudyIntentionsForm({
         <div className={styles.scrollIcon}>📜</div>
         <h2>Share Your Study Input</h2>
         <p className={styles.subtitle}>
-          Share where you are—Berea AI will use everyone's input to generate a study that fits your whole circle. Once submitted, your circle host can generate the plan.
+          Berea AI brings everyone&apos;s input together to create your
+          group&apos;s Bible study. Once all have responded, the host generates
+          the plan.
         </p>
       </div>
 
       {/* Topic Cards */}
       <div className={styles.section}>
         <h3>What themes are speaking to your heart?</h3>
-        <p className={styles.sectionSubtitle}>Select 1-3 topics that resonate most</p>
+        <p className={styles.sectionSubtitle}>
+          Select 1-3 topics that resonate most
+        </p>
         <div className={styles.topicGrid}>
           {TOPIC_OPTIONS.map((topic) => (
             <button
