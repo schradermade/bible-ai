@@ -601,6 +601,7 @@ export default function Dashboard() {
         conversationRefreshTrigger={conversationRefreshTrigger}
         welcomeMinimized={welcomeMinimized}
         onRestoreWelcome={() => handleWelcomeMinimizedChange(false)}
+        hasMessages={messages.length > 0}
       />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>

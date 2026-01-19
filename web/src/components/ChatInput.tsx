@@ -31,6 +31,7 @@ interface ChatInputProps {
   conversationRefreshTrigger?: number;
   welcomeMinimized?: boolean;
   onRestoreWelcome?: () => void;
+  hasMessages?: boolean;
 }
 
 export default function ChatInput({
@@ -43,6 +44,7 @@ export default function ChatInput({
   conversationRefreshTrigger = 0,
   welcomeMinimized = false,
   onRestoreWelcome,
+  hasMessages = false,
 }: ChatInputProps) {
   const { user } = useUser();
   const [input, setInput] = useState('');
@@ -136,7 +138,7 @@ export default function ChatInput({
               refreshTrigger={conversationRefreshTrigger}
             />
           </div>
-          {welcomeMinimized && onRestoreWelcome && (
+          {welcomeMinimized && onRestoreWelcome && !hasMessages && (
             <button
               type="button"
               className={styles.welcomeRestoreButton}
