@@ -270,7 +270,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-4.1',  // Testing newer model per ChatGPT recommendation
+        model: 'gpt-5.2',  // Testing newest flagship model
         messages: [
           {
             role: 'system',
@@ -291,7 +291,7 @@ Your task is to create pastoral Bible study guides that include direct Scripture
           },
         ],
         temperature: 0.7,
-        max_tokens: duration === 7 ? 12000 : 24000,
+        max_completion_tokens: duration === 7 ? 12000 : 24000,  // GPT-5 uses max_completion_tokens
         response_format: { type: 'json_object' },
       });
 
