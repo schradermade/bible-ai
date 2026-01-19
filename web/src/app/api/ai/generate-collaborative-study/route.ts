@@ -249,6 +249,13 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
+    // TEST: Check if Hebrews 10:24-25 triggers actual moderation
+    const testVerse = "And let us consider how to stir up one another to love and good works, not neglecting to meet together, as is the habit of some, but encouraging one another";
+    const moderationTest = await openai.moderations.create({
+      input: testVerse,
+    });
+    console.log('[API] Moderation test for Hebrews 10:24-25:', JSON.stringify(moderationTest.results[0]));
+
     const MAX_RETRIES = 2;  // Required: API content filter is stricter than ChatGPT web interface
     let completion;
     let finishReason;
@@ -263,7 +270,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-4o',  // Using with retry logic to handle intermittent content_filter
+        model: 'gpt-4.1',  // Testing newer model per ChatGPT recommendation
         messages: [
           {
             role: 'system',
