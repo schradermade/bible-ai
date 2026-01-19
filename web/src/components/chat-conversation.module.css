@@ -12,9 +12,13 @@
   position: relative;
 }
 
-/* When showing welcome screen, disable scrolling */
+/* When showing welcome screen, disable scrolling and hide messages */
 .chatContainer.showingWelcome {
   overflow: hidden;
+}
+
+.chatContainer.showingWelcome .messagesContainer {
+  display: none;
 }
 
 /* When messages exist, add padding for scrolling content */
