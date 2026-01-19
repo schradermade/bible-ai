@@ -284,7 +284,7 @@ Your task is to create pastoral Bible study guides that include direct Scripture
           },
         ],
         temperature: 0.7,
-        max_tokens: duration === 7 ? 12000 : 24000,
+        max_completion_tokens: duration === 7 ? 12000 : 24000,  // GPT-5 uses max_completion_tokens instead of max_tokens
         response_format: { type: 'json_object' },
       });
 
