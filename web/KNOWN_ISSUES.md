@@ -183,6 +183,30 @@ if (finishReason === 'content_filter') {
 **Long-term recommendation:**
 Still pursue Option 1 (OpenAI Support) to address root cause
 
+---
+
+**ACTUAL ROOT CAUSE DISCOVERED** (2026-01-19)
+
+Testing at chatgpt.com revealed the issue is **model-specific**:
+- **GPT-4o (gpt-4o-2024-08-06)**: Triggers content_filter on Hebrews 10:24-25 ❌
+- **Newer models (GPT-4.5/newer GPT-4o snapshots)**: No content_filter issues ✅
+
+**Real Solution: Update Model Version**
+
+Changed from `model: 'gpt-4o'` (which uses gpt-4o-2024-08-06) to `model: 'gpt-4o-2024-11-20'` (November 2024 snapshot).
+
+The August 2024 snapshot has an overly aggressive content filter that flags Bible verses. Newer snapshots do not have this issue.
+
+**Status:**
+- Updated to gpt-4o-2024-11-20
+- Retry logic (Option 3) remains in place as safety net
+- Testing needed to confirm this resolves the issue
+
+**If this works:**
+- Retry logic can remain as defensive measure
+- No need to pursue Option 1 (OpenAI Support)
+- Issue resolved by model upgrade
+
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)
 
