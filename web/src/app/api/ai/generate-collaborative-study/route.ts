@@ -249,7 +249,7 @@ export async function POST(request: Request) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const MAX_RETRIES = 2;
+    const MAX_RETRIES = 0;  // Temporarily disabled to test model upgrade fix
     let completion;
     let finishReason;
     let responseContent;
