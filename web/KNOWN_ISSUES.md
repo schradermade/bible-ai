@@ -210,10 +210,22 @@ The August 2024 snapshot has an overly aggressive content filter that flags Bibl
 **Critical Discovery:**
 ChatGPT.com can quote Hebrews 10:24-25 without issues using the same models, but the **OpenAI API has stricter content filtering** than the web interface. This is an API policy difference, not a model difference.
 
-**Final Solution:**
-- Using gpt-4-turbo with retry logic (MAX_RETRIES = 2)
-- Retry logic is REQUIRED - no model avoids the API's content filter
-- User should contact OpenAI Support about API vs ChatGPT filtering discrepancy
+**Final Status:**
+- Retry logic tested - FAILS on all 3 attempts for Hebrews 10:24-25
+- No model works (gpt-4o, gpt-4-turbo, gpt-5.1 all trigger content_filter)
+- No technical workaround exists
+- This is a POLICY PROBLEM that requires OpenAI to fix
+
+**CRITICAL - ACTION REQUIRED:**
+The OpenAI API is blocking legitimate King James Bible verses in a Christian educational app. This is completely unacceptable.
+
+**Immediate Actions:**
+1. **Contact OpenAI Support** - Demand accommodation for religious educational content
+2. **Escalate if needed** - This is a fundamental failure of their content filtering
+3. **Consider alternative providers** - Anthropic's Claude API may be more appropriate
+4. **Cannot continue with OpenAI** - If they won't fix this, must switch providers
+
+A Bible study platform cannot function if the AI provider blocks Bible verses.
 
 ### Related Files
 - `/src/app/api/ai/generate-collaborative-study/route.ts` (lines 250-370)
