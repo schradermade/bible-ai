@@ -294,6 +294,11 @@ export default function Dashboard() {
       setExpandedPanel(null);
     }
 
+    // Auto-minimize welcome when user sends a message or clicks suggestion
+    if (!welcomeMinimized) {
+      handleWelcomeMinimizedChange(true);
+    }
+
     setLastQuery(query);
     setIsLoadingContent(true);
 
@@ -601,7 +606,6 @@ export default function Dashboard() {
         conversationRefreshTrigger={conversationRefreshTrigger}
         welcomeMinimized={welcomeMinimized}
         onRestoreWelcome={() => handleWelcomeMinimizedChange(false)}
-        hasMessages={messages.length > 0}
       />
       <div className={styles.panelsContainer}>
       <div className={styles.gridExpanded}>
