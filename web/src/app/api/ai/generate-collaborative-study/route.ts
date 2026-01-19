@@ -263,7 +263,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-4-turbo',  // GPT-5.1 also triggers content_filter, testing GPT-4 Turbo
+        model: 'gpt-4o',  // Using with retry logic to handle intermittent content_filter
         messages: [
           {
             role: 'system',
