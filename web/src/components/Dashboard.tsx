@@ -554,6 +554,9 @@ export default function Dashboard() {
       setMessages(loadedMessages);
       setCurrentConversationId(conversationId);
 
+      // Minimize welcome screen to show the conversation
+      handleWelcomeMinimizedChange(true);
+
       // Close any expanded panel to show the chat
       setExpandedPanel(null);
     } catch (error) {

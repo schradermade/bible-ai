@@ -10,20 +10,11 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(176, 123, 76, 0.3) transparent;
   position: relative;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 20px,
-    black calc(100% - 20px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 20px,
-    black calc(100% - 20px),
-    transparent 100%
-  );
+}
+
+/* When showing welcome screen, disable scrolling */
+.chatContainer.showingWelcome {
+  overflow: hidden;
 }
 
 /* When messages exist, add padding for scrolling content */
@@ -68,14 +59,15 @@
   max-width: none;
   margin: 0;
   padding: 40px 20px;
-  overflow-y: auto;
+  overflow: hidden;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 20px;
   z-index: 10;
   background: linear-gradient(145deg, #ffffff 0%, #f9f6f0 100%);
+  border-radius: 14px;
 }
 
 .minimizeButton {
