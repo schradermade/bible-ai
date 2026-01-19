@@ -102,7 +102,9 @@ export default function CreateCircleModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={
-                  isSolo ? 'e.g., My Personal Study' : 'e.g., Sunday School Group'
+                  isSolo
+                    ? 'e.g., My Personal Study'
+                    : 'e.g., Sunday School Group'
                 }
                 maxLength={100}
                 disabled={loading}

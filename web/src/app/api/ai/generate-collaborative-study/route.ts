@@ -241,6 +241,8 @@ export async function POST(request: Request) {
 
     // Build prompt
     const prompt = buildCollaborativeStudyPrompt(intentions, duration);
+    console.log('[API] Prompt length (chars):', prompt.length);
+    console.log('[API] Prompt length (approx tokens):', Math.ceil(prompt.length / 4));
 
     // Call OpenAI
     const openai = new OpenAI({
@@ -267,6 +269,12 @@ export async function POST(request: Request) {
     const finishReason = completion.choices[0]?.finish_reason;
     let responseContent = completion.choices[0]?.message?.content?.trim();
 
+    // Log detailed response info
+    console.log('[API] Finish reason:', finishReason);
+    console.log('[API] Response length (chars):', responseContent?.length || 0);
+    console.log('[API] Usage:', JSON.stringify(completion.usage));
+    console.log('[API] Model:', completion.model);
+
     if (!responseContent) {
       throw new Error('No study generated');
     }
@@ -276,6 +284,11 @@ export async function POST(request: Request) {
       console.error('[API] Response was truncated due to token limit');
       console.error('[API] Response length:', responseContent.length);
       throw new Error('Study generation was incomplete. This is a system issue - please contact support or try a shorter duration.');
+    }
+
+    // Check for other concerning finish reasons
+    if (finishReason !== 'stop') {
+      console.warn('[API] Unexpected finish reason:', finishReason);
     }
 
     // Remove markdown code blocks if present
