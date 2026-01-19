@@ -381,7 +381,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0;
-  padding: 0;
+  padding: 0 15px 0 0;
 }
 
 /* Message Styles */
@@ -569,13 +569,13 @@
 /* Responsive */
 @media (max-width: 1760px) {
   .messagesContainer {
-    padding: 0;
+    padding: 0 15px 0 0;
   }
 }
 
 @media (max-width: 1320px) {
   .messagesContainer {
-    padding: 0;
+    padding: 0 15px 0 0;
   }
 }
 
@@ -585,7 +585,7 @@
   }
 
   .messagesContainer {
-    padding: 0;
+    padding: 0 15px 0 0;
   }
 
   .welcomeContainer {
