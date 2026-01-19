@@ -771,6 +771,10 @@ export default function ChatConversation({
           <p className={styles.promptSubtext}>
             Ask me anything about the Bible, theology, or how God's Word applies to your life.
           </p>
+          <div className={styles.promptDivider}></div>
+          <p className={styles.promptAffirmation}>
+            Berea AI affirms that the Bible is God&rsquo;s inspired Word, God exists as Trinity, and Jesus is fully divine—who lived, died, and rose again to save humanity—offering salvation by grace through Him alone.
+          </p>
         </div>
       )}
 

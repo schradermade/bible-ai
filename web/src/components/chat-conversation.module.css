@@ -328,8 +328,8 @@
   width: 48px;
   height: 48px;
   margin-bottom: 20px;
-  color: #b07b4c;
-  opacity: 0.5;
+  color: #8b6239;
+  opacity: 0.7;
 }
 
 .promptIcon svg {
@@ -340,19 +340,41 @@
 .promptText {
   font-size: 18px;
   font-weight: 600;
-  color: #5d4e37;
+  color: #3a2f26;
   margin: 0 0 12px 0;
   max-width: 500px;
-  opacity: 0.8;
 }
 
 .promptSubtext {
   font-size: 14px;
-  color: #8b6239;
+  color: #5d4e37;
   margin: 0;
   max-width: 450px;
   line-height: 1.5;
-  opacity: 0.6;
+}
+
+.promptDivider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(176, 123, 76, 0.3) 50%,
+    transparent 100%
+  );
+  margin: 28px 0 20px 0;
+}
+
+.promptAffirmation {
+  font-size: 12px;
+  color: #5d4e37;
+  margin: 0;
+  max-width: 550px;
+  line-height: 1.6;
+  opacity: 0.7;
+  font-style: italic;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
 
 /* Messages Container */
