@@ -263,7 +263,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-4o-2024-11-20',  // Using newer snapshot to avoid content_filter issues on Bible verses
+        model: 'gpt-4-turbo',  // Testing alternative model to avoid content_filter
         messages: [
           {
             role: 'system',
