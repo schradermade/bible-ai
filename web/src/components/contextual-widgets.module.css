@@ -465,7 +465,7 @@
   color: #8b6239;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 100%;
+  flex: 1;
   justify-content: center;
 }
 

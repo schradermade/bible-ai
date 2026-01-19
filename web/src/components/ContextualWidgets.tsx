@@ -1182,7 +1182,7 @@ export default function ContextualWidgets({
                                       />
                                     )}
                                   </svg>
-                                  Memorize
+                                  {memVerse.memorized ? 'Memorized' : 'Memorize'}
                                 </button>
                                 <button
                                   className={styles.createPrayerButton}
