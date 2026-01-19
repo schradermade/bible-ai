@@ -263,7 +263,7 @@ export async function POST(request: Request) {
       }
 
       completion = await openai.chat.completions.create({
-        model: 'gpt-4-turbo',  // Testing alternative model to avoid content_filter
+        model: 'gpt-5.1',  // Testing GPT-5 model to avoid content_filter
         messages: [
           {
             role: 'system',
