@@ -176,84 +176,49 @@ function PrayerMarker({
     }
   };
 
+  if (onCreatePrayer) {
+    return (
+      <button
+        type="button"
+        onClick={handleCreatePrayer}
+        className={styles.prayerMarker}
+        disabled={isGenerating}
+        aria-label="Create prayer for this"
+        title="Create a prayer for this moment"
+      >
+        <span className={styles.prayerText}>{prayerText}</span>
+        {isGenerating ? (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={styles.spinner}
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray="60"
+              strokeDashoffset="20"
+            />
+          </svg>
+        ) : (
+          <span className={styles.prayerIcon} role="img" aria-label="Save prayer">
+            🙏
+          </span>
+        )}
+      </button>
+    );
+  }
+
   return (
     <span className={styles.prayerMarker}>
       <span className={styles.prayerText}>{prayerText}</span>
-      {onCreatePrayer && (
-        <button
-          onClick={handleCreatePrayer}
-          className={styles.prayerCreateButton}
-          disabled={isGenerating}
-          aria-label="Create prayer for this"
-          title="Create a prayer for this moment"
-        >
-          {isGenerating ? (
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className={styles.spinner}
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeDasharray="60"
-                strokeDashoffset="20"
-              />
-            </svg>
-          ) : (
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Left hand outline with fill */}
-              <path
-                d="M17 8C17 6 16 4 14 4C12 4 10 5 9 7C8 9 7 12 7 15C7 18 7 22 9 25C10 27 12 28 14 28C15 28 16 27 17 26V8Z"
-                fill="currentColor"
-                opacity="0.25"
-              />
-              {/* Right hand outline with fill */}
-              <path
-                d="M19 8C19 6 20 4 22 4C24 4 26 5 27 7C28 9 29 12 29 15C29 18 29 22 27 25C26 27 24 28 22 28C21 28 20 27 19 26V8Z"
-                fill="currentColor"
-                opacity="0.25"
-              />
-              {/* Left hand stroke */}
-              <path
-                d="M17 8C17 6 16 4 14 4C12 4 10 5 9 7C8 9 7 12 7 15C7 18 7 22 9 25C10 27 12 28 14 28C15 28 16 27 17 26V8Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Right hand stroke */}
-              <path
-                d="M19 8C19 6 20 4 22 4C24 4 26 5 27 7C28 9 29 12 29 15C29 18 29 22 27 25C26 27 24 28 22 28C21 28 20 27 19 26V8Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Center dividing line */}
-              <path
-                d="M18 4L18 28"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
-        </button>
-      )}
     </span>
   );
 }
