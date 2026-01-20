@@ -184,9 +184,11 @@ function PrayerMarker({
         className={styles.prayerMarker}
         disabled={isGenerating}
         aria-label="Create prayer for this"
-        title="Create a prayer for this moment"
       >
         <span className={styles.prayerText}>{prayerText}</span>
+        <div className={styles.prayerTooltip}>
+          <div>Save to Prayer</div>
+        </div>
         {isGenerating ? (
           <svg
             width="16"
