@@ -95,6 +95,27 @@ const navItems: NavItem[] = [
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const handleAvatarWrapperClick = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    const wrapper = event.currentTarget;
+    const button = wrapper.querySelector('button');
+    if (!button) return;
+    if (button.contains(event.target as Node)) return;
+    button.click();
+  };
+
+  const handleAvatarWrapperKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>
+  ) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    const wrapper = event.currentTarget;
+    const button = wrapper.querySelector('button');
+    if (button) {
+      button.click();
+    }
+  };
 
   return (
     <div className={styles.shell}>
@@ -178,7 +199,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <div className={styles.avatarWrapper}>
+            <div
+              className={styles.avatarWrapper}
+              role="button"
+              tabIndex={0}
+              onClick={handleAvatarWrapperClick}
+              onKeyDown={handleAvatarWrapperKeyDown}
+              aria-label="Open account menu"
+            >
               <UserButton>
                 <UserButton.UserProfilePage
                   label="Subscription"
