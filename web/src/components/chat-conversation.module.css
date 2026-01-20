@@ -192,43 +192,59 @@
   align-items: center;
   gap: 6px;
   position: relative;
-}
-
-.verseSaveButton {
-  background: linear-gradient(145deg, rgba(176, 123, 76, 0.1), rgba(176, 123, 76, 0.05));
-  border: 1px solid rgba(176, 123, 76, 0.3);
-  border-radius: 6px;
-  padding: 4px;
-  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgba(176, 123, 76, 0.25);
+  border-radius: 8px;
+  padding: 4px 8px;
   transition: all 0.2s ease;
+  cursor: pointer;
   color: #8b6239;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
 }
 
-.verseSaveButton:hover {
-  background: linear-gradient(145deg, rgba(176, 123, 76, 0.2), rgba(176, 123, 76, 0.1));
-  border-color: rgba(176, 123, 76, 0.5);
-  color: #6b4e2e;
-  transform: scale(1.05);
+.verseReference:hover {
+  border-color: rgba(176, 123, 76, 0.45);
+  box-shadow: 0 4px 10px rgba(176, 123, 76, 0.12), 0 0 0 1px rgba(176, 123, 76, 0.08);
+  transform: translateY(-1px);
 }
 
-.verseSaveButton:active {
-  transform: scale(0.95);
+.verseReference:hover span[aria-label="Save verse"] {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
 }
 
-.verseSaveButton svg {
-  width: 16px;
-  height: 16px;
-}
-
-.verseSaveButton:disabled {
+.verseReference:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.verseReference:focus-visible {
+  outline: 2px solid rgba(176, 123, 76, 0.5);
+  outline-offset: 2px;
+}
+
+.verseTooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(42, 33, 24, 0.95);
+  color: #fef3c7;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.verseReference:hover .verseTooltip {
+  opacity: 1;
 }
 
 /* Prayer Marker Styles */
@@ -253,6 +269,11 @@
   border-color: rgba(42, 90, 77, 0.35);
   box-shadow: 0 4px 10px rgba(42, 90, 77, 0.12), 0 0 0 1px rgba(42, 90, 77, 0.08);
   transform: translateY(-1px);
+}
+
+.prayerMarker:hover .prayerIcon {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
 }
 
 .prayerMarker:hover .prayerTooltip {
